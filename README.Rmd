@@ -113,5 +113,49 @@ dplyr::glimpse(oco2_br)
 ```
 
 
+```{r}
+# Mapas no R
+library(geobr)
+library(tidyverse)
+library(ggspatial)
 
+estados <- read_state(code_state = "all")
 
+muni <- read_municipality()
+ms <- muni %>% 
+  filter(abbrev_state == "MS")
+sp <- muni %>% 
+  filter(abbrev_state == "SP")
+
+fsp<-if_else(sp$name_muni == "Jaboticabal" | 
+             sp$name_muni == "Guariba" |
+             sp$name_muni == "Padrópolis" |
+             sp$name_muni == "Rincão"|
+             sp$name_muni == "Mococa"|
+             sp$name_muni == "Ilha Solteira"
+             ,"red","lightyellow")
+
+fms<-if_else(ms$name_muni == "Aparecida Do Taboado" | 
+             ms$name_muni == "Selvíria"|
+             ms$name_muni == "Dourados"   
+             ,"red","lightyellow")
+
+sp_ <- read_state() %>% 
+      filter(abbrev_state == "SP")
+
+ms_ <- read_state() %>% 
+      filter(abbrev_state == "MS")
+
+ggplot(estados) + 
+  geom_sf(fill="lightyellow")+
+  theme_minimal() + 
+  annotation_scale(location="bl")+
+  annotation_north_arrow(location="tr",
+                         style = north_arrow_nautical(),
+                         width = unit(2,"cm"),
+                         height = unit(2,"cm"))+
+  geom_sf(data= sp, fill=fsp,col=fsp) +
+  geom_sf(data=sp_,fill="transparent") +
+  geom_sf(data= ms, fill=fms,col=fms) +
+  geom_sf(data=ms_,fill="transparent")
+```
