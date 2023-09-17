@@ -23,5 +23,5 @@ Contribuições são bem-vindas! Se você deseja colaborar com melhorias nos có
 
 ## Licença
 
-Este projeto é licenciado sob `MIT License`. Consulte o arquivo [LICENSE](/LICENSE) para obter mais detalhes.
+Este projeto é licenciado sob `MIT License`. Consulte o arquivo [LICENSE]("https://github.com/arpanosso/tese-fco2-ml-2023/blob/master/LICENSE.md") para obter mais detalhes.
 

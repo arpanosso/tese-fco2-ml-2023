@@ -21,4 +21,5 @@ vontade para abrir uma solicitação de `pull request`.
 ## Licença
 
 Este projeto é licenciado sob `MIT License`. Consulte o arquivo
-[LICENSE](/LICENSE) para obter mais detalhes.
+[LICENSE](%22https://github.com/arpanosso/tese-fco2-ml-2023/blob/master/LICENSE.md%22)
+para obter mais detalhes.
