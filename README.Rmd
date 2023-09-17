@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 
 # EMISSÃO DE CO~2~ DO SOLO EM ÁREAS AGRÍCOLAS: ABORDAGEM EM APRENDIZADO DE MÁQUINA ESTATÍSTICO
 
-## Auto: [Alan Rodrigo Panosso](www.fcav.unesp.br/alan)
+## Auto: [Alan Rodrigo Panosso]("www.fcav.unesp.br/alan")
 
 ## Objetivo
 

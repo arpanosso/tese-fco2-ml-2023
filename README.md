@@ -3,7 +3,7 @@
 
 # EMISSÃO DE CO<sub>2</sub> DO SOLO EM ÁREAS AGRÍCOLAS: ABORDAGEM EM APRENDIZADO DE MÁQUINA ESTATÍSTICO
 
-## Auto: [Alan Rodrigo Panosso](www.fcav.unesp.br/alan)
+## Auto: [Alan Rodrigo Panosso](%22www.fcav.unesp.br/alan%22)
 
 ## Objetivo
 
