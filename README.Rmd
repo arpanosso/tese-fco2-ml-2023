@@ -6,14 +6,17 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
+  collapse = TRUE, warning = FALSE, error = FALSE, message = FALSE,
   comment = "#>"
 )
 ```
 
 # EMISSÃO DE CO~2~ DO SOLO EM ÁREAS AGRÍCOLAS: ABORDAGEM EM APRENDIZADO DE MÁQUINA ESTATÍSTICO
 
-## Auto: [Alan Rodrigo Panosso]("www.fcav.unesp.br/alan")
+## Autor: Prof. Dr. [Alan Rodrigo Panosso](https://www.fcav.unesp.br/#!/alan)
+##### E-mail: alan.panosso@unesp.br 
+##### Departamento de Engenharia e Ciências Exatas
+##### UNESP - Câmpus de Jaboticabal
 
 ## Objetivo
 
@@ -26,4 +29,89 @@ Contribuições são bem-vindas! Se você deseja colaborar com melhorias nos có
 ## Licença
 
 Este projeto é licenciado sob `MIT License`. Consulte o arquivo [LICENSE](https://github.com/arpanosso/tese-fco2-ml-2023/blob/master/LICENSE.md) para obter mais detalhes.
+
+## Base de dados
+
+Apresentação do pacote `fco2r` construído para  facilitar a divulgação e análise dos resultados obtidos ao longo de mais de 20 anos de ensaios em campo. Este pacote, permite a visualização dos dados, a execução de análises estatísticas avançadas e a geração de gráficos interativos para tornar os resultados mais acessíveis e compreensíveis para a comunidade científica.
+
+### Intalação
+
+Você pode instalar uma versão de desenvolvimento do pacote `fco2r` a partir do [GitHub](https://github.com/) com os seguintes comandos:
+
+```{r,eval=FALSE}
+# install.packages("devtools")
+# devtools::install_github("arpanosso/fco2r")
+```
+
+### Problemas na instalação:
+
+Possíveis problemas na instalação do pacote podem ser sanados com os seguintes comandos:
+
+```{r}
+# Sys.getenv("GITHUB_PAT")
+# Sys.unsetenv("GITHUB_PAT")
+# Sys.getenv("GITHUB_PAT")
+```
+
+### Carregando o pacote
+
+```{r}
+library(fco2r)
+```
+
+
+### Conhecendo a base de dados de emissão de CO~2~ do solo
+
+Base proveniente de ensaios de campo.
+
+```{r}
+help(data_fco2)
+dplyr::glimpse(data_fco2)
+```
+
+
+Vamos conhecer, um pouco mais a nossa base de dados.
+
+```{r}
+skimr::skim(data_fco2)
+```
+
+### Alguns gráficos a respeito de nossa variável alvo, emissão de CO~2~ do solo (FCO~2~).
+
+```{r,fig.width=15, fig.height=10}
+library(magrittr)
+library(patchwork)
+ggplot2::theme_set(ggplot2::theme_bw())
+fco2_histograma <- data_fco2 %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(x=FCO2, y=..density..)) +
+  ggplot2::geom_histogram(col="black",fill="gray") +
+  ggplot2::geom_density(fill="blue",alpha=.08)
+
+fco2_boxplot <- data_fco2 %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(x=FCO2)) +
+  ggplot2::geom_boxplot(fill="lightgray") + 
+  ggplot2::coord_cartesian(ylim=c(-.9,.9))
+
+fco2_qqplot <- data_fco2 %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(sample=FCO2)) +
+  ggplot2::stat_qq(shape=1,size=1,color="black")+
+  ggplot2::stat_qq_line(col="red")
+
+fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
+```
+
+
+
+
+### Conhecendo a base de dados de concentração de CO~2~ atmosférico, oriundo do sensor NASA-OCO2.
+```{r}
+help(oco2_br)
+dplyr::glimpse(oco2_br)
+```
+
+
+
 
