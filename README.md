@@ -3,6 +3,8 @@
 
 # EMISSÃO DE CO<sub>2</sub> DO SOLO EM ÁREAS AGRÍCOLAS: ABORDAGEM EM APRENDIZADO DE MÁQUINA ESTATÍSTICO
 
+## Auto: [Alan Rodrigo Panosso](www.fcav.unesp.br/alan)
+
 ## Objetivo
 
 O objetivo do repositório `tese-fco2-ml-2023` é promover a
@@ -21,5 +23,5 @@ vontade para abrir uma solicitação de `pull request`.
 ## Licença
 
 Este projeto é licenciado sob `MIT License`. Consulte o arquivo
-[LICENSE](%22https://github.com/arpanosso/tese-fco2-ml-2023/blob/master/LICENSE.md%22)
+[LICENSE](https://github.com/arpanosso/tese-fco2-ml-2023/blob/master/LICENSE.md)
 para obter mais detalhes.
