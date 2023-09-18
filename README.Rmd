@@ -103,6 +103,31 @@ fco2_qqplot <- data_fco2 %>%
 fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 ```
 
+### Aplicando a transformação logarítmica nos dados de FCO~2~
+
+```{r,fig.width=15, fig.height=10}
+ggplot2::theme_set(ggplot2::theme_bw())
+
+fco2_histograma <- data_fco2 %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(x=log(FCO2), y=..density..)) +
+  ggplot2::geom_histogram(col="black",fill="gray") +
+  ggplot2::geom_density(fill="red",alpha=.08)
+
+fco2_boxplot <- data_fco2 %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(x=log(FCO2))) +
+  ggplot2::geom_boxplot(fill="orange") + 
+  ggplot2::coord_cartesian(ylim=c(-.9,.9))
+
+fco2_qqplot <- data_fco2 %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(sample=log(FCO2))) +
+  ggplot2::stat_qq(shape=1,size=1,color="black")+
+  ggplot2::stat_qq_line(col="blue")
+
+fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
+```
 
 
 
@@ -114,7 +139,7 @@ dplyr::glimpse(oco2_br)
 
 
 ```{r}
-library(geobr)
+# library(geobr)
 library(tidyverse)
 library(ggspatial)
 ```
