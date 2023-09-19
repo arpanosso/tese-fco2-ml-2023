@@ -256,33 +256,6 @@ fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-### Conhecendo a base de dados de concentração de CO<sub>2</sub> atmosférico, oriundo do sensor NASA-OCO2.
-
-``` r
-help(oco2_br)
-dplyr::glimpse(oco2_br)
-#> Rows: 37,387
-#> Columns: 18
-#> $ longitude                                                     <dbl> -70.5, -…
-#> $ longitude_bnds                                                <chr> "-71.0:-…
-#> $ latitude                                                      <dbl> -5.5, -4…
-#> $ latitude_bnds                                                 <chr> "-6.0:-5…
-#> $ time_yyyymmddhhmmss                                           <dbl> 2.014091…
-#> $ time_bnds_yyyymmddhhmmss                                      <chr> "2014090…
-#> $ altitude_km                                                   <dbl> 3307.8, …
-#> $ alt_bnds_km                                                   <chr> "0.0:661…
-#> $ fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 7.272876…
-#> $ fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 2.537127…
-#> $ xco2_moles_mole_1                                             <dbl> 0.000394…
-#> $ aerosol_total_aod                                             <dbl> 0.148579…
-#> $ fluorescence_offset_relative_771nm_idp                        <dbl> 0.016753…
-#> $ fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              <dbl> 2.615319…
-#> $ fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 3.088582…
-#> $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969…
-#> $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878…
-#> $ XCO2                                                          <dbl> 387.2781…
-```
-
 ``` r
 # library(geobr)
 library(tidyverse)
@@ -290,8 +263,10 @@ library(ggspatial)
 ```
 
 ``` r
+# brasil_geobr <- geobr::read_country()
 # estados <- read_state(code_state = "all")
 # write_rds(estados,"data/estados.rds")
+# write_rds(brasil_geobr,"data/brasil_geobr.rds")
 estados <- read_rds("data/estados.rds")
 ```
 
@@ -341,4 +316,140 @@ ggplot(sp_ms) +
   geom_sf(data=ms_,fill="transparent")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+### Conhecendo a base de dados de concentração de CO<sub>2</sub> atmosférico, oriundo do sensor NASA-OCO2.
+
+``` r
+help(oco2_br)
+dplyr::glimpse(oco2_br)
+#> Rows: 37,387
+#> Columns: 18
+#> $ longitude                                                     <dbl> -70.5, -…
+#> $ longitude_bnds                                                <chr> "-71.0:-…
+#> $ latitude                                                      <dbl> -5.5, -4…
+#> $ latitude_bnds                                                 <chr> "-6.0:-5…
+#> $ time_yyyymmddhhmmss                                           <dbl> 2.014091…
+#> $ time_bnds_yyyymmddhhmmss                                      <chr> "2014090…
+#> $ altitude_km                                                   <dbl> 3307.8, …
+#> $ alt_bnds_km                                                   <chr> "0.0:661…
+#> $ fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 7.272876…
+#> $ fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 2.537127…
+#> $ xco2_moles_mole_1                                             <dbl> 0.000394…
+#> $ aerosol_total_aod                                             <dbl> 0.148579…
+#> $ fluorescence_offset_relative_771nm_idp                        <dbl> 0.016753…
+#> $ fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              <dbl> 2.615319…
+#> $ fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 3.088582…
+#> $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969…
+#> $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878…
+#> $ XCO2                                                          <dbl> 387.2781…
+```
+
+### Breve resumo do banco de dados de X<sub>CO2</sub>
+
+``` r
+skimr::skim(oco2_br)
+```
+
+|                                                  |         |
+|:-------------------------------------------------|:--------|
+| Name                                             | oco2_br |
+| Number of rows                                   | 37387   |
+| Number of columns                                | 18      |
+| \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_   |         |
+| Column type frequency:                           |         |
+| character                                        | 4       |
+| numeric                                          | 14      |
+| \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ |         |
+| Group variables                                  | None    |
+
+Data summary
+
+**Variable type: character**
+
+| skim_variable            | n_missing | complete_rate | min | max | empty | n_unique | whitespace |
+|:-------------------------|----------:|--------------:|----:|----:|------:|---------:|-----------:|
+| longitude_bnds           |         0 |             1 |  11 |  11 |     0 |       39 |          0 |
+| latitude_bnds            |         0 |             1 |   7 |  11 |     0 |       38 |          0 |
+| time_bnds_yyyymmddhhmmss |         0 |             1 |  29 |  29 |     0 |     1765 |          0 |
+| alt_bnds_km              |         0 |             1 |  11 |  20 |     0 |       64 |          0 |
+
+**Variable type: numeric**
+
+| skim_variable                                                 | n_missing | complete_rate |          mean |           sd |            p0 |           p25 |           p50 |           p75 |          p100 | hist  |
+|:--------------------------------------------------------------|----------:|--------------:|--------------:|-------------:|--------------:|--------------:|--------------:|--------------:|--------------:|:------|
+| longitude                                                     |         0 |             1 | -5.120000e+01 | 8.280000e+00 | -7.350000e+01 | -5.650000e+01 | -5.050000e+01 | -4.450000e+01 | -3.550000e+01 | ▂▃▇▇▅ |
+| latitude                                                      |         0 |             1 | -1.179000e+01 | 7.850000e+00 | -3.250000e+01 | -1.750000e+01 | -1.050000e+01 | -5.500000e+00 |  4.500000e+00 | ▂▃▇▇▃ |
+| time_yyyymmddhhmmss                                           |         0 |             1 |  2.016952e+13 | 1.564571e+10 |  2.014091e+13 |  2.016020e+13 |  2.017052e+13 |  2.018092e+13 |  2.020012e+13 | ▇▇▅▆▇ |
+| altitude_km                                                   |         0 |             1 |  3.123200e+03 | 1.108800e+02 |  2.555700e+03 |  3.056350e+03 |  3.126310e+03 |  3.196250e+03 |  3.307800e+03 | ▁▁▂▇▇ |
+| fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 |         0 |             1 |  8.520719e+17 | 5.599367e+18 | -9.999990e+05 |  6.323256e+17 |  6.951592e+17 |  7.671609e+17 |  9.365539e+20 | ▇▁▁▁▁ |
+| fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        |         0 |             1 | -1.358150e+18 | 1.946775e+20 | -3.400736e+22 |  7.735159e+17 |  1.676353e+18 |  2.566089e+18 |  2.316112e+20 | ▁▁▁▁▇ |
+| xco2_moles_mole_1                                             |         0 |             1 |  0.000000e+00 | 0.000000e+00 |  0.000000e+00 |  0.000000e+00 |  0.000000e+00 |  0.000000e+00 |  0.000000e+00 | ▁▁▇▁▁ |
+| aerosol_total_aod                                             |         0 |             1 |  4.828100e+02 | 7.848572e+04 |  2.000000e-02 |  1.100000e-01 |  1.700000e-01 |  2.600000e-01 |  1.487623e+07 | ▇▁▁▁▁ |
+| fluorescence_offset_relative_771nm_idp                        |         0 |             1 | -4.814400e+02 | 2.193698e+04 | -9.999990e+05 |  1.000000e-02 |  1.000000e-02 |  2.000000e-02 |  1.230000e+00 | ▁▁▁▁▇ |
+| fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              |         0 |             1 |  1.296932e+18 | 2.245185e+18 | -8.394901e+19 |  2.014560e+17 |  1.268715e+18 |  2.395217e+18 |  8.610756e+19 | ▁▁▇▁▁ |
+| fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        |         0 |             1 |  1.904438e+18 | 2.236381e+18 | -8.453983e+19 |  9.694709e+17 |  1.987682e+18 |  2.918792e+18 |  4.338306e+19 | ▁▁▁▇▁ |
+| fluorescence_offset_relative_757nm_idp                        |         0 |             1 | -3.744400e+02 | 1.934763e+04 | -9.999990e+05 |  1.000000e-02 |  1.000000e-02 |  2.000000e-02 |  2.086000e+01 | ▁▁▁▁▇ |
+| fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 |         0 |             1 |  5.235574e+17 | 7.580471e+16 | -9.999990e+05 |  4.695467e+17 |  5.216793e+17 |  5.736367e+17 |  1.143215e+18 | ▁▂▇▁▁ |
+| XCO2                                                          |         0 |             1 |  3.858900e+02 | 3.120000e+00 |  3.383400e+02 |  3.844100e+02 |  3.862900e+02 |  3.878000e+02 |  4.301400e+02 | ▁▁▇▁▁ |
+
+### Manipulando a base `oco2_br` para criação das variáveis temporais e ajuste de unidade de xco2.
+
+``` r
+oco2_br <- oco2_br  %>% 
+         dplyr::mutate(
+           xco2 = xco2_moles_mole_1*1e06,
+           data = lubridate::ymd_hms(time_yyyymmddhhmmss),
+           ano = lubridate::year(data),
+           mes = lubridate::month(data),
+           dia = lubridate::day(data),
+           dia_semana = lubridate::wday(data))
+oco2_br$ano %>% unique()
+#> [1] 2014 2015 2016 2017 2018 2019 2020
+```
+
+Mapa das leituras do satélite OCO2-NASA
+
+``` r
+source("R/graficos.R")
+brasil_geobr <- readr::read_rds("data/brasil_geobr.rds")
+brasil_geobr %>% 
+  ggplot2::ggplot() +
+  ggplot2::geom_sf(fill="white", color="black",
+          size=.15, show.legend = FALSE) +
+  tema_mapa() +
+  ggplot2::geom_point(data=oco2_br %>%  
+                        dplyr::sample_n(20000) ,
+             ggplot2::aes(x=longitude,y=latitude),
+             shape=1,
+             col="red",
+             alpha=01)+
+  ggplot2::labs(x="Longitude",y="Latitude")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+ggplot2::theme_set(ggplot2::theme_bw())
+xco2_histograma <- oco2_br %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(x=xco2, y=..density..)) +
+  ggplot2::geom_histogram(col="black",fill="gray") +
+  ggplot2::geom_density(fill="green",alpha=.08)
+
+xco2_boxplot <- oco2_br %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(x=xco2)) +
+  ggplot2::geom_boxplot(fill="aquamarine4") + 
+  ggplot2::coord_cartesian(ylim=c(-.9,.9))
+
+xco2_qqplot <- oco2_br %>% 
+  tidyr::drop_na() %>% 
+  ggplot2::ggplot(ggplot2::aes(sample=xco2)) +
+  ggplot2::stat_qq(shape=1,size=1,color="black")+
+  ggplot2::stat_qq_line(col="purple",lwd=2)
+
+xco2_qqplot | (xco2_histograma)/(xco2_boxplot)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
