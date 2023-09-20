@@ -62,10 +62,13 @@ seguintes comandos:
 # Sys.getenv("GITHUB_PAT")
 ```
 
-### Carregando o pacote
+### Carregando os pacotes
 
 ``` r
 library(fco2r)
+library(tidyverse)
+library(patchwork)
+library(ggspatial)
 ```
 
 ### Conhecendo a base de dados de emissão de CO<sub>2</sub> do solo
@@ -74,7 +77,7 @@ Base proveniente de ensaios de campo.
 
 ``` r
 help(data_fco2)
-dplyr::glimpse(data_fco2)
+glimpse(data_fco2)
 #> Rows: 15,397
 #> Columns: 39
 #> $ experimento       <chr> "Espacial", "Espacial", "Espacial", "Espacial", "Esp…
@@ -202,26 +205,24 @@ Data summary
 ### Alguns gráficos a respeito de nossa variável alvo, emissão de CO<sub>2</sub> do solo (FCO<sub>2</sub>).
 
 ``` r
-library(magrittr)
-library(patchwork)
-ggplot2::theme_set(ggplot2::theme_bw())
+theme_set(theme_bw())
 fco2_histograma <- data_fco2 %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(x=FCO2, y=..density..)) +
-  ggplot2::geom_histogram(col="black",fill="gray") +
-  ggplot2::geom_density(fill="blue",alpha=.08)
+  drop_na() %>% 
+  ggplot(aes(x=FCO2, y=..density..)) +
+  geom_histogram(col="black",fill="gray") +
+  geom_density(fill="blue",alpha=.08)
 
 fco2_boxplot <- data_fco2 %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(x=FCO2)) +
-  ggplot2::geom_boxplot(fill="lightgray") + 
-  ggplot2::coord_cartesian(ylim=c(-.9,.9))
+  drop_na() %>% 
+  ggplot(aes(x=FCO2)) +
+  geom_boxplot(fill="lightgray") + 
+  coord_cartesian(ylim=c(-.9,.9))
 
 fco2_qqplot <- data_fco2 %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(sample=FCO2)) +
-  ggplot2::stat_qq(shape=1,size=1,color="black")+
-  ggplot2::stat_qq_line(col="red")
+  drop_na() %>% 
+  ggplot(aes(sample=FCO2)) +
+  stat_qq(shape=1,size=1,color="black")+
+  stat_qq_line(col="red")
 
 fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 ```
@@ -231,36 +232,30 @@ fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 ### Aplicando a transformação logarítmica nos dados de FCO<sub>2</sub>
 
 ``` r
-ggplot2::theme_set(ggplot2::theme_bw())
+ggplot2::theme_set(theme_bw())
 
 fco2_histograma <- data_fco2 %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(x=log(FCO2), y=..density..)) +
-  ggplot2::geom_histogram(col="black",fill="gray") +
-  ggplot2::geom_density(fill="red",alpha=.08)
+  drop_na() %>% 
+  ggplot(aes(x=log(FCO2), y=..density..)) +
+  geom_histogram(col="black",fill="gray") +
+  geom_density(fill="red",alpha=.08)
 
 fco2_boxplot <- data_fco2 %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(x=log(FCO2))) +
-  ggplot2::geom_boxplot(fill="orange") + 
-  ggplot2::coord_cartesian(ylim=c(-.9,.9))
+  drop_na() %>% 
+  ggplot(aes(x=log(FCO2))) +
+  geom_boxplot(fill="orange") + 
+  coord_cartesian(ylim=c(-.9,.9))
 
 fco2_qqplot <- data_fco2 %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(sample=log(FCO2))) +
-  ggplot2::stat_qq(shape=1,size=1,color="black")+
-  ggplot2::stat_qq_line(col="blue")
+  drop_na() %>% 
+  ggplot(aes(sample=log(FCO2))) +
+  stat_qq(shape=1,size=1,color="black")+
+  stat_qq_line(col="blue")
 
 fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
-
-``` r
-# library(geobr)
-library(tidyverse)
-library(ggspatial)
-```
 
 ``` r
 # brasil_geobr <- geobr::read_country()
@@ -274,14 +269,15 @@ estados <- read_rds("data/estados.rds")
 # muni <- read_municipality()
 # write_rds(muni,"data/municipios.rds")
 muni <- read_rds("data/municipios.rds")
-ms <- muni %>% 
-  filter(abbrev_state == "MS")
+
 sp <- muni %>% 
   filter(abbrev_state == "SP")
 
+ms <- muni %>% 
+  filter(abbrev_state == "MS")
+
 sp_ms <- muni %>% 
   filter(abbrev_state == "SP" | abbrev_state == "MS")
-
 
 fsp<-if_else(sp$name_muni == "Jaboticabal" | 
              sp$name_muni == "Guariba" |
@@ -316,13 +312,13 @@ ggplot(sp_ms) +
   geom_sf(data=ms_,fill="transparent")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### Conhecendo a base de dados de concentração de CO<sub>2</sub> atmosférico, oriundo do sensor NASA-OCO2.
 
 ``` r
 help(oco2_br)
-dplyr::glimpse(oco2_br)
+glimpse(oco2_br)
 #> Rows: 37,387
 #> Columns: 18
 #> $ longitude                                                     <dbl> -70.5, -…
@@ -397,59 +393,56 @@ Data summary
 
 ``` r
 oco2_br <- oco2_br  %>% 
-         dplyr::mutate(
+        mutate(
            xco2 = xco2_moles_mole_1*1e06,
-           data = lubridate::ymd_hms(time_yyyymmddhhmmss),
-           ano = lubridate::year(data),
-           mes = lubridate::month(data),
-           dia = lubridate::day(data),
-           dia_semana = lubridate::wday(data))
-oco2_br$ano %>% unique()
-#> [1] 2014 2015 2016 2017 2018 2019 2020
+           data = ymd_hms(time_yyyymmddhhmmss),
+           ano = year(data),
+           mes = month(data),
+           dia = day(data),
+           dia_semana = wday(data))
 ```
 
 Mapa das leituras do satélite OCO2-NASA
 
 ``` r
 source("R/graficos.R")
-brasil_geobr <- readr::read_rds("data/brasil_geobr.rds")
+brasil_geobr <- read_rds("data/brasil_geobr.rds")
 brasil_geobr %>% 
-  ggplot2::ggplot() +
-  ggplot2::geom_sf(fill="white", color="black",
+  ggplot() +
+  geom_sf(fill="white", color="black",
           size=.15, show.legend = FALSE) +
   tema_mapa() +
-  ggplot2::geom_point(data=oco2_br %>%  
-                        dplyr::sample_n(20000) ,
-             ggplot2::aes(x=longitude,y=latitude),
+  geom_point(data=oco2_br %>%  
+                        sample_n(20000) ,
+             aes(x=longitude,y=latitude),
              shape=1,
              col="red",
              alpha=01)+
-  ggplot2::labs(x="Longitude",y="Latitude")
+  labs(x="Longitude",y="Latitude")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
-ggplot2::theme_set(ggplot2::theme_bw())
 xco2_histograma <- oco2_br %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(x=xco2, y=..density..)) +
-  ggplot2::geom_histogram(col="black",fill="gray") +
-  ggplot2::geom_density(fill="green",alpha=.08)
+  drop_na() %>% 
+  ggplot(aes(x=xco2, y=..density..)) +
+  geom_histogram(col="black",fill="gray") +
+  geom_density(fill="aquamarine2",alpha=.08)
 
 xco2_boxplot <- oco2_br %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(x=xco2)) +
-  ggplot2::geom_boxplot(fill="aquamarine4") + 
-  ggplot2::coord_cartesian(ylim=c(-.9,.9))
+  drop_na() %>% 
+  ggplot(aes(x=xco2)) +
+  geom_boxplot(fill="aquamarine4") + 
+  coord_cartesian(ylim=c(-.9,.9))
 
 xco2_qqplot <- oco2_br %>% 
-  tidyr::drop_na() %>% 
-  ggplot2::ggplot(ggplot2::aes(sample=xco2)) +
-  ggplot2::stat_qq(shape=1,size=1,color="black")+
-  ggplot2::stat_qq_line(col="purple",lwd=2)
+  drop_na() %>% 
+  ggplot(aes(sample=xco2)) +
+  stat_qq(shape=1,size=1,color="black")+
+  stat_qq_line(col="purple",lwd=2)
 
 xco2_qqplot | (xco2_histograma)/(xco2_boxplot)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
