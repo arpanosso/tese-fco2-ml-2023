@@ -251,4 +251,3 @@ xco2_qqplot <- oco2_br %>%
 
 xco2_qqplot | (xco2_histograma)/(xco2_boxplot)
 ```
-
