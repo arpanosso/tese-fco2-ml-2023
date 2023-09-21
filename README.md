@@ -41,7 +41,7 @@ análises estatísticas avançadas e a geração de gráficos interativos para
 tornar os resultados mais acessíveis e compreensíveis para a comunidade
 científica.
 
-### Intalação
+### Instalação
 
 Você pode instalar uma versão de desenvolvimento do pacote `fco2r` a
 partir do [GitHub](https://github.com/) com os seguintes comandos:
@@ -69,6 +69,13 @@ library(fco2r)
 library(tidyverse)
 library(patchwork)
 library(ggspatial)
+library(readxl)
+library(skimr)
+library(tidymodels)
+library(ISLR)
+library(modeldata)
+library(vip)
+library(ggpubr)
 ```
 
 ### Conhecendo a base de dados de emissão de CO<sub>2</sub> do solo
@@ -446,3 +453,124 @@ xco2_qqplot | (xco2_histograma)/(xco2_boxplot)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+# Definindo o plano de multisession
+future::plan("multisession")
+```
+
+``` r
+oco2_br  %>%  
+  ggplot(aes(x=data,y=XCO2)) +
+  geom_point(shape=21,color="black",fill="gray") +
+  geom_smooth(method = "lm") +
+  stat_regline_equation(ggplot2::aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+visdat::vis_miss(data_fco2)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+## Listando as datas dos arquivos
+
+``` r
+lista_data_fco2 <- unique(data_fco2$data)
+lista_data_oco2 <- unique(oco2_br$data)
+datas_fco2 <- paste0(lubridate::year(lista_data_fco2),"-",lubridate::month(lista_data_fco2)) %>% unique()
+
+datas_oco2 <- paste0(lubridate::year(lista_data_oco2),"-",lubridate::month(lista_data_oco2)) %>% unique()
+datas <- datas_fco2[datas_fco2 %in% datas_oco2]
+```
+
+Chaves para mesclagem
+
+``` r
+fco2 <- data_fco2 %>% 
+  mutate(ano_mes = paste0(lubridate::year(data),"-",lubridate::month(data))) %>% 
+  dplyr::filter(ano_mes %in% datas)
+
+xco2 <- oco2_br %>%   
+  mutate(ano_mes=paste0(ano,"-",mes)) %>% 
+  dplyr::filter(ano_mes %in% datas)
+```
+
+Coordenadas das cidades
+
+``` r
+unique(xco2$ano_mes)[unique(xco2$ano_mes) %>% order()] == 
+unique(fco2$ano_mes)[unique(fco2$ano_mes) %>% order()]
+#>  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+#> [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+```
+
+``` r
+data_set <- left_join(fco2 %>% 
+            mutate(ano = lubridate::year(data),
+                   mes = lubridate::month(data)
+                   ), 
+          xco2 %>% 
+            select(data,mes,dia,longitude,latitude,XCO2,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
+  mutate(dist = sqrt((longitude-(-51.423519))^2+(latitude-(-20.362911))^2),
+         SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2)
+
+
+data_set<-data_set %>%
+  select(-fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1, -fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1 )  %>% 
+  filter(dist <= .16, FCO2 <= 30 ) 
+```
+
+``` r
+visdat::vis_miss(data_set)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+
+``` r
+tab_medias <- data_set %>% 
+  # mutate(SIF = ifelse(SIF <=0, mean(data_set$SIF, na.rm=TRUE),SIF)) %>% 
+  group_by(ano_mes, cultura) %>% 
+  summarise(FCO2 = mean(FCO2, na.rm=TRUE),
+            XCO2 = mean(XCO2, na.rm=TRUE),
+            SIF = mean(SIF, na.rm=TRUE))
+
+tab_medias %>% 
+  ggplot(aes(x=XCO2, y=SIF,color=cultura)) +
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme_bw()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+
+``` r
+tab_medias %>% 
+  ggplot(aes(x=XCO2, y=FCO2,col=cultura)) +
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme_bw()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+
+``` r
+tab_medias %>% 
+  ggplot(aes(x=FCO2, y=SIF, color=cultura)) +
+  geom_point()+
+  geom_smooth(method = "lm") +
+  theme_bw()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+
+``` r
+data_set_temporal <- data_set %>% 
+  filter(experimento == "Temporal")
+
+data_set_espacial <- data_set %>% 
+  filter(experimento == "Espacial")
+```
