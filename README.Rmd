@@ -370,11 +370,26 @@ data_set_espacial <- data_set %>%
   filter(experimento == "Espacial")
 ```
 
-# Segunda Aproximação
+
+# Carregando dados Meteorológicos de Ilha Solteira
+
+```{r}
+dados_estacao <- read_excel("data-raw/xlsx/estacao_meteorologia_ilha_solteira.xlsx", na = "NA") 
+glimpse(dados_estacao)
+dados_estacao <- dados_estacao %>% 
+                   drop_na()
+visdat::vis_miss(dados_estacao)
+data_set_est_isa <- left_join(data_set %>% 
+                         rename(data=data.x), dados_estacao, by = "data") %>%                           mutate(range_T = Tmax-Tmin) 
+```
+
+
+
+# Terceira Aproximação
 
 - Alvo: FCO2 
 - restrição dados após 2014
-- Features: Atributos do Solo + Xco2 e SIF
+- Features: Atributos do Solo + Xco2 e SIF + Dados da Estação de ISA
 - Modelo mais simples e geral
 - Testar 3 métodos baseados em árvores de decisão
 
@@ -382,12 +397,12 @@ data_set_espacial <- data_set %>%
 ### visualização do banco de dados 
 
 ```{r}
-visdat::vis_miss(data_set)
+visdat::vis_miss(data_set_est_isa)
 ```
 
 ### Definindo a Base de treino e teste
 ```{r}
-data_set_ml <- data_set %>% sample_n(100) # <-------
+data_set_ml <- data_set_est_isa %>% sample_n(100) # <-------
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
@@ -415,8 +430,8 @@ fco2_testing  %>%
 ```
 
 ```{r}
-fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF) %>% 
-  select(where(is.numeric)) %>%
+fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) %>% 
+  mutate(range_T = Tmax-Tmin) %>% select(-c(Tmax,Tmin,Umax,Umin,Dir_vel)) %>%   select(where(is.numeric)) %>%
   drop_na() %>% 
   cor()  %>%  
   corrplot::corrplot()
@@ -425,7 +440,7 @@ fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF) %>%
 ```{r}
 fco2_recipe <- recipe(FCO2 ~ ., 
                       data = fco2_train %>% 
-                        select(cultura, manejo, cobertura, FCO2:HLIFS,XCO2,SIF)
+                        select(cultura, manejo, cobertura, FCO2:HLIFS,XCO2,SIF,Tmed:inso) 
 ) %>%  
   step_normalize(all_numeric_predictors())  %>% 
   step_novel(all_nominal_predictors()) %>% 
@@ -443,7 +458,7 @@ visdat::vis_miss(bake(prep(fco2_recipe), new_data = NULL))
 ### Reamostragem definida e será padrão para todos os modelos
 
 ```{r}
-fco2_resamples <- vfold_cv(fco2_train, v = 10) # 10 fold
+fco2_resamples <- vfold_cv(fco2_train, v = 5) # 10 fold
 grid <- grid_regular(
   penalty(range = c(-8, 0)),
   levels = 20
