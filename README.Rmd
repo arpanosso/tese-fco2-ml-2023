@@ -370,10 +370,11 @@ data_set_espacial <- data_set %>%
   filter(experimento == "Espacial")
 ```
 
-# Primeira Aproximação
+# Segunda Aproximação
 
-- Alvo: FCO2
-- Features: Atributos do Solo
+- Alvo: FCO2 
+- restrição dados após 2014
+- Features: Atributos do Solo + Xco2 e SIF
 - Modelo mais simples e geral
 - Testar 3 métodos baseados em árvores de decisão
 
@@ -381,12 +382,12 @@ data_set_espacial <- data_set %>%
 ### visualização do banco de dados 
 
 ```{r}
-visdat::vis_miss(data_fco2)
+visdat::vis_miss(data_set)
 ```
 
 ### Definindo a Base de treino e teste
 ```{r}
-data_set_ml <- data_fco2 %>% sample_n(100) # <-------
+data_set_ml <- data_set %>% sample_n(100) # <-------
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
@@ -414,7 +415,7 @@ fco2_testing  %>%
 ```
 
 ```{r}
-fco2_train   %>%    select(FCO2:HLIFS) %>% 
+fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF) %>% 
   select(where(is.numeric)) %>%
   drop_na() %>% 
   cor()  %>%  
@@ -424,7 +425,7 @@ fco2_train   %>%    select(FCO2:HLIFS) %>%
 ```{r}
 fco2_recipe <- recipe(FCO2 ~ ., 
                       data = fco2_train %>% 
-                        select(cultura, manejo, cobertura, FCO2:HLIFS)
+                        select(cultura, manejo, cobertura, FCO2:HLIFS,XCO2,SIF)
 ) %>%  
   step_normalize(all_numeric_predictors())  %>% 
   step_novel(all_nominal_predictors()) %>% 
