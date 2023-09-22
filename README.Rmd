@@ -383,11 +383,19 @@ data_set_est_isa <- left_join(data_set %>%
                          rename(data=data.x), dados_estacao, by = "data") %>%                           mutate(range_T = Tmax-Tmin) 
 ```
 
+```{r}
+data_set_temporal <- data_set_est_isa %>% 
+  filter(experimento == "Temporal")
+
+data_set_espacial <- data_set_est_isa %>% 
+  filter(experimento == "Espacial")
+```
 
 
-# Terceira Aproximação
 
-- Alvo: FCO2 
+# Quarta Aproximação
+
+- Alvo: FCO2 - temporal
 - restrição dados após 2014
 - Features: Atributos do Solo + Xco2 e SIF + Dados da Estação de ISA
 - Modelo mais simples e geral
@@ -397,12 +405,12 @@ data_set_est_isa <- left_join(data_set %>%
 ### visualização do banco de dados 
 
 ```{r}
-visdat::vis_miss(data_set_est_isa)
+visdat::vis_miss(data_set_temporal)
 ```
 
 ### Definindo a Base de treino e teste
 ```{r}
-data_set_ml <- data_set_est_isa %>% sample_n(100) # <-------
+data_set_ml <- data_set_temporal %>% sample_n(100) # <-------
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
