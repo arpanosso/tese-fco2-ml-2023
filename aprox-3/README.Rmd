@@ -384,17 +384,10 @@ data_set_est_isa <- left_join(data_set %>%
 ```
 
 
-```{r}
-data_set_temporal <- data_set_est_isa %>% 
-  filter(experimento == "Temporal")
 
-data_set_espacial <- data_set_est_isa %>% 
-  filter(experimento == "Espacial")
-```
+# Terceira Aproximação
 
-# Quinta Aproximação
-
-- Alvo: FCO2 - espacial
+- Alvo: FCO2 
 - restrição dados após 2014
 - Features: Atributos do Solo + Xco2 e SIF + Dados da Estação de ISA
 - Modelo mais simples e geral
@@ -404,16 +397,12 @@ data_set_espacial <- data_set_est_isa %>%
 ### visualização do banco de dados 
 
 ```{r}
-visdat::vis_miss(data_set_espacial)
+visdat::vis_miss(data_set_est_isa)
 ```
 
 ### Definindo a Base de treino e teste
 ```{r}
-<<<<<<< HEAD
-data_set_ml <- data_set_temporal # <-------
-=======
-data_set_ml <- data_set_espacial  # <-------
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
+data_set_ml <- data_set_est_isa  # <-------
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 

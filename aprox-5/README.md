@@ -328,26 +328,6 @@ help(oco2_br)
 glimpse(oco2_br)
 #> Rows: 37,387
 #> Columns: 18
-<<<<<<< HEAD
-#> $ longitude                                                     <dbl> -70.5, -~
-#> $ longitude_bnds                                                <chr> "-71.0:-~
-#> $ latitude                                                      <dbl> -5.5, -4~
-#> $ latitude_bnds                                                 <chr> "-6.0:-5~
-#> $ time_yyyymmddhhmmss                                           <dbl> 2.014091~
-#> $ time_bnds_yyyymmddhhmmss                                      <chr> "2014090~
-#> $ altitude_km                                                   <dbl> 3307.8, ~
-#> $ alt_bnds_km                                                   <chr> "0.0:661~
-#> $ fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 7.272876~
-#> $ fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 2.537127~
-#> $ xco2_moles_mole_1                                             <dbl> 0.000394~
-#> $ aerosol_total_aod                                             <dbl> 0.148579~
-#> $ fluorescence_offset_relative_771nm_idp                        <dbl> 0.016753~
-#> $ fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              <dbl> 2.615319~
-#> $ fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 3.088582~
-#> $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969~
-#> $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878~
-#> $ XCO2                                                          <dbl> 387.2781~
-=======
 #> $ longitude                                                     <dbl> -70.5, -…
 #> $ longitude_bnds                                                <chr> "-71.0:-…
 #> $ latitude                                                      <dbl> -5.5, -4…
@@ -366,7 +346,6 @@ glimpse(oco2_br)
 #> $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969…
 #> $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878…
 #> $ XCO2                                                          <dbl> 387.2781…
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ### Breve resumo do banco de dados de X<sub>CO2</sub>
@@ -658,11 +637,7 @@ visdat::vis_miss(data_set_espacial)
 ### Definindo a Base de treino e teste
 
 ``` r
-<<<<<<< HEAD
-data_set_ml <- data_set_temporal # <-------
-=======
 data_set_ml <- data_set_espacial  # <-------
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
@@ -716,28 +691,6 @@ fco2_recipe <- recipe(FCO2 ~ .,
   #step_poly(c(Us,Ts), degree = 2)  %>%  
   step_dummy(all_nominal_predictors())
 bake(prep(fco2_recipe), new_data = NULL)
-<<<<<<< HEAD
-#> # A tibble: 2,676 x 49
-#>         Ts      Us      pH       MO      P       K      Ca      Mg   H_Al     SB
-#>      <dbl>   <dbl>   <dbl>    <dbl>  <dbl>   <dbl>   <dbl>   <dbl>  <dbl>  <dbl>
-#>  1  0.0801 -0.386  -0.671   0.751   -0.441 -0.539  -0.674  -1.26    1.25  -1.01 
-#>  2 -0.0121 -0.834   0.619   0.109    0.560 -0.739  -0.198   0.239  -1.09  -0.155
-#>  3  0.370  -0.116  -0.187   1.18    -0.942 -0.389   0.0873  0.613  -0.129  0.233
-#>  4  0.449  -0.383  -0.0262  0.00189 -0.691 -0.739  -0.674  -0.696  -0.939 -0.835
-#>  5 -1.96    1.75   -0.510  -0.640    1.48  -0.239  -0.198   0.0519  0.471 -0.155
-#>  6  0.765   0.0189 -0.0262  1.18    -0.274 -0.189   0.468   1.36   -0.429  0.804
-#>  7 -0.776   1.64   -0.832  -0.533    0.393 -0.689  -0.769  -1.63    1.25  -1.24 
-#>  8 -0.0121 -1.24    0.619   0.109    0.560 -0.739  -0.198   0.239  -1.09  -0.155
-#>  9  0.225  -0.826  -0.0262  0.00189 -0.691 -0.739  -0.674  -0.696  -0.939 -0.835
-#> 10 -2.36    0.829  -0.0262 -0.533    1.73  -0.0389  1.42    0.0519 -0.129  1.03 
-#> # ... with 2,666 more rows, and 39 more variables: CTC <dbl>, V <dbl>,
-#> #   Ds <dbl>, Macro <dbl>, Micro <dbl>, VTP <dbl>, PLA <dbl>, AT <dbl>,
-#> #   SILTE <dbl>, ARG <dbl>, HLIFS <dbl>, XCO2 <dbl>, SIF <dbl>, Tmed <dbl>,
-#> #   Tmax <dbl>, Tmin <dbl>, Umed <dbl>, Umax <dbl>, Umin <dbl>, PkPa <dbl>,
-#> #   Rad <dbl>, PAR <dbl>, Eto <dbl>, Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>,
-#> #   chuva <dbl>, inso <dbl>, FCO2 <dbl>, cultura_eucalipto <dbl>,
-#> #   cultura_mata.ciliar <dbl>, cultura_pasto <dbl>, cultura_pinus <dbl>, ...
-=======
 #> # A tibble: 3,428 × 44
 #>         Ts     Us      pH      MO      P      K     Ca     Mg    H_Al     SB
 #>      <dbl>  <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>  <dbl>
@@ -758,7 +711,6 @@ bake(prep(fco2_recipe), new_data = NULL)
 #> #   Umax <dbl>, Umin <dbl>, PkPa <dbl>, Rad <dbl>, PAR <dbl>, Eto <dbl>,
 #> #   Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>, chuva <dbl>, inso <dbl>,
 #> #   FCO2 <dbl>, cultura_pasto <dbl>, cultura_silvipastoril <dbl>, …
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ``` r
@@ -810,15 +762,9 @@ grid_dt <- grid_random(
 glimpse(grid_dt)
 #> Rows: 10
 #> Columns: 3
-<<<<<<< HEAD
-#> $ cost_complexity <dbl> 9.025760e-05, 4.913009e-05, 6.339129e-05, 6.345867e-06~
-#> $ tree_depth      <int> 12, 8, 18, 16, 8, 18, 8, 10, 8, 16
-#> $ min_n           <int> 47, 50, 44, 52, 46, 43, 46, 50, 48, 46
-=======
 #> $ cost_complexity <dbl> 1.497271e-05, 3.016738e-05, 1.233316e-05, 1.557756e-05…
 #> $ tree_depth      <int> 17, 10, 17, 13, 13, 14, 13, 11, 10, 14
 #> $ min_n           <int> 48, 44, 48, 47, 45, 45, 45, 48, 48, 48
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ### Tuning de hiperparâmetros
@@ -840,22 +786,6 @@ autoplot(fco2_dt_tune_grid)
 
 ``` r
 collect_metrics(fco2_dt_tune_grid)
-<<<<<<< HEAD
-#> # A tibble: 10 x 9
-#>    cost_complexity tree_depth min_n .metric .estim~1  mean     n std_err .config
-#>              <dbl>      <int> <int> <chr>   <chr>    <dbl> <int>   <dbl> <chr>  
-#>  1      0.0000903          12    47 rmse    standard  1.31     5  0.0511 Prepro~
-#>  2      0.0000491           8    50 rmse    standard  1.33     5  0.0528 Prepro~
-#>  3      0.0000634          18    44 rmse    standard  1.29     5  0.0419 Prepro~
-#>  4      0.00000635         16    52 rmse    standard  1.32     5  0.0459 Prepro~
-#>  5      0.00000281          8    46 rmse    standard  1.33     5  0.0465 Prepro~
-#>  6      0.00000169         18    43 rmse    standard  1.29     5  0.0452 Prepro~
-#>  7      0.0000325           8    46 rmse    standard  1.33     5  0.0465 Prepro~
-#>  8      0.0000209          10    50 rmse    standard  1.32     5  0.0457 Prepro~
-#>  9      0.0000255           8    48 rmse    standard  1.32     5  0.0530 Prepro~
-#> 10      0.00000112         16    46 rmse    standard  1.31     5  0.0471 Prepro~
-#> # ... with abbreviated variable name 1: .estimator
-=======
 #> # A tibble: 10 × 9
 #>    cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
 #>              <dbl>      <int> <int> <chr>   <chr>      <dbl> <int>   <dbl>
@@ -870,7 +800,6 @@ collect_metrics(fco2_dt_tune_grid)
 #>  9      0.00000340         10    48 rmse    standard    1.22     5  0.0596
 #> 10      0.00000304         14    48 rmse    standard    1.23     5  0.0587
 #> # ℹ 1 more variable: .config <chr>
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ### Desempenho dos modelos finais
@@ -947,21 +876,12 @@ fco2_test_preds %>%
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
 #>      vector_of_metrics
-<<<<<<< HEAD
-#> r            0.8277487
-#> R2           0.6851679
-#> MSE          1.5935510
-#> RMSE         1.2623593
-#> MAE          0.8337241
-#> MAPE        27.3322549
-=======
 #> r            0.7817922
 #> R2           0.6111991
 #> MSE          1.3956239
 #> RMSE         1.1813653
 #> MAE          0.7420816
 #> MAPE        27.6461279
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ## Random Forest
@@ -1011,21 +931,6 @@ autoplot(fco2_rf_tune_grid)
 
 ``` r
 collect_metrics(fco2_rf_tune_grid)
-<<<<<<< HEAD
-#> # A tibble: 10 x 9
-#>     mtry trees min_n .metric .estimator  mean     n std_err .config             
-#>    <int> <int> <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#>  1    17  1050    28 rmse    standard    1.06     5  0.0334 Preprocessor1_Model~
-#>  2    17  1069    23 rmse    standard    1.05     5  0.0320 Preprocessor1_Model~
-#>  3    16  1217    23 rmse    standard    1.05     5  0.0333 Preprocessor1_Model~
-#>  4    11  1000    20 rmse    standard    1.05     5  0.0334 Preprocessor1_Model~
-#>  5    12  1004    24 rmse    standard    1.06     5  0.0334 Preprocessor1_Model~
-#>  6    12  1436    30 rmse    standard    1.08     5  0.0347 Preprocessor1_Model~
-#>  7    12  1190    29 rmse    standard    1.07     5  0.0345 Preprocessor1_Model~
-#>  8    20  1414    21 rmse    standard    1.04     5  0.0317 Preprocessor1_Model~
-#>  9    20  1035    29 rmse    standard    1.06     5  0.0329 Preprocessor1_Model~
-#> 10    14   951    28 rmse    standard    1.07     5  0.0324 Preprocessor1_Model~
-=======
 #> # A tibble: 10 × 9
 #>     mtry trees min_n .metric .estimator  mean     n std_err .config             
 #>    <int> <int> <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
@@ -1039,7 +944,6 @@ collect_metrics(fco2_rf_tune_grid)
 #>  8    16  1118    23 rmse    standard    1.10     5  0.0661 Preprocessor1_Model…
 #>  9    10   887    30 rmse    standard    1.12     5  0.0662 Preprocessor1_Model…
 #> 10    17  1245    20 rmse    standard    1.09     5  0.0665 Preprocessor1_Model…
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ### Desempenho modelo final
@@ -1114,21 +1018,12 @@ fco2_test_preds %>%
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
 #>      vector_of_metrics
-<<<<<<< HEAD
-#> r            0.8955432
-#> R2           0.8019976
-#> MSE          1.0068983
-#> RMSE         1.0034432
-#> MAE          0.6387230
-#> MAPE        21.3415904
-=======
 #> r            0.8540438
 #> R2           0.7293909
 #> MSE          0.9579750
 #> RMSE         0.9787620
 #> MAE          0.5753262
 #> MAPE        21.6829855
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ## Boosting gradient tree (xgb)
@@ -1177,17 +1072,6 @@ autoplot(fco2_xgb_tune_grid)
 
 ``` r
 fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 6)
-<<<<<<< HEAD
-#> # A tibble: 6 x 8
-#>   trees learn_rate .metric .estimator  mean     n std_err .config             
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1   500       0.3  rmse    standard   0.934     5  0.0358 Preprocessor1_Model6
-#> 2   250       0.3  rmse    standard   0.942     5  0.0350 Preprocessor1_Model5
-#> 3   500       0.05 rmse    standard   0.960     5  0.0336 Preprocessor1_Model3
-#> 4   250       0.05 rmse    standard   1.02      5  0.0361 Preprocessor1_Model2
-#> 5     2       0.3  rmse    standard   2.18      5  0.0642 Preprocessor1_Model4
-#> 6     2       0.05 rmse    standard   3.36      5  0.0566 Preprocessor1_Model1
-=======
 #> # A tibble: 6 × 8
 #>   trees learn_rate .metric .estimator  mean     n std_err .config             
 #>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
@@ -1197,7 +1081,6 @@ fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 6)
 #> 4   250       0.3  rmse    standard    1.17     5  0.0559 Preprocessor1_Model5
 #> 5     2       0.3  rmse    standard    1.95     5  0.0724 Preprocessor1_Model4
 #> 6     2       0.05 rmse    standard    3.00     5  0.0766 Preprocessor1_Model1
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ``` r
@@ -1207,11 +1090,7 @@ fco2_xgb_select_best_passo1
 #> # A tibble: 1 × 3
 #>   trees learn_rate .config             
 #>   <dbl>      <dbl> <chr>               
-<<<<<<< HEAD
-#> 1   500        0.3 Preprocessor1_Model6
-=======
 #> 1   500       0.05 Preprocessor1_Model3
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 #### Passo 2
@@ -1256,16 +1135,6 @@ autoplot(fco2_xgb_tune_grid)
 
 ``` r
 fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
-<<<<<<< HEAD
-#> # A tibble: 5 x 8
-#>   min_n tree_depth .metric .estimator  mean     n std_err .config             
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1     5          4 rmse    standard   0.944     5  0.0290 Preprocessor1_Model3
-#> 2     5          3 rmse    standard   0.952     5  0.0325 Preprocessor1_Model2
-#> 3    30          4 rmse    standard   0.957     5  0.0328 Preprocessor1_Model6
-#> 4    60          4 rmse    standard   0.975     5  0.0293 Preprocessor1_Model9
-#> 5    30          3 rmse    standard   0.988     5  0.0285 Preprocessor1_Model5
-=======
 #> # A tibble: 5 × 8
 #>   min_n tree_depth .metric .estimator  mean     n std_err .config             
 #>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
@@ -1274,17 +1143,12 @@ fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
 #> 3    30          4 rmse    standard    1.14     5  0.0540 Preprocessor1_Model6
 #> 4    60          3 rmse    standard    1.15     5  0.0554 Preprocessor1_Model8
 #> 5    30          3 rmse    standard    1.16     5  0.0544 Preprocessor1_Model5
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 fco2_xgb_select_best_passo2 <- fco2_xgb_tune_grid  %>%   select_best(metric = "rmse")
 fco2_xgb_select_best_passo2
 #> # A tibble: 1 × 3
 #>   min_n tree_depth .config             
 #>   <dbl>      <dbl> <chr>               
-<<<<<<< HEAD
-#> 1     5          4 Preprocessor1_Model3
-=======
 #> 1    60          4 Preprocessor1_Model9
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ## Passo 3
@@ -1328,16 +1192,6 @@ autoplot(fco2_xgb_tune_grid)
 
 ``` r
 fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
-<<<<<<< HEAD
-#> # A tibble: 5 x 7
-#>   loss_reduction .metric .estimator  mean     n std_err .config             
-#>            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1           1    rmse    standard   0.933     5  0.0317 Preprocessor1_Model3
-#> 2           0.01 rmse    standard   0.939     5  0.0322 Preprocessor1_Model1
-#> 3           0.05 rmse    standard   0.940     5  0.0312 Preprocessor1_Model2
-#> 4           2    rmse    standard   0.980     5  0.0311 Preprocessor1_Model4
-#> 5           4    rmse    standard   0.993     5  0.0330 Preprocessor1_Model5
-=======
 #> # A tibble: 5 × 7
 #>   loss_reduction .metric .estimator  mean     n std_err .config             
 #>            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
@@ -1346,17 +1200,12 @@ fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
 #> 3           0.01 rmse    standard    1.13     5  0.0558 Preprocessor1_Model1
 #> 4           2    rmse    standard    1.13     5  0.0564 Preprocessor1_Model4
 #> 5           4    rmse    standard    1.13     5  0.0593 Preprocessor1_Model5
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 fco2_xgb_select_best_passo3 <- fco2_xgb_tune_grid %>% select_best(metric = "rmse")
 fco2_xgb_select_best_passo3
 #> # A tibble: 1 × 2
 #>   loss_reduction .config             
 #>            <dbl> <chr>               
-<<<<<<< HEAD
-#> 1              1 Preprocessor1_Model3
-=======
 #> 1           0.05 Preprocessor1_Model2
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ### Passo 4
@@ -1403,27 +1252,16 @@ fco2_xgb_tune_grid  |>  show_best(metric = "rmse", n = 5)
 #> # A tibble: 4 × 8
 #>    mtry sample_size .metric .estimator  mean     n std_err .config             
 #>   <dbl>       <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-<<<<<<< HEAD
-#> 1   0.1         1   rmse    standard   0.962     5  0.0316 Preprocessor1_Model2
-#> 2   1           0.5 rmse    standard   0.974     5  0.0364 Preprocessor1_Model3
-#> 3   1           1   rmse    standard   0.991     5  0.0403 Preprocessor1_Model4
-#> 4   0.1         0.5 rmse    standard   1.00      5  0.0282 Preprocessor1_Model1
-=======
 #> 1   1           1   rmse    standard    1.12     5  0.0562 Preprocessor1_Model4
 #> 2   0.1         1   rmse    standard    1.13     5  0.0555 Preprocessor1_Model2
 #> 3   1           0.5 rmse    standard    1.14     5  0.0578 Preprocessor1_Model3
 #> 4   0.1         0.5 rmse    standard    1.16     5  0.0624 Preprocessor1_Model1
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 fco2_xgb_select_best_passo4 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
 fco2_xgb_select_best_passo4
 #> # A tibble: 1 × 3
 #>    mtry sample_size .config             
 #>   <dbl>       <dbl> <chr>               
-<<<<<<< HEAD
-#> 1   0.1           1 Preprocessor1_Model2
-=======
 #> 1     1           1 Preprocessor1_Model4
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ### Passo 5
@@ -1468,22 +1306,6 @@ autoplot(fco2_xgb_tune_grid)
 
 ``` r
 fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
-<<<<<<< HEAD
-#> # A tibble: 5 x 8
-#>   trees learn_rate .metric .estimator  mean     n std_err .config              
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1   500       0.25 rmse    standard   0.962     5  0.0343 Preprocessor1_Model12
-#> 2   500       0.15 rmse    standard   0.964     5  0.0282 Preprocessor1_Model09
-#> 3   500       0.1  rmse    standard   0.981     5  0.0282 Preprocessor1_Model06
-#> 4   250       0.25 rmse    standard   0.983     5  0.0332 Preprocessor1_Model11
-#> 5   250       0.15 rmse    standard   1.00      5  0.0302 Preprocessor1_Model08
-fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
-fco2_xgb_select_best_passo5
-#> # A tibble: 1 x 3
-#>   trees learn_rate .config              
-#>   <dbl>      <dbl> <chr>                
-#> 1   500       0.25 Preprocessor1_Model12
-=======
 #> # A tibble: 5 × 8
 #>   trees learn_rate .metric .estimator  mean     n std_err .config              
 #>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
@@ -1498,7 +1320,6 @@ fco2_xgb_select_best_passo5
 #>   trees learn_rate .config              
 #>   <dbl>      <dbl> <chr>                
 #> 1   250       0.15 Preprocessor1_Model08
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
 
 ## Desempenho dos modelos finais
@@ -1590,19 +1411,10 @@ fco2_test_preds %>%
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
 #>      vector_of_metrics
-<<<<<<< HEAD
-#> r            0.9091056
-#> R2           0.8264731
-#> MSE          0.8718466
-#> RMSE         0.9337272
-#> MAE          0.5919247
-#> MAPE        19.7835459
-=======
 #> r            0.8479290
 #> R2           0.7189837
 #> MSE          0.9951377
 #> RMSE         0.9975659
 #> MAE          0.6028209
 #> MAPE        23.0930305
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
