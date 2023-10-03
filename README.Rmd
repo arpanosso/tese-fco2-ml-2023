@@ -4,7 +4,7 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE, warning = FALSE, error = FALSE, message = FALSE,
   comment = "#>"
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Objetivo
 
-O objetivo do repositório `tese-fco2-ml-2023` é promover a transparência, a reprodutibilidade e a colaboração em pesquisa. Você é incentivado a explorar o código-fonte, utilizar os dados e contribuir com melhorias, se desejar. Sinta-se à vontade para entrar em contato caso tenha alguma dúvida ou precise de mais informações sobre minha pesquisa.
+O objetivo do repositório `tese-fco2-ml-2023` é promover a transparência, a reprodutibilidade e a colaboração em pesquisa. Você é incentivado a explorar o código-fonte, utilizar os dados e contribuir com melhorias, se desejar. Sinta-se à vontade para entrar em contato caso tenha alguma dúvida ou precise de mais informações sobre minha pesquisa. 
 
 ## Contribuições
 
@@ -32,7 +32,7 @@ Este projeto é licenciado sob `MIT License`. Consulte o arquivo [LICENSE](https
 
 ## Base de dados
 
-Apresentação do pacote `fco2r` construído para  facilitar a divulgação e análise dos resultados obtidos ao longo de mais de 20 anos de ensaios em campo. Este pacote, permite a visualização dos dados, a execução de análises estatísticas avançadas e a geração de gráficos interativos para tornar os resultados mais acessíveis e compreensíveis para a comunidade científica.
+Apresentação do pacote `fco2r` construído para  divulgação e análise dos resultados obtidos ao longo de mais de $21$ anos de ensaios em campo. Este pacote, permite a visualização dos dados, a execução de análises estatísticas avançadas e a geração de gráficos interativos para tornar os resultados mais acessíveis e compreensíveis para a comunidade científica.
 
 ### Instalação
 
@@ -67,6 +67,8 @@ library(ISLR)
 library(modeldata)
 library(vip)
 library(ggpubr)
+source("R/graficos.R")
+theme_set(theme_bw())
 ```
 
 
@@ -89,54 +91,17 @@ skimr::skim(data_fco2)
 ### Alguns gráficos a respeito de nossa variável alvo, emissão de CO~2~ do solo (FCO~2~).
 
 ```{r,fig.width=15, fig.height=10}
-theme_set(theme_bw())
-fco2_histograma <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=FCO2, y=..density..)) +
-  geom_histogram(col="black",fill="gray") +
-  geom_density(fill="blue",alpha=.08)
-
-fco2_boxplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=FCO2)) +
-  geom_boxplot(fill="lightgray") + 
-  coord_cartesian(ylim=c(-.9,.9))
-
-fco2_qqplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(sample=FCO2)) +
-  stat_qq(shape=1,size=1,color="black")+
-  stat_qq_line(col="red")
-
-fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
+composition(FCO2,data_fco2)
 ```
 
 ### Aplicando a transformação logarítmica nos dados de FCO~2~
 
 ```{r,fig.width=15, fig.height=10}
-ggplot2::theme_set(theme_bw())
-
-fco2_histograma <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=log(FCO2), y=..density..)) +
-  geom_histogram(col="black",fill="gray") +
-  geom_density(fill="red",alpha=.08)
-
-fco2_boxplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=log(FCO2))) +
-  geom_boxplot(fill="orange") + 
-  coord_cartesian(ylim=c(-.9,.9))
-
-fco2_qqplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(sample=log(FCO2))) +
-  stat_qq(shape=1,size=1,color="black")+
-  stat_qq_line(col="blue")
-
-fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
+composition(log10(FCO2) ,data_fco2)
 ```
+### Carregando os dados do pacote `{geobr}`
 
+#### Shape dos estados do Brasil
 ```{r}
 # brasil_geobr <- geobr::read_country()
 # estados <- read_state(code_state = "all")
@@ -145,55 +110,43 @@ fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 estados <- read_rds("data/estados.rds")
 ```
 
-
+#### Shape dos municípios
 ```{r}
 # muni <- read_municipality()
 # write_rds(muni,"data/municipios.rds")
 muni <- read_rds("data/municipios.rds")
+```
 
-sp <- muni %>% 
-  filter(abbrev_state == "SP")
 
-ms <- muni %>% 
-  filter(abbrev_state == "MS")
-
+```{r}
 sp_ms <- muni %>% 
   filter(abbrev_state == "SP" | abbrev_state == "MS")
 
-fsp<-if_else(sp$name_muni == "Jaboticabal" | 
-             sp$name_muni == "Guariba" |
-             sp$name_muni == "Padrópolis" |
-             sp$name_muni == "Rincão"|
-             sp$name_muni == "Mococa"|
-             sp$name_muni == "Ilha Solteira"
+fsp_ms<-if_else(sp_ms$name_muni == "Jaboticabal" | 
+             sp_ms$name_muni == "Guariba" |
+             sp_ms$name_muni == "Padrópolis" |
+             sp_ms$name_muni == "Rincão"|
+             sp_ms$name_muni == "Mococa"|
+             sp_ms$name_muni == "Ilha Solteira" |
+             sp_ms$name_muni == "Aparecida Do Taboado" | 
+             sp_ms$name_muni == "Selvíria"|
+             sp_ms$name_muni == "Dourados"   
              ,"red","lightyellow")
 
-fms<-if_else(ms$name_muni == "Aparecida Do Taboado" | 
-             ms$name_muni == "Selvíria"|
-             ms$name_muni == "Dourados"   
-             ,"red","lightyellow")
-
-sp_ <- estados %>% 
-      filter(abbrev_state == "SP")
-
-ms_ <- estados %>% 
-      filter(abbrev_state == "MS")
+sp_ms_ <- estados %>% 
+      filter(abbrev_state == "SP" | abbrev_state == "MS")
 
 ggplot(sp_ms) + 
-  geom_sf(fill="lightyellow")+
+  geom_sf(fill="lightyellow") +
   theme_minimal() + 
-  annotation_scale(location="bl")+
-  annotation_north_arrow(location="tr",
-                         style = north_arrow_nautical(),
-                         width = unit(2,"cm"),
-                         height = unit(2,"cm")) +
-  geom_sf(data= sp, fill=fsp,col=fsp) +
-  geom_sf(data=sp_,fill="transparent") +
-  geom_sf(data= ms, fill=fms,col=fms) +
-  geom_sf(data=ms_,fill="transparent")
+  annotation_scale(location="bl") +
+  geom_sf(data = sp_ms, fill=fsp_ms,col=fsp_ms) +
+  # geom_sf(data = sp_ms, fill=fms,col=fms) +
+  geom_sf(data = sp_ms_,fill="transparent") +
+  tema_mapa()
 ```
 
-### Conhecendo a base de dados de concentração de CO~2~ atmosférico, oriundo do sensor NASA-OCO2.
+### Conhecendo a base de dados de concentração de CO~2~ atmosférico, oriundo do sensor orbital NASA-OCO2.
 ```{r}
 help(oco2_br)
 glimpse(oco2_br)
@@ -214,13 +167,14 @@ oco2_br <- oco2_br  %>%
            ano = year(data),
            mes = month(data),
            dia = day(data),
-           dia_semana = wday(data))
+           dia_semana = wday(data),
+           SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
+           )
 ```
 
 Mapa das leituras do satélite OCO2-NASA
 
 ```{r}
-source("R/graficos.R")
 brasil_geobr <- read_rds("data/brasil_geobr.rds")
 brasil_geobr %>% 
   ggplot() +
@@ -238,31 +192,22 @@ brasil_geobr %>%
 
 
 ```{r,fig.width=15, fig.height=10}
-xco2_histograma <- oco2_br %>% 
-  drop_na() %>% 
-  ggplot(aes(x=xco2, y=..density..)) +
-  geom_histogram(col="black",fill="gray") +
-  geom_density(fill="aquamarine2",alpha=.08)
-
-xco2_boxplot <- oco2_br %>% 
-  drop_na() %>% 
-  ggplot(aes(x=xco2)) +
-  geom_boxplot(fill="aquamarine4") + 
-  coord_cartesian(ylim=c(-.9,.9))
-
-xco2_qqplot <- oco2_br %>% 
-  drop_na() %>% 
-  ggplot(aes(sample=xco2)) +
-  stat_qq(shape=1,size=1,color="black")+
-  stat_qq_line(col="purple",lwd=2)
-
-xco2_qqplot | (xco2_histograma)/(xco2_boxplot)
+composition(xco2,oco2_br)
 ```
+
+```{r,fig.width=15, fig.height=10}
+composition(SIF,oco2_br)
+```
+
+Necessário tratamento dos dados de SIF
 
 ```{r}
-# Definindo o plano de multisession
-future::plan("multisession")
+oco2_br %>% filter (SIF > 0) %>%  pull(SIF) %>% summary
+sif_median <- 0.64297
+oco2_br <- oco2_br %>% 
+  mutate(SIF = ifelse(SIF > 0, SIF, sif_median))
 ```
+
 
 
 ```{r}
@@ -317,14 +262,26 @@ data_set <- left_join(fco2 %>%
                    mes = lubridate::month(data)
                    ), 
           xco2 %>% 
-            select(data,mes,dia,longitude,latitude,XCO2,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
+            select(data,mes,dia,longitude,latitude,XCO2,SIF,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
   mutate(dist = sqrt((longitude-(-51.423519))^2+(latitude-(-20.362911))^2),
-         SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2)
+         # SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
+         )
 
 
 data_set<-data_set %>%
   select(-fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1, -fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1 )  %>% 
   filter(dist <= .16, FCO2 <= 30 ) 
+```
+
+
+```{r,fig.width=15, fig.height=10}
+composition(SIF,data_set)
+```
+
+
+```{r}
+# Definindo o plano de multisession
+future::plan("multisession")
 ```
 
 ```{r}
@@ -339,27 +296,84 @@ tab_medias <- data_set %>%
             XCO2 = mean(XCO2, na.rm=TRUE),
             SIF = mean(SIF, na.rm=TRUE))
 
-tab_medias %>% 
-  ggplot(aes(x=XCO2, y=SIF,color=cultura)) +
-  geom_point()+
-  geom_smooth(method = "lm")+
-  theme_bw()
+tab_medias %>% filter(SIF > 0) %>% 
+  ggplot(aes(y=XCO2, x=SIF)) +
+  geom_point(size=3, shape=21, fill="gray")+
+  geom_smooth(method = "lm", se=FALSE,
+              ldw=2,color="red")+
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5, label.x.npc = .4)
+
+lm(XCO2 ~ SIF,
+           data = tab_medias %>% filter(SIF > 0) ) %>% 
+  summary.lm()
+
+lm(XCO2 ~ SIF + SIF2,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2))  %>% 
+  summary.lm()
+
+lm(XCO2 ~ SIF + SIF2 + SIF3,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2,
+                                                            SIF3 = SIF^3))  %>% 
+  summary.lm()
 ```
 
 ```{r}
-tab_medias %>% 
-  ggplot(aes(x=XCO2, y=FCO2,col=cultura)) +
-  geom_point()+
-  geom_smooth(method = "lm")+
-  theme_bw()
+formula <- y ~ poly(x, 3, raw = TRUE)
+tab_medias %>% filter(SIF > 0) %>%
+  ggplot(aes(x=XCO2, y=FCO2)) +
+  geom_point(size=3, shape=21, fill="gray")+
+  geom_smooth(method = "lm", se=FALSE,
+              ldw=2,color="red") +
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5,label.x.npc = .4) +
+  stat_smooth(method="lm", se=TRUE, fill=NA,
+                formula=y ~ poly(x, 3, raw=TRUE),colour="blue") +
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")), formula = y ~ poly(x, 3, raw = TRUE)
+    ,size=5,label.x.npc = .2,label.y.npc = .85)
+
+lm(XCO2 ~ FCO2,
+           data = tab_medias %>% filter(SIF > 0) ) %>% 
+  summary.lm()
+
+lm(XCO2 ~ FCO2 + FCO22,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2))  %>% 
+  summary.lm()
+
+lm(XCO2 ~ FCO2 + FCO22 + FCO23,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2,
+                                                            FCO23 = FCO2^3))  %>% 
+  summary.lm()
+
+lm(XCO2 ~ FCO2 + FCO22 + FCO23+ FCO24,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2,
+                                                            FCO23 = FCO2^3,
+                                                            FCO24 = FCO2^4))  %>% 
+  summary.lm()
 ```
 
 ```{r}
-tab_medias %>% 
-  ggplot(aes(y=FCO2, x=SIF, color=cultura)) +
-  geom_point()+
-  geom_smooth(method = "lm") +
-  theme_bw()
+tab_medias %>% filter(SIF > 0) %>%
+  ggplot(aes(y=FCO2, x=SIF)) +
+  geom_point(size=3, shape=21, fill="gray")+
+  geom_smooth(method = "lm", se=FALSE,
+              ldw=2,color="red")+
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5,label.x.npc = .4,label.y.npc = .1)
+
+lm(FCO2 ~ SIF,
+           data = tab_medias %>% filter(SIF > 0) ) %>% 
+  summary.lm()
+
+lm(FCO2 ~ SIF + SIF2,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2))  %>% 
+  summary.lm()
+
+lm(FCO2 ~ SIF + SIF2 + SIF3,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2,
+                                                            SIF3 = SIF^3))  %>% 
+  summary.lm()
 ```
 
 ```{r}
@@ -392,28 +406,25 @@ data_set_espacial <- data_set_est_isa %>%
   filter(experimento == "Espacial")
 ```
 
-# Quinta Aproximação
+# Quarta Aproximação
 
-- Alvo: FCO2 - espacial
+- Alvo: FCO2 - temporal
 - restrição dados após 2014
 - Features: Atributos do Solo + Xco2 e SIF + Dados da Estação de ISA
 - Modelo mais simples e geral
-- Testar 3 métodos baseados em árvores de decisão
+- Teste de três métodos baseados em árvores de decisão
 
 
-### visualização do banco de dados 
+### Visualização do banco de dados 
 
 ```{r}
-visdat::vis_miss(data_set_espacial)
+visdat::vis_miss(data_set_temporal)
 ```
 
 ### Definindo a Base de treino e teste
 ```{r}
-<<<<<<< HEAD
+# data_set_ml <- data_set_espacial  # <-------
 data_set_ml <- data_set_temporal # <-------
-=======
-data_set_ml <- data_set_espacial  # <-------
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
@@ -522,6 +533,7 @@ fco2_dt_tune_grid <- tune_grid(
 ```{r}
 autoplot(fco2_dt_tune_grid)
 ```
+
 ```{r}
 collect_metrics(fco2_dt_tune_grid)
 ```
@@ -553,7 +565,8 @@ fco2_test_preds %>%
   theme_bw() +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) 
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
+  geom_abline (slope=1, linetype = "dashed", color="Red")
 ```
 
 # Importância
@@ -614,11 +627,11 @@ fco2_rf_wf <- workflow()   %>%
 
 ### Tune
 ```{r}
-grid_rf <- grid_random(
+grid_rf <- grid_regular(
   min_n(range = c(20, 30)),
   mtry(range = c(10,20)),
   trees(range = c(769,1500) ),
-  size = 10 #<-----------------------
+  levels = 2 #<-----------------------
 )
 ```
 
@@ -661,7 +674,8 @@ fco2_test_preds %>%
   theme_bw() +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) 
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
+  geom_abline (slope=1, linetype = "dashed", color="Red")
 ```
 
 # Importância
@@ -966,7 +980,8 @@ fco2_test_preds %>%
   theme_bw() +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))+
+  geom_abline (slope=1, linetype = "dashed", color="Red")
 ```
 
 ```{r}

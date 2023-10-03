@@ -34,12 +34,13 @@ para obter mais detalhes.
 
 ## Base de dados
 
-Apresentação do pacote `fco2r` construído para facilitar a divulgação e
-análise dos resultados obtidos ao longo de mais de 20 anos de ensaios em
-campo. Este pacote, permite a visualização dos dados, a execução de
-análises estatísticas avançadas e a geração de gráficos interativos para
-tornar os resultados mais acessíveis e compreensíveis para a comunidade
-científica.
+Apresentação do pacote `fco2r` construído para divulgação e análise dos
+resultados obtidos ao longo de mais de
+![21](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;21 "21")
+anos de ensaios em campo. Este pacote, permite a visualização dos dados,
+a execução de análises estatísticas avançadas e a geração de gráficos
+interativos para tornar os resultados mais acessíveis e compreensíveis
+para a comunidade científica.
 
 ### Instalação
 
@@ -67,15 +68,60 @@ seguintes comandos:
 ``` r
 library(fco2r)
 library(tidyverse)
+```
+
+    ## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+    ## v dplyr     1.1.2     v readr     2.1.4
+    ## v forcats   1.0.0     v stringr   1.5.0
+    ## v ggplot2   3.4.2     v tibble    3.2.1
+    ## v lubridate 1.9.2     v tidyr     1.3.0
+    ## v purrr     1.0.1     
+    ## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+    ## x dplyr::filter() masks stats::filter()
+    ## x dplyr::lag()    masks stats::lag()
+    ## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library(patchwork)
 library(ggspatial)
 library(readxl)
 library(skimr)
 library(tidymodels)
+```
+
+    ## -- Attaching packages -------------------------------------- tidymodels 1.0.0 --
+    ## v broom        1.0.4     v rsample      1.1.0
+    ## v dials        1.0.0     v tune         1.0.0
+    ## v infer        1.0.2     v workflows    1.0.0
+    ## v modeldata    1.0.0     v workflowsets 1.0.0
+    ## v parsnip      1.0.0     v yardstick    1.0.0
+    ## v recipes      1.0.1     
+    ## -- Conflicts ----------------------------------------- tidymodels_conflicts() --
+    ## x scales::discard() masks purrr::discard()
+    ## x dplyr::filter()   masks stats::filter()
+    ## x recipes::fixed()  masks stringr::fixed()
+    ## x dplyr::lag()      masks stats::lag()
+    ## x yardstick::spec() masks readr::spec()
+    ## x recipes::step()   masks stats::step()
+    ## * Use tidymodels_prefer() to resolve common conflicts.
+
+``` r
 library(ISLR)
 library(modeldata)
 library(vip)
+```
+
+    ## 
+    ## Attaching package: 'vip'
+    ## 
+    ## The following object is masked from 'package:utils':
+    ## 
+    ##     vi
+
+``` r
 library(ggpubr)
+source("R/graficos.R")
+theme_set(theme_bw())
 ```
 
 ### Conhecendo a base de dados de emissão de CO<sub>2</sub> do solo
@@ -84,49 +130,55 @@ Base proveniente de ensaios de campo.
 
 ``` r
 help(data_fco2)
-glimpse(data_fco2)
-#> Rows: 15,397
-#> Columns: 39
-#> $ experimento       <chr> "Espacial", "Espacial", "Espacial", "Espacial", "Esp…
-#> $ data              <date> 2001-07-10, 2001-07-10, 2001-07-10, 2001-07-10, 200…
-#> $ manejo            <chr> "convencional", "convencional", "convencional", "con…
-#> $ tratamento        <chr> "AD_GN", "AD_GN", "AD_GN", "AD_GN", "AD_GN", "AD_GN"…
-#> $ revolvimento_solo <lgl> FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FAL…
-#> $ data_preparo      <date> 2001-07-01, 2001-07-01, 2001-07-01, 2001-07-01, 200…
-#> $ conversao         <date> 1970-01-01, 1970-01-01, 1970-01-01, 1970-01-01, 197…
-#> $ cobertura         <lgl> TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE…
-#> $ cultura           <chr> "milho_soja", "milho_soja", "milho_soja", "milho_soj…
-#> $ x                 <dbl> 0, 40, 80, 10, 25, 40, 55, 70, 20, 40, 60, 10, 70, 3…
-#> $ y                 <dbl> 0, 0, 0, 10, 10, 10, 10, 10, 20, 20, 20, 25, 25, 30,…
-#> $ longitude_muni    <dbl> 782062.7, 782062.7, 782062.7, 782062.7, 782062.7, 78…
-#> $ latitude_muni     <dbl> 7647674, 7647674, 7647674, 7647674, 7647674, 7647674…
-#> $ estado            <chr> "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP"…
-#> $ municipio         <chr> "Jaboticabal", "Jaboticabal", "Jaboticabal", "Jaboti…
-#> $ ID                <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1…
-#> $ prof              <chr> "0-0.1", "0-0.1", "0-0.1", "0-0.1", "0-0.1", "0-0.1"…
-#> $ FCO2              <dbl> 1.080, 0.825, 1.950, 0.534, 0.893, 0.840, 1.110, 1.8…
-#> $ Ts                <dbl> 18.73, 18.40, 19.20, 18.28, 18.35, 18.47, 19.10, 18.…
-#> $ Us                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ pH                <dbl> 5.1, 5.1, 5.8, 5.3, 5.5, 5.7, 5.6, 6.4, 5.3, 5.8, 5.…
-#> $ MO                <dbl> 20, 24, 25, 23, 23, 21, 26, 23, 25, 24, 26, 20, 25, …
-#> $ P                 <dbl> 46, 26, 46, 78, 60, 46, 55, 92, 55, 60, 48, 71, 125,…
-#> $ K                 <dbl> 2.4, 2.2, 5.3, 3.6, 3.4, 2.9, 4.0, 2.3, 3.3, 3.6, 4.…
-#> $ Ca                <dbl> 25, 30, 41, 27, 33, 38, 35, 94, 29, 36, 37, 29, 50, …
-#> $ Mg                <dbl> 11, 11, 25, 11, 15, 20, 16, 65, 11, 17, 15, 11, 30, …
-#> $ H_Al              <dbl> 31, 31, 22, 28, 27, 22, 22, 12, 31, 28, 28, 31, 18, …
-#> $ SB                <dbl> 38.4, 43.2, 71.3, 41.6, 50.6, 60.9, 55.0, 161.3, 43.…
-#> $ CTC               <dbl> 69.4, 74.2, 93.3, 69.6, 77.9, 82.9, 77.0, 173.3, 74.…
-#> $ V                 <dbl> 55, 58, 76, 60, 65, 73, 71, 93, 58, 67, 67, 58, 82, …
-#> $ Ds                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ Macro             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ Micro             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ VTP               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ PLA               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ AT                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ SILTE             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ ARG               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-#> $ HLIFS             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
 ```
+
+    ## starting httpd help server ... done
+
+``` r
+glimpse(data_fco2)
+```
+
+    ## Rows: 15,397
+    ## Columns: 39
+    ## $ experimento       <chr> "Espacial", "Espacial", "Espacial", "Espacial", "Esp~
+    ## $ data              <date> 2001-07-10, 2001-07-10, 2001-07-10, 2001-07-10, 200~
+    ## $ manejo            <chr> "convencional", "convencional", "convencional", "con~
+    ## $ tratamento        <chr> "AD_GN", "AD_GN", "AD_GN", "AD_GN", "AD_GN", "AD_GN"~
+    ## $ revolvimento_solo <lgl> FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FAL~
+    ## $ data_preparo      <date> 2001-07-01, 2001-07-01, 2001-07-01, 2001-07-01, 200~
+    ## $ conversao         <date> 1970-01-01, 1970-01-01, 1970-01-01, 1970-01-01, 197~
+    ## $ cobertura         <lgl> TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE~
+    ## $ cultura           <chr> "milho_soja", "milho_soja", "milho_soja", "milho_soj~
+    ## $ x                 <dbl> 0, 40, 80, 10, 25, 40, 55, 70, 20, 40, 60, 10, 70, 3~
+    ## $ y                 <dbl> 0, 0, 0, 10, 10, 10, 10, 10, 20, 20, 20, 25, 25, 30,~
+    ## $ longitude_muni    <dbl> 782062.7, 782062.7, 782062.7, 782062.7, 782062.7, 78~
+    ## $ latitude_muni     <dbl> 7647674, 7647674, 7647674, 7647674, 7647674, 7647674~
+    ## $ estado            <chr> "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP"~
+    ## $ municipio         <chr> "Jaboticabal", "Jaboticabal", "Jaboticabal", "Jaboti~
+    ## $ ID                <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1~
+    ## $ prof              <chr> "0-0.1", "0-0.1", "0-0.1", "0-0.1", "0-0.1", "0-0.1"~
+    ## $ FCO2              <dbl> 1.080, 0.825, 1.950, 0.534, 0.893, 0.840, 1.110, 1.8~
+    ## $ Ts                <dbl> 18.73, 18.40, 19.20, 18.28, 18.35, 18.47, 19.10, 18.~
+    ## $ Us                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ pH                <dbl> 5.1, 5.1, 5.8, 5.3, 5.5, 5.7, 5.6, 6.4, 5.3, 5.8, 5.~
+    ## $ MO                <dbl> 20, 24, 25, 23, 23, 21, 26, 23, 25, 24, 26, 20, 25, ~
+    ## $ P                 <dbl> 46, 26, 46, 78, 60, 46, 55, 92, 55, 60, 48, 71, 125,~
+    ## $ K                 <dbl> 2.4, 2.2, 5.3, 3.6, 3.4, 2.9, 4.0, 2.3, 3.3, 3.6, 4.~
+    ## $ Ca                <dbl> 25, 30, 41, 27, 33, 38, 35, 94, 29, 36, 37, 29, 50, ~
+    ## $ Mg                <dbl> 11, 11, 25, 11, 15, 20, 16, 65, 11, 17, 15, 11, 30, ~
+    ## $ H_Al              <dbl> 31, 31, 22, 28, 27, 22, 22, 12, 31, 28, 28, 31, 18, ~
+    ## $ SB                <dbl> 38.4, 43.2, 71.3, 41.6, 50.6, 60.9, 55.0, 161.3, 43.~
+    ## $ CTC               <dbl> 69.4, 74.2, 93.3, 69.6, 77.9, 82.9, 77.0, 173.3, 74.~
+    ## $ V                 <dbl> 55, 58, 76, 60, 65, 73, 71, 93, 58, 67, 67, 58, 82, ~
+    ## $ Ds                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ Macro             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ Micro             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ VTP               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ PLA               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ AT                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ SILTE             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ ARG               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+    ## $ HLIFS             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
 
 Vamos conhecer, um pouco mais a nossa base de dados.
 
@@ -212,57 +264,41 @@ Data summary
 ### Alguns gráficos a respeito de nossa variável alvo, emissão de CO<sub>2</sub> do solo (FCO<sub>2</sub>).
 
 ``` r
-theme_set(theme_bw())
-fco2_histograma <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=FCO2, y=..density..)) +
-  geom_histogram(col="black",fill="gray") +
-  geom_density(fill="blue",alpha=.08)
-
-fco2_boxplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=FCO2)) +
-  geom_boxplot(fill="lightgray") + 
-  coord_cartesian(ylim=c(-.9,.9))
-
-fco2_qqplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(sample=FCO2)) +
-  stat_qq(shape=1,size=1,color="black")+
-  stat_qq_line(col="red")
-
-fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
+composition(FCO2,data_fco2)
 ```
+
+    ## Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+    ## i Please use `after_stat(density)` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ### Aplicando a transformação logarítmica nos dados de FCO<sub>2</sub>
 
 ``` r
-ggplot2::theme_set(theme_bw())
-
-fco2_histograma <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=log(FCO2), y=..density..)) +
-  geom_histogram(col="black",fill="gray") +
-  geom_density(fill="red",alpha=.08)
-
-fco2_boxplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(x=log(FCO2))) +
-  geom_boxplot(fill="orange") + 
-  coord_cartesian(ylim=c(-.9,.9))
-
-fco2_qqplot <- data_fco2 %>% 
-  drop_na() %>% 
-  ggplot(aes(sample=log(FCO2))) +
-  stat_qq(shape=1,size=1,color="black")+
-  stat_qq_line(col="blue")
-
-fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
+composition(log10(FCO2) ,data_fco2)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+    ## Warning: Removed 1 rows containing non-finite values (`stat_qq()`).
+
+    ## Warning: Removed 1 rows containing non-finite values (`stat_qq_line()`).
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 1 rows containing non-finite values (`stat_bin()`).
+
+    ## Warning: Removed 1 rows containing non-finite values (`stat_density()`).
+
+    ## Warning: Removed 1 rows containing non-finite values (`stat_boxplot()`).
+
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> \###
+Carregando os dados do pacote `{geobr}`
+
+#### Shape dos estados do Brasil
 
 ``` r
 # brasil_geobr <- geobr::read_country()
@@ -272,102 +308,85 @@ fco2_qqplot | (fco2_histograma)/(fco2_boxplot)
 estados <- read_rds("data/estados.rds")
 ```
 
+#### Shape dos municípios
+
 ``` r
 # muni <- read_municipality()
 # write_rds(muni,"data/municipios.rds")
 muni <- read_rds("data/municipios.rds")
+```
 
-sp <- muni %>% 
-  filter(abbrev_state == "SP")
-
-ms <- muni %>% 
-  filter(abbrev_state == "MS")
-
+``` r
 sp_ms <- muni %>% 
   filter(abbrev_state == "SP" | abbrev_state == "MS")
 
-fsp<-if_else(sp$name_muni == "Jaboticabal" | 
-             sp$name_muni == "Guariba" |
-             sp$name_muni == "Padrópolis" |
-             sp$name_muni == "Rincão"|
-             sp$name_muni == "Mococa"|
-             sp$name_muni == "Ilha Solteira"
+fsp_ms<-if_else(sp_ms$name_muni == "Jaboticabal" | 
+             sp_ms$name_muni == "Guariba" |
+             sp_ms$name_muni == "Padrópolis" |
+             sp_ms$name_muni == "Rincão"|
+             sp_ms$name_muni == "Mococa"|
+             sp_ms$name_muni == "Ilha Solteira" |
+             sp_ms$name_muni == "Aparecida Do Taboado" | 
+             sp_ms$name_muni == "Selvíria"|
+             sp_ms$name_muni == "Dourados"   
              ,"red","lightyellow")
 
-fms<-if_else(ms$name_muni == "Aparecida Do Taboado" | 
-             ms$name_muni == "Selvíria"|
-             ms$name_muni == "Dourados"   
-             ,"red","lightyellow")
-
-sp_ <- estados %>% 
-      filter(abbrev_state == "SP")
-
-ms_ <- estados %>% 
-      filter(abbrev_state == "MS")
+sp_ms_ <- estados %>% 
+      filter(abbrev_state == "SP" | abbrev_state == "MS")
 
 ggplot(sp_ms) + 
-  geom_sf(fill="lightyellow")+
+  geom_sf(fill="lightyellow") +
   theme_minimal() + 
-  annotation_scale(location="bl")+
-  annotation_north_arrow(location="tr",
-                         style = north_arrow_nautical(),
-                         width = unit(2,"cm"),
-                         height = unit(2,"cm")) +
-  geom_sf(data= sp, fill=fsp,col=fsp) +
-  geom_sf(data=sp_,fill="transparent") +
-  geom_sf(data= ms, fill=fms,col=fms) +
-  geom_sf(data=ms_,fill="transparent")
+  annotation_scale(location="bl") +
+  geom_sf(data = sp_ms, fill=fsp_ms,col=fsp_ms) +
+  # geom_sf(data = sp_ms, fill=fms,col=fms) +
+  geom_sf(data = sp_ms_,fill="transparent") +
+  tema_mapa()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-### Conhecendo a base de dados de concentração de CO<sub>2</sub> atmosférico, oriundo do sensor NASA-OCO2.
+### Conhecendo a base de dados de concentração de CO<sub>2</sub> atmosférico, oriundo do sensor orbital NASA-OCO2.
 
 ``` r
 help(oco2_br)
 glimpse(oco2_br)
-#> Rows: 37,387
-#> Columns: 18
-<<<<<<< HEAD
-#> $ longitude                                                     <dbl> -70.5, -~
-#> $ longitude_bnds                                                <chr> "-71.0:-~
-#> $ latitude                                                      <dbl> -5.5, -4~
-#> $ latitude_bnds                                                 <chr> "-6.0:-5~
-#> $ time_yyyymmddhhmmss                                           <dbl> 2.014091~
-#> $ time_bnds_yyyymmddhhmmss                                      <chr> "2014090~
-#> $ altitude_km                                                   <dbl> 3307.8, ~
-#> $ alt_bnds_km                                                   <chr> "0.0:661~
-#> $ fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 7.272876~
-#> $ fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 2.537127~
-#> $ xco2_moles_mole_1                                             <dbl> 0.000394~
-#> $ aerosol_total_aod                                             <dbl> 0.148579~
-#> $ fluorescence_offset_relative_771nm_idp                        <dbl> 0.016753~
-#> $ fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              <dbl> 2.615319~
-#> $ fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 3.088582~
-#> $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969~
-#> $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878~
-#> $ XCO2                                                          <dbl> 387.2781~
-=======
-#> $ longitude                                                     <dbl> -70.5, -…
-#> $ longitude_bnds                                                <chr> "-71.0:-…
-#> $ latitude                                                      <dbl> -5.5, -4…
-#> $ latitude_bnds                                                 <chr> "-6.0:-5…
-#> $ time_yyyymmddhhmmss                                           <dbl> 2.014091…
-#> $ time_bnds_yyyymmddhhmmss                                      <chr> "2014090…
-#> $ altitude_km                                                   <dbl> 3307.8, …
-#> $ alt_bnds_km                                                   <chr> "0.0:661…
-#> $ fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 7.272876…
-#> $ fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 2.537127…
-#> $ xco2_moles_mole_1                                             <dbl> 0.000394…
-#> $ aerosol_total_aod                                             <dbl> 0.148579…
-#> $ fluorescence_offset_relative_771nm_idp                        <dbl> 0.016753…
-#> $ fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              <dbl> 2.615319…
-#> $ fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 3.088582…
-#> $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969…
-#> $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878…
-#> $ XCO2                                                          <dbl> 387.2781…
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## Rows: 37,387
+    ## Columns: 32
+    ## $ longitude                                                     <dbl> -70.5, -~
+    ## $ longitude_bnds                                                <chr> "-71.0:-~
+    ## $ latitude                                                      <dbl> -5.5, -4~
+    ## $ latitude_bnds                                                 <chr> "-6.0:-5~
+    ## $ time_yyyymmddhhmmss                                           <dbl> 2.014091~
+    ## $ time_bnds_yyyymmddhhmmss                                      <chr> "2014090~
+    ## $ altitude_km                                                   <dbl> 3307.8, ~
+    ## $ alt_bnds_km                                                   <chr> "0.0:661~
+    ## $ fluorescence_radiance_757nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 7.272876~
+    ## $ fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 2.537127~
+    ## $ xco2_moles_mole_1                                             <dbl> 0.000394~
+    ## $ aerosol_total_aod                                             <dbl> 0.148579~
+    ## $ fluorescence_offset_relative_771nm_idp                        <dbl> 0.016753~
+    ## $ fluorescence_at_reference_ph_sec_1_m_2_sr_1_um_1              <dbl> 2.615319~
+    ## $ fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        <dbl> 3.088582~
+    ## $ fluorescence_offset_relative_757nm_idp                        <dbl> 0.013969~
+    ## $ fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 <dbl> 5.577878~
+    ## $ xco2                                                          <dbl> 394.3686~
+    ## $ data                                                          <dttm> 2014-09~
+    ## $ ano                                                           <dbl> 2014, 20~
+    ## $ mes                                                           <dbl> 9, 9, 9,~
+    ## $ dia                                                           <int> 6, 6, 6,~
+    ## $ dia_semana                                                    <dbl> 7, 7, 7,~
+    ## $ x                                                             <int> 7, 8, 11~
+    ## $ xco2_est                                                      <dbl> 392.7080~
+    ## $ delta                                                         <dbl> -1.66062~
+    ## $ XCO2                                                          <dbl> 387.2781~
+    ## $ flag_norte                                                    <lgl> TRUE, TR~
+    ## $ flag_nordeste                                                 <lgl> FALSE, F~
+    ## $ flag_sul                                                      <lgl> FALSE, F~
+    ## $ flag_sudeste                                                  <lgl> FALSE, F~
+    ## $ flag_centroeste                                               <lgl> FALSE, F~
 
 ### Breve resumo do banco de dados de X<sub>CO2</sub>
 
@@ -379,11 +398,13 @@ skimr::skim(oco2_br)
 |:-------------------------------------------------|:--------|
 | Name                                             | oco2_br |
 | Number of rows                                   | 37387   |
-| Number of columns                                | 18      |
+| Number of columns                                | 32      |
 | \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_   |         |
 | Column type frequency:                           |         |
 | character                                        | 4       |
-| numeric                                          | 14      |
+| logical                                          | 5       |
+| numeric                                          | 22      |
+| POSIXct                                          | 1       |
 | \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ |         |
 | Group variables                                  | None    |
 
@@ -397,6 +418,16 @@ Data summary
 | latitude_bnds            |         0 |             1 |   7 |  11 |     0 |       38 |          0 |
 | time_bnds_yyyymmddhhmmss |         0 |             1 |  29 |  29 |     0 |     1765 |          0 |
 | alt_bnds_km              |         0 |             1 |  11 |  20 |     0 |       64 |          0 |
+
+**Variable type: logical**
+
+| skim_variable   | n_missing | complete_rate | mean | count                  |
+|:----------------|----------:|--------------:|-----:|:-----------------------|
+| flag_norte      |         0 |             1 | 0.34 | FAL: 24511, TRU: 12876 |
+| flag_nordeste   |         0 |             1 | 0.23 | FAL: 28765, TRU: 8622  |
+| flag_sul        |         0 |             1 | 0.08 | FAL: 34531, TRU: 2856  |
+| flag_sudeste    |         0 |             1 | 0.12 | FAL: 32834, TRU: 4553  |
+| flag_centroeste |         0 |             1 | 0.21 | FAL: 29612, TRU: 7775  |
 
 **Variable type: numeric**
 
@@ -415,7 +446,21 @@ Data summary
 | fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1        |         0 |             1 |  1.904438e+18 | 2.236381e+18 | -8.453983e+19 |  9.694709e+17 |  1.987682e+18 |  2.918792e+18 |  4.338306e+19 | ▁▁▁▇▁ |
 | fluorescence_offset_relative_757nm_idp                        |         0 |             1 | -3.744400e+02 | 1.934763e+04 | -9.999990e+05 |  1.000000e-02 |  1.000000e-02 |  2.000000e-02 |  2.086000e+01 | ▁▁▁▁▇ |
 | fluorescence_radiance_771nm_uncert_idp_ph_sec_1_m_2_sr_1_um_1 |         0 |             1 |  5.235574e+17 | 7.580471e+16 | -9.999990e+05 |  4.695467e+17 |  5.216793e+17 |  5.736367e+17 |  1.143215e+18 | ▁▂▇▁▁ |
+| xco2                                                          |         0 |             1 |  4.000400e+02 | 5.090000e+00 |  3.573800e+02 |  3.966000e+02 |  4.003200e+02 |  4.037000e+02 |  4.386500e+02 | ▁▁▇▁▁ |
+| ano                                                           |         0 |             1 |  2.016880e+03 | 1.570000e+00 |  2.014000e+03 |  2.016000e+03 |  2.017000e+03 |  2.018000e+03 |  2.020000e+03 | ▇▇▅▆▇ |
+| mes                                                           |         0 |             1 |  6.820000e+00 | 3.170000e+00 |  1.000000e+00 |  4.000000e+00 |  7.000000e+00 |  9.000000e+00 |  1.200000e+01 | ▆▆▇▆▇ |
+| dia                                                           |         0 |             1 |  1.572000e+01 | 8.680000e+00 |  1.000000e+00 |  8.000000e+00 |  1.600000e+01 |  2.300000e+01 |  3.100000e+01 | ▇▇▇▇▆ |
+| dia_semana                                                    |         0 |             1 |  3.980000e+00 | 2.020000e+00 |  1.000000e+00 |  2.000000e+00 |  4.000000e+00 |  6.000000e+00 |  7.000000e+00 | ▇▃▃▃▇ |
+| x                                                             |         0 |             1 |  5.566068e+04 | 3.223617e+04 |  7.000000e+00 |  2.811250e+04 |  5.606800e+04 |  8.290750e+04 |  1.117280e+05 | ▇▇▇▇▇ |
+| xco2_est                                                      |         0 |             1 |  3.997700e+02 | 4.090000e+00 |  3.927100e+02 |  3.962700e+02 |  3.998200e+02 |  4.032300e+02 |  4.068800e+02 | ▇▇▇▇▇ |
+| delta                                                         |         0 |             1 | -2.700000e-01 | 3.120000e+00 | -4.452000e+01 | -2.190000e+00 | -6.800000e-01 |  1.210000e+00 |  4.728000e+01 | ▁▁▇▁▁ |
 | XCO2                                                          |         0 |             1 |  3.858900e+02 | 3.120000e+00 |  3.383400e+02 |  3.844100e+02 |  3.862900e+02 |  3.878000e+02 |  4.301400e+02 | ▁▁▇▁▁ |
+
+**Variable type: POSIXct**
+
+| skim_variable | n_missing | complete_rate | min                 | max                 | median              | n_unique |
+|:--------------|----------:|--------------:|:--------------------|:--------------------|:--------------------|---------:|
+| data          |         0 |             1 | 2014-09-06 12:00:00 | 2020-01-20 12:00:00 | 2017-05-18 12:00:00 |     1765 |
 
 ### Manipulando a base `oco2_br` para criação das variáveis temporais e ajuste de unidade de xco2.
 
@@ -427,13 +472,14 @@ oco2_br <- oco2_br  %>%
            ano = year(data),
            mes = month(data),
            dia = day(data),
-           dia_semana = wday(data))
+           dia_semana = wday(data),
+           SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
+           )
 ```
 
 Mapa das leituras do satélite OCO2-NASA
 
 ``` r
-source("R/graficos.R")
 brasil_geobr <- read_rds("data/brasil_geobr.rds")
 brasil_geobr %>% 
   ggplot() +
@@ -449,35 +495,39 @@ brasil_geobr %>%
   labs(x="Longitude",y="Latitude")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
-``` r
-xco2_histograma <- oco2_br %>% 
-  drop_na() %>% 
-  ggplot(aes(x=xco2, y=..density..)) +
-  geom_histogram(col="black",fill="gray") +
-  geom_density(fill="aquamarine2",alpha=.08)
-
-xco2_boxplot <- oco2_br %>% 
-  drop_na() %>% 
-  ggplot(aes(x=xco2)) +
-  geom_boxplot(fill="aquamarine4") + 
-  coord_cartesian(ylim=c(-.9,.9))
-
-xco2_qqplot <- oco2_br %>% 
-  drop_na() %>% 
-  ggplot(aes(sample=xco2)) +
-  stat_qq(shape=1,size=1,color="black")+
-  stat_qq_line(col="purple",lwd=2)
-
-xco2_qqplot | (xco2_histograma)/(xco2_boxplot)
-```
+    ## Scale on map varies by more than 10%, scale bar may be inaccurate
 
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
-# Definindo o plano de multisession
-future::plan("multisession")
+composition(xco2,oco2_br)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+composition(SIF,oco2_br)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+Necessário tratamento dos dados de SIF
+
+``` r
+oco2_br %>% filter (SIF > 0) %>%  pull(SIF) %>% summary
+```
+
+    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+    ##  0.00002  0.38094  0.64297  0.70352  0.89260 31.96757
+
+``` r
+sif_median <- 0.64297
+oco2_br <- oco2_br %>% 
+  mutate(SIF = ifelse(SIF > 0, SIF, sif_median))
 ```
 
 ``` r
@@ -489,13 +539,23 @@ oco2_br  %>%
   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 visdat::vis_miss(data_fco2)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+    ## Warning: `gather_()` was deprecated in tidyr 1.2.0.
+    ## i Please use `gather()` instead.
+    ## i The deprecated feature was likely used in the visdat package.
+    ##   Please report the issue at <https://github.com/ropensci/visdat/issues>.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ## Listando as datas dos arquivos
 
@@ -525,9 +585,10 @@ Coordenadas das cidades
 ``` r
 unique(xco2$ano_mes)[unique(xco2$ano_mes) %>% order()] == 
 unique(fco2$ano_mes)[unique(fco2$ano_mes) %>% order()]
-#>  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-#> [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 ```
+
+    ##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 
 ``` r
 data_set <- left_join(fco2 %>% 
@@ -535,21 +596,42 @@ data_set <- left_join(fco2 %>%
                    mes = lubridate::month(data)
                    ), 
           xco2 %>% 
-            select(data,mes,dia,longitude,latitude,XCO2,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
+            select(data,mes,dia,longitude,latitude,XCO2,SIF,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
   mutate(dist = sqrt((longitude-(-51.423519))^2+(latitude-(-20.362911))^2),
-         SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2)
+         # SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
+         )
+```
 
+    ## Warning in left_join(fco2 %>% mutate(ano = lubridate::year(data), mes = lubridate::month(data)), : Detected an unexpected many-to-many relationship between `x` and `y`.
+    ## i Row 1 of `x` matches multiple rows in `y`.
+    ## i Row 1 of `y` matches multiple rows in `x`.
+    ## i If a many-to-many relationship is expected, set `relationship =
+    ##   "many-to-many"` to silence this warning.
 
+``` r
 data_set<-data_set %>%
   select(-fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1, -fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1 )  %>% 
   filter(dist <= .16, FCO2 <= 30 ) 
 ```
 
 ``` r
+composition(SIF,data_set)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+
+``` r
+# Definindo o plano de multisession
+future::plan("multisession")
+```
+
+``` r
 visdat::vis_miss(data_set)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 ``` r
 tab_medias <- data_set %>% 
@@ -558,35 +640,341 @@ tab_medias <- data_set %>%
   summarise(FCO2 = mean(FCO2, na.rm=TRUE),
             XCO2 = mean(XCO2, na.rm=TRUE),
             SIF = mean(SIF, na.rm=TRUE))
-
-tab_medias %>% 
-  ggplot(aes(x=XCO2, y=SIF,color=cultura)) +
-  geom_point()+
-  geom_smooth(method = "lm")+
-  theme_bw()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+    ## `summarise()` has grouped output by 'ano_mes'. You can override using the
+    ## `.groups` argument.
 
 ``` r
-tab_medias %>% 
-  ggplot(aes(x=XCO2, y=FCO2,col=cultura)) +
-  geom_point()+
-  geom_smooth(method = "lm")+
-  theme_bw()
+tab_medias %>% filter(SIF > 0) %>% 
+  ggplot(aes(y=XCO2, x=SIF)) +
+  geom_point(size=3, shape=21, fill="gray")+
+  geom_smooth(method = "lm", se=FALSE,
+              ldw=2,color="red")+
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5, label.x.npc = .4)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+    ## Warning in geom_smooth(method = "lm", se = FALSE, ldw = 2, color = "red"):
+    ## Ignoring unknown parameters: `ldw`
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ``` r
-tab_medias %>% 
-  ggplot(aes(y=FCO2, x=SIF, color=cultura)) +
-  geom_point()+
-  geom_smooth(method = "lm") +
-  theme_bw()
+lm(XCO2 ~ SIF,
+           data = tab_medias %>% filter(SIF > 0) ) %>% 
+  summary.lm()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ SIF, data = tab_medias %>% filter(SIF > 0))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.1219 -1.5150  0.0957  0.6931  3.7631 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 387.5248     0.4803 806.801  < 2e-16 ***
+    ## SIF          -2.0433     0.6320  -3.233  0.00211 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.825 on 53 degrees of freedom
+    ## Multiple R-squared:  0.1647, Adjusted R-squared:  0.149 
+    ## F-statistic: 10.45 on 1 and 53 DF,  p-value: 0.00211
+
+``` r
+lm(XCO2 ~ SIF + SIF2,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ SIF + SIF2, data = tab_medias %>% filter(SIF > 
+    ##     0) %>% mutate(SIF2 = SIF^2))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.0362 -1.3729  0.1043  0.6334  3.9880 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 388.2875     0.9331 416.126   <2e-16 ***
+    ## SIF          -4.5561     2.7099  -1.681   0.0987 .  
+    ## SIF2          1.5192     1.5931   0.954   0.3447    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.826 on 52 degrees of freedom
+    ## Multiple R-squared:  0.1791, Adjusted R-squared:  0.1475 
+    ## F-statistic: 5.672 on 2 and 52 DF,  p-value: 0.005913
+
+``` r
+lm(XCO2 ~ SIF + SIF2 + SIF3,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2,
+                                                            SIF3 = SIF^3))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ SIF + SIF2 + SIF3, data = tab_medias %>% 
+    ##     filter(SIF > 0) %>% mutate(SIF2 = SIF^2, SIF3 = SIF^3))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.9810 -1.3315  0.1091  0.7363  4.0294 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  388.654      1.734 224.086   <2e-16 ***
+    ## SIF           -6.484      8.135  -0.797    0.429    
+    ## SIF2           4.208     10.808   0.389    0.699    
+    ## SIF3          -1.054      4.189  -0.252    0.802    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.843 on 51 degrees of freedom
+    ## Multiple R-squared:  0.1801, Adjusted R-squared:  0.1319 
+    ## F-statistic: 3.734 on 3 and 51 DF,  p-value: 0.01676
+
+``` r
+formula <- y ~ poly(x, 3, raw = TRUE)
+tab_medias %>% filter(SIF > 0) %>%
+  ggplot(aes(x=XCO2, y=FCO2)) +
+  geom_point(size=3, shape=21, fill="gray")+
+  geom_smooth(method = "lm", se=FALSE,
+              ldw=2,color="red") +
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5,label.x.npc = .4) +
+  stat_smooth(method="lm", se=TRUE, fill=NA,
+                formula=y ~ poly(x, 3, raw=TRUE),colour="blue") +
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")), formula = y ~ poly(x, 3, raw = TRUE)
+    ,size=5,label.x.npc = .2,label.y.npc = .85)
+```
+
+    ## Warning in geom_smooth(method = "lm", se = FALSE, ldw = 2, color = "red"):
+    ## Ignoring unknown parameters: `ldw`
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+
+``` r
+lm(XCO2 ~ FCO2,
+           data = tab_medias %>% filter(SIF > 0) ) %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ FCO2, data = tab_medias %>% filter(SIF > 
+    ##     0))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.8763 -0.9973  0.0098  0.7118  3.7944 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 388.3840     0.4956 783.599  < 2e-16 ***
+    ## FCO2         -0.6252     0.1263  -4.952 7.87e-06 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.651 on 53 degrees of freedom
+    ## Multiple R-squared:  0.3163, Adjusted R-squared:  0.3034 
+    ## F-statistic: 24.52 on 1 and 53 DF,  p-value: 7.867e-06
+
+``` r
+lm(XCO2 ~ FCO2 + FCO22,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ FCO2 + FCO22, data = tab_medias %>% filter(SIF > 
+    ##     0) %>% mutate(FCO22 = FCO2^2))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.7982 -0.8280  0.0033  0.6508  3.6498 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 387.81592    1.01518 382.018   <2e-16 ***
+    ## FCO2         -0.25984    0.58283  -0.446    0.658    
+    ## FCO22        -0.04630    0.07208  -0.642    0.523    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.66 on 52 degrees of freedom
+    ## Multiple R-squared:  0.3217, Adjusted R-squared:  0.2956 
+    ## F-statistic: 12.33 on 2 and 52 DF,  p-value: 4.141e-05
+
+``` r
+lm(XCO2 ~ FCO2 + FCO22 + FCO23,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2,
+                                                            FCO23 = FCO2^3))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ FCO2 + FCO22 + FCO23, data = tab_medias %>% 
+    ##     filter(SIF > 0) %>% mutate(FCO22 = FCO2^2, FCO23 = FCO2^3))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.9322 -0.9353  0.0675  0.6658  3.3518 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 384.0046     1.9473 197.201   <2e-16 ***
+    ## FCO2          3.5011     1.7542   1.996   0.0513 .  
+    ## FCO22        -1.0680     0.4568  -2.338   0.0234 *  
+    ## FCO23         0.0810     0.0358   2.263   0.0279 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.598 on 51 degrees of freedom
+    ## Multiple R-squared:  0.3836, Adjusted R-squared:  0.3473 
+    ## F-statistic: 10.58 on 3 and 51 DF,  p-value: 1.616e-05
+
+``` r
+lm(XCO2 ~ FCO2 + FCO22 + FCO23+ FCO24,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2,
+                                                            FCO23 = FCO2^3,
+                                                            FCO24 = FCO2^4))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = XCO2 ~ FCO2 + FCO22 + FCO23 + FCO24, data = tab_medias %>% 
+    ##     filter(SIF > 0) %>% mutate(FCO22 = FCO2^2, FCO23 = FCO2^3, 
+    ##     FCO24 = FCO2^4))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -4.1290 -0.7578 -0.0005  0.8101  3.5196 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 380.75370    3.54284 107.471   <2e-16 ***
+    ## FCO2          7.96676    4.42977   1.798   0.0781 .  
+    ## FCO22        -3.04007    1.85387  -1.640   0.1073    
+    ## FCO23         0.42194    0.31271   1.349   0.1833    
+    ## FCO24        -0.02000    0.01822  -1.097   0.2777    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.595 on 50 degrees of freedom
+    ## Multiple R-squared:  0.3981, Adjusted R-squared:  0.3499 
+    ## F-statistic: 8.267 on 4 and 50 DF,  p-value: 3.373e-05
+
+``` r
+tab_medias %>% filter(SIF > 0) %>%
+  ggplot(aes(y=FCO2, x=SIF)) +
+  geom_point(size=3, shape=21, fill="gray")+
+  geom_smooth(method = "lm", se=FALSE,
+              ldw=2,color="red")+
+  stat_regline_equation(aes(
+    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5,label.x.npc = .4,label.y.npc = .1)
+```
+
+    ## Warning in geom_smooth(method = "lm", se = FALSE, ldw = 2, color = "red"):
+    ## Ignoring unknown parameters: `ldw`
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+
+``` r
+lm(FCO2 ~ SIF,
+           data = tab_medias %>% filter(SIF > 0) ) %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = FCO2 ~ SIF, data = tab_medias %>% filter(SIF > 0))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.5468 -0.7814 -0.2975  0.7166  3.2571 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   1.4350     0.3371   4.257 8.50e-05 ***
+    ## SIF           3.1750     0.4436   7.158 2.51e-09 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.281 on 53 degrees of freedom
+    ## Multiple R-squared:  0.4915, Adjusted R-squared:  0.4819 
+    ## F-statistic: 51.23 on 1 and 53 DF,  p-value: 2.514e-09
+
+``` r
+lm(FCO2 ~ SIF + SIF2,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = FCO2 ~ SIF + SIF2, data = tab_medias %>% filter(SIF > 
+    ##     0) %>% mutate(SIF2 = SIF^2))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.5244 -0.8894 -0.2424  0.7600  3.1917 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)   
+    ## (Intercept)   0.4461     0.6409   0.696   0.4895   
+    ## SIF           6.4331     1.8613   3.456   0.0011 **
+    ## SIF2         -1.9698     1.0942  -1.800   0.0776 . 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.254 on 52 degrees of freedom
+    ## Multiple R-squared:  0.5214, Adjusted R-squared:  0.5029 
+    ## F-statistic: 28.32 on 2 and 52 DF,  p-value: 4.791e-09
+
+``` r
+lm(FCO2 ~ SIF + SIF2 + SIF3,
+           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2,
+                                                            SIF3 = SIF^3))  %>% 
+  summary.lm()
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = FCO2 ~ SIF + SIF2 + SIF3, data = tab_medias %>% 
+    ##     filter(SIF > 0) %>% mutate(SIF2 = SIF^2, SIF3 = SIF^3))
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.5431 -0.8731 -0.2585  0.7704  3.1687 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)
+    ## (Intercept)   0.2809     1.1917   0.236    0.815
+    ## SIF           7.3019     5.5894   1.306    0.197
+    ## SIF2         -3.1818     7.4263  -0.428    0.670
+    ## SIF3          0.4750     2.8779   0.165    0.870
+    ## 
+    ## Residual standard error: 1.266 on 51 degrees of freedom
+    ## Multiple R-squared:  0.5216, Adjusted R-squared:  0.4935 
+    ## F-statistic: 18.54 on 3 and 51 DF,  p-value: 2.901e-08
 
 ``` r
 data_set_temporal <- data_set %>% 
@@ -601,30 +989,34 @@ data_set_espacial <- data_set %>%
 ``` r
 dados_estacao <- read_excel("data-raw/xlsx/estacao_meteorologia_ilha_solteira.xlsx", na = "NA") 
 glimpse(dados_estacao)
-#> Rows: 1,826
-#> Columns: 16
-#> $ data    <dttm> 2015-01-01, 2015-01-02, 2015-01-03, 2015-01-04, 2015-01-05, 2…
-#> $ Tmed    <dbl> 30.5, 30.0, 26.8, 27.1, 27.0, 27.6, 30.2, 28.2, 28.5, 29.9, 30…
-#> $ Tmax    <dbl> 36.5, 36.7, 35.7, 34.3, 33.2, 36.4, 37.2, 32.4, 37.1, 38.1, 38…
-#> $ Tmin    <dbl> 24.6, 24.5, 22.9, 22.7, 22.3, 22.8, 22.7, 24.0, 23.0, 23.3, 24…
-#> $ Umed    <dbl> 66.6, 70.4, 82.7, 76.8, 81.6, 75.5, 65.8, 70.0, 72.9, 67.6, 66…
-#> $ Umax    <dbl> 89.6, 93.6, 99.7, 95.0, 98.3, 96.1, 99.2, 83.4, 90.7, 97.4, 90…
-#> $ Umin    <dbl> 42.0, 44.2, 52.9, 43.8, 57.1, 47.5, 34.1, 57.4, 42.7, 38.3, 37…
-#> $ PkPa    <dbl> 97.2, 97.3, 97.4, 97.5, 97.4, 97.5, 97.4, 97.4, 97.4, 97.4, 97…
-#> $ Rad     <dbl> 23.6, 24.6, 20.2, 21.4, 17.8, 19.2, 27.0, 15.2, 21.6, 24.3, 24…
-#> $ PAR     <dbl> 496.6, 513.3, 430.5, 454.0, 378.2, 405.4, 565.7, 317.2, 467.5,…
-#> $ Eto     <dbl> 5.7, 5.8, 4.9, 5.1, 4.1, 4.8, 6.2, 4.1, 5.5, 5.7, 5.9, 6.1, 6.…
-#> $ Velmax  <dbl> 6.1, 4.8, 12.1, 6.2, 5.1, 4.5, 4.6, 5.7, 5.8, 5.2, 5.2, 4.7, 6…
-#> $ Velmin  <dbl> 1.0, 1.0, 1.2, 1.0, 0.8, 0.9, 0.9, 1.5, 1.2, 0.8, 0.8, 1.2, 1.…
-#> $ Dir_vel <dbl> 17.4, 261.9, 222.0, 25.0, 56.9, 74.9, 53.4, 89.0, 144.8, 303.9…
-#> $ chuva   <dbl> 0.0, 0.0, 3.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.…
-#> $ inso    <dbl> 7.9, 8.7, 5.2, 6.2, 3.4, 4.5, 10.5, 1.3, 6.3, 8.4, 8.6, 7.9, 1…
+```
+
+    ## Rows: 1,826
+    ## Columns: 16
+    ## $ data    <dttm> 2015-01-01, 2015-01-02, 2015-01-03, 2015-01-04, 2015-01-05, 2~
+    ## $ Tmed    <dbl> 30.5, 30.0, 26.8, 27.1, 27.0, 27.6, 30.2, 28.2, 28.5, 29.9, 30~
+    ## $ Tmax    <dbl> 36.5, 36.7, 35.7, 34.3, 33.2, 36.4, 37.2, 32.4, 37.1, 38.1, 38~
+    ## $ Tmin    <dbl> 24.6, 24.5, 22.9, 22.7, 22.3, 22.8, 22.7, 24.0, 23.0, 23.3, 24~
+    ## $ Umed    <dbl> 66.6, 70.4, 82.7, 76.8, 81.6, 75.5, 65.8, 70.0, 72.9, 67.6, 66~
+    ## $ Umax    <dbl> 89.6, 93.6, 99.7, 95.0, 98.3, 96.1, 99.2, 83.4, 90.7, 97.4, 90~
+    ## $ Umin    <dbl> 42.0, 44.2, 52.9, 43.8, 57.1, 47.5, 34.1, 57.4, 42.7, 38.3, 37~
+    ## $ PkPa    <dbl> 97.2, 97.3, 97.4, 97.5, 97.4, 97.5, 97.4, 97.4, 97.4, 97.4, 97~
+    ## $ Rad     <dbl> 23.6, 24.6, 20.2, 21.4, 17.8, 19.2, 27.0, 15.2, 21.6, 24.3, 24~
+    ## $ PAR     <dbl> 496.6, 513.3, 430.5, 454.0, 378.2, 405.4, 565.7, 317.2, 467.5,~
+    ## $ Eto     <dbl> 5.7, 5.8, 4.9, 5.1, 4.1, 4.8, 6.2, 4.1, 5.5, 5.7, 5.9, 6.1, 6.~
+    ## $ Velmax  <dbl> 6.1, 4.8, 12.1, 6.2, 5.1, 4.5, 4.6, 5.7, 5.8, 5.2, 5.2, 4.7, 6~
+    ## $ Velmin  <dbl> 1.0, 1.0, 1.2, 1.0, 0.8, 0.9, 0.9, 1.5, 1.2, 0.8, 0.8, 1.2, 1.~
+    ## $ Dir_vel <dbl> 17.4, 261.9, 222.0, 25.0, 56.9, 74.9, 53.4, 89.0, 144.8, 303.9~
+    ## $ chuva   <dbl> 0.0, 0.0, 3.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.~
+    ## $ inso    <dbl> 7.9, 8.7, 5.2, 6.2, 3.4, 4.5, 10.5, 1.3, 6.3, 8.4, 8.6, 7.9, 1~
+
+``` r
 dados_estacao <- dados_estacao %>% 
                    drop_na()
 visdat::vis_miss(dados_estacao)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 ``` r
 data_set_est_isa <- left_join(data_set %>% 
@@ -639,30 +1031,27 @@ data_set_espacial <- data_set_est_isa %>%
   filter(experimento == "Espacial")
 ```
 
-# Quinta Aproximação
+# Quarta Aproximação
 
-- Alvo: FCO2 - espacial
+- Alvo: FCO2 - temporal
 - restrição dados após 2014
 - Features: Atributos do Solo + Xco2 e SIF + Dados da Estação de ISA
 - Modelo mais simples e geral
-- Testar 3 métodos baseados em árvores de decisão
+- Teste de três métodos baseados em árvores de decisão
 
-### visualização do banco de dados
+### Visualização do banco de dados
 
 ``` r
-visdat::vis_miss(data_set_espacial)
+visdat::vis_miss(data_set_temporal)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 ### Definindo a Base de treino e teste
 
 ``` r
-<<<<<<< HEAD
+# data_set_ml <- data_set_espacial  # <-------
 data_set_ml <- data_set_temporal # <-------
-=======
-data_set_ml <- data_set_espacial  # <-------
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
@@ -678,7 +1067,7 @@ fco2_train  %>%
   labs(x="FCO2 - treino", y = "Densidade")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
 ``` r
 fco2_testing <- testing(fco2_initial_split)
@@ -690,7 +1079,7 @@ fco2_testing  %>%
   labs(x="FCO2 - teste", y = "Densidade")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
 
 ``` r
 fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) %>% 
@@ -700,7 +1089,7 @@ fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) %>%
   corrplot::corrplot()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- --> \### data
+![](README_files/figure-gfm/unnamed-chunk-38-1.png)<!-- --> \### data
 prep
 
 ``` r
@@ -716,56 +1105,34 @@ fco2_recipe <- recipe(FCO2 ~ .,
   #step_poly(c(Us,Ts), degree = 2)  %>%  
   step_dummy(all_nominal_predictors())
 bake(prep(fco2_recipe), new_data = NULL)
-<<<<<<< HEAD
-#> # A tibble: 2,676 x 49
-#>         Ts      Us      pH       MO      P       K      Ca      Mg   H_Al     SB
-#>      <dbl>   <dbl>   <dbl>    <dbl>  <dbl>   <dbl>   <dbl>   <dbl>  <dbl>  <dbl>
-#>  1  0.0801 -0.386  -0.671   0.751   -0.441 -0.539  -0.674  -1.26    1.25  -1.01 
-#>  2 -0.0121 -0.834   0.619   0.109    0.560 -0.739  -0.198   0.239  -1.09  -0.155
-#>  3  0.370  -0.116  -0.187   1.18    -0.942 -0.389   0.0873  0.613  -0.129  0.233
-#>  4  0.449  -0.383  -0.0262  0.00189 -0.691 -0.739  -0.674  -0.696  -0.939 -0.835
-#>  5 -1.96    1.75   -0.510  -0.640    1.48  -0.239  -0.198   0.0519  0.471 -0.155
-#>  6  0.765   0.0189 -0.0262  1.18    -0.274 -0.189   0.468   1.36   -0.429  0.804
-#>  7 -0.776   1.64   -0.832  -0.533    0.393 -0.689  -0.769  -1.63    1.25  -1.24 
-#>  8 -0.0121 -1.24    0.619   0.109    0.560 -0.739  -0.198   0.239  -1.09  -0.155
-#>  9  0.225  -0.826  -0.0262  0.00189 -0.691 -0.739  -0.674  -0.696  -0.939 -0.835
-#> 10 -2.36    0.829  -0.0262 -0.533    1.73  -0.0389  1.42    0.0519 -0.129  1.03 
-#> # ... with 2,666 more rows, and 39 more variables: CTC <dbl>, V <dbl>,
-#> #   Ds <dbl>, Macro <dbl>, Micro <dbl>, VTP <dbl>, PLA <dbl>, AT <dbl>,
-#> #   SILTE <dbl>, ARG <dbl>, HLIFS <dbl>, XCO2 <dbl>, SIF <dbl>, Tmed <dbl>,
-#> #   Tmax <dbl>, Tmin <dbl>, Umed <dbl>, Umax <dbl>, Umin <dbl>, PkPa <dbl>,
-#> #   Rad <dbl>, PAR <dbl>, Eto <dbl>, Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>,
-#> #   chuva <dbl>, inso <dbl>, FCO2 <dbl>, cultura_eucalipto <dbl>,
-#> #   cultura_mata.ciliar <dbl>, cultura_pasto <dbl>, cultura_pinus <dbl>, ...
-=======
-#> # A tibble: 3,428 × 44
-#>         Ts     Us      pH      MO      P      K     Ca     Mg    H_Al     SB
-#>      <dbl>  <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>  <dbl>
-#>  1  0.746  -0.992 -0.207   1.24    0.944 -0.115 -0.181 -0.537  0.505  -0.317
-#>  2 -1.59    0.872 -0.207  -0.393  -0.910 -0.311 -0.371 -1.22   1.13   -0.696
-#>  3 -1.08    0.587 -0.207  -0.542  -0.601  0.539 -0.560 -0.764  1.13   -0.603
-#>  4 -0.771   0.161 -0.161   0.348  -0.910  1.72  -0.560 -0.991  0.505  -0.546
-#>  5 -0.0256 -1.10   0.0206  1.24    1.25  -0.442  1.05   1.74  -0.261   1.29 
-#>  6  0.283  -0.524 -0.0703  0.496  -0.292  0.932 -0.465  0.373  0.226  -0.132
-#>  7 -0.334  -0.196 -0.116   0.496   0.326 -0.377  0.765  0.827 -0.0523  0.795
-#>  8 -1.13    0.395 -0.207   0.348  -0.601  0.278 -0.465 -0.537  0.783  -0.489
-#>  9  1.31    1.57  -0.207   0.200  -0.601  0.408 -0.655 -0.991  1.13   -0.760
-#> 10  1.26   -0.565 -0.161   0.0513 -0.601  1.26  -0.465 -0.537  0.505  -0.382
-#> # ℹ 3,418 more rows
-#> # ℹ 34 more variables: CTC <dbl>, V <dbl>, Ds <dbl>, Macro <dbl>, Micro <dbl>,
-#> #   VTP <dbl>, PLA <dbl>, AT <dbl>, SILTE <dbl>, ARG <dbl>, HLIFS <dbl>,
-#> #   XCO2 <dbl>, SIF <dbl>, Tmed <dbl>, Tmax <dbl>, Tmin <dbl>, Umed <dbl>,
-#> #   Umax <dbl>, Umin <dbl>, PkPa <dbl>, Rad <dbl>, PAR <dbl>, Eto <dbl>,
-#> #   Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>, chuva <dbl>, inso <dbl>,
-#> #   FCO2 <dbl>, cultura_pasto <dbl>, cultura_silvipastoril <dbl>, …
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 2,676 x 49
+    ##         Ts       Us      pH      MO      P       K      Ca     Mg    H_Al
+    ##      <dbl>    <dbl>   <dbl>   <dbl>  <dbl>   <dbl>   <dbl>  <dbl>   <dbl>
+    ##  1  0.710  -1.19    -0.361   0.523  -1.17  -0.629  -0.683  -0.332 -0.258 
+    ##  2  0.710  -0.788   -0.0413  1.70   -0.672  0.411   0.362   1.35  -0.108 
+    ##  3  0.473   0.00317 -0.681  -0.872   1.24   4.72   -0.588  -0.145  1.27  
+    ##  4  0.592  -0.788   -0.361   2.03   -0.505 -0.0847 -0.0180  0.790  0.251 
+    ##  5  1.11   -1.28     0.439  -0.121  -0.921 -0.629  -0.588  -0.332 -1.07  
+    ##  6 -2.34    0.889   -0.521  -1.19    0.327 -0.679  -0.493  -1.27   0.251 
+    ##  7 -1.82    0.996    0.119  -0.443   1.49   0.212   0.647   0.603  0.0714
+    ##  8  0.434  -0.399    0.918   0.0939 -0.339 -0.778  -0.113   0.416 -1.07  
+    ##  9  0.513   2.03    -0.681   0.630  -1.09  -0.233  -0.778  -0.705  0.491 
+    ## 10  0.0520 -1.40    -0.0413 -0.0134 -0.672 -0.728  -0.683  -0.705 -0.917 
+    ## # i 2,666 more rows
+    ## # i 40 more variables: SB <dbl>, CTC <dbl>, V <dbl>, Ds <dbl>, Macro <dbl>,
+    ## #   Micro <dbl>, VTP <dbl>, PLA <dbl>, AT <dbl>, SILTE <dbl>, ARG <dbl>,
+    ## #   HLIFS <dbl>, XCO2 <dbl>, SIF <dbl>, Tmed <dbl>, Tmax <dbl>, Tmin <dbl>,
+    ## #   Umed <dbl>, Umax <dbl>, Umin <dbl>, PkPa <dbl>, Rad <dbl>, PAR <dbl>,
+    ## #   Eto <dbl>, Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>, chuva <dbl>,
+    ## #   inso <dbl>, FCO2 <dbl>, cultura_eucalipto <dbl>, ...
 
 ``` r
 visdat::vis_miss(bake(prep(fco2_recipe), new_data = NULL))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- --> \###
+![](README_files/figure-gfm/unnamed-chunk-40-1.png)<!-- --> \###
 Reamostragem definida e será padrão para todos os modelos
 
 ``` r
@@ -808,18 +1175,13 @@ grid_dt <- grid_random(
   size = 10 # <-----------------------------
 )
 glimpse(grid_dt)
-#> Rows: 10
-#> Columns: 3
-<<<<<<< HEAD
-#> $ cost_complexity <dbl> 9.025760e-05, 4.913009e-05, 6.339129e-05, 6.345867e-06~
-#> $ tree_depth      <int> 12, 8, 18, 16, 8, 18, 8, 10, 8, 16
-#> $ min_n           <int> 47, 50, 44, 52, 46, 43, 46, 50, 48, 46
-=======
-#> $ cost_complexity <dbl> 1.497271e-05, 3.016738e-05, 1.233316e-05, 1.557756e-05…
-#> $ tree_depth      <int> 17, 10, 17, 13, 13, 14, 13, 11, 10, 14
-#> $ min_n           <int> 48, 44, 48, 47, 45, 45, 45, 48, 48, 48
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## Rows: 10
+    ## Columns: 3
+    ## $ cost_complexity <dbl> 3.837068e-06, 3.525887e-05, 9.348907e-06, 1.014590e-05~
+    ## $ tree_depth      <int> 17, 13, 9, 17, 17, 13, 11, 16, 13, 10
+    ## $ min_n           <int> 47, 47, 47, 47, 52, 49, 51, 47, 50, 42
 
 ### Tuning de hiperparâmetros
 
@@ -836,42 +1198,26 @@ fco2_dt_tune_grid <- tune_grid(
 autoplot(fco2_dt_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 ``` r
 collect_metrics(fco2_dt_tune_grid)
-<<<<<<< HEAD
-#> # A tibble: 10 x 9
-#>    cost_complexity tree_depth min_n .metric .estim~1  mean     n std_err .config
-#>              <dbl>      <int> <int> <chr>   <chr>    <dbl> <int>   <dbl> <chr>  
-#>  1      0.0000903          12    47 rmse    standard  1.31     5  0.0511 Prepro~
-#>  2      0.0000491           8    50 rmse    standard  1.33     5  0.0528 Prepro~
-#>  3      0.0000634          18    44 rmse    standard  1.29     5  0.0419 Prepro~
-#>  4      0.00000635         16    52 rmse    standard  1.32     5  0.0459 Prepro~
-#>  5      0.00000281          8    46 rmse    standard  1.33     5  0.0465 Prepro~
-#>  6      0.00000169         18    43 rmse    standard  1.29     5  0.0452 Prepro~
-#>  7      0.0000325           8    46 rmse    standard  1.33     5  0.0465 Prepro~
-#>  8      0.0000209          10    50 rmse    standard  1.32     5  0.0457 Prepro~
-#>  9      0.0000255           8    48 rmse    standard  1.32     5  0.0530 Prepro~
-#> 10      0.00000112         16    46 rmse    standard  1.31     5  0.0471 Prepro~
-#> # ... with abbreviated variable name 1: .estimator
-=======
-#> # A tibble: 10 × 9
-#>    cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
-#>              <dbl>      <int> <int> <chr>   <chr>      <dbl> <int>   <dbl>
-#>  1      0.0000150          17    48 rmse    standard    1.23     5  0.0603
-#>  2      0.0000302          10    44 rmse    standard    1.22     5  0.0579
-#>  3      0.0000123          17    48 rmse    standard    1.23     5  0.0603
-#>  4      0.0000156          13    47 rmse    standard    1.23     5  0.0599
-#>  5      0.00000510         13    45 rmse    standard    1.23     5  0.0599
-#>  6      0.0000875          14    45 rmse    standard    1.23     5  0.0587
-#>  7      0.0000116          13    45 rmse    standard    1.23     5  0.0599
-#>  8      0.0000300          11    48 rmse    standard    1.23     5  0.0585
-#>  9      0.00000340         10    48 rmse    standard    1.22     5  0.0596
-#> 10      0.00000304         14    48 rmse    standard    1.23     5  0.0587
-#> # ℹ 1 more variable: .config <chr>
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 10 x 9
+    ##    cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
+    ##              <dbl>      <int> <int> <chr>   <chr>      <dbl> <int>   <dbl>
+    ##  1      0.00000384         17    47 rmse    standard    1.33     5  0.0220
+    ##  2      0.0000353          13    47 rmse    standard    1.33     5  0.0230
+    ##  3      0.00000935          9    47 rmse    standard    1.35     5  0.0300
+    ##  4      0.0000101          17    47 rmse    standard    1.33     5  0.0220
+    ##  5      0.00000187         17    52 rmse    standard    1.34     5  0.0222
+    ##  6      0.00000872         13    49 rmse    standard    1.33     5  0.0210
+    ##  7      0.00000652         11    51 rmse    standard    1.34     5  0.0227
+    ##  8      0.0000184          16    47 rmse    standard    1.33     5  0.0226
+    ##  9      0.00000137         13    50 rmse    standard    1.34     5  0.0203
+    ## 10      0.00000623         10    42 rmse    standard    1.34     5  0.0324
+    ## # i 1 more variable: .config <chr>
 
 ### Desempenho dos modelos finais
 
@@ -892,7 +1238,7 @@ fco2_test <- testing(fco2_initial_split)
 visdat::vis_miss(fco2_test)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
 
 ``` r
 fco2_test_preds %>% 
@@ -901,10 +1247,13 @@ fco2_test_preds %>%
   theme_bw() +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) 
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
+  geom_abline (slope=1, linetype = "dashed", color="Red")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
 
 # Importância
 
@@ -913,7 +1262,7 @@ fco2_dt_last_fit_model <-fco2_dt_last_fit$.workflow[[1]]$fit$fit
 vip(fco2_dt_last_fit_model)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
 
 ## Métricas
 
@@ -938,7 +1287,9 @@ fco2_test_preds %>%
     label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-48-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
 
 ``` r
   # ggplot2::annotate('text',x=10.4,y=16.7,label=paste0('RMSE = ',round(my_rmse,2),', MAPE = '
@@ -946,23 +1297,15 @@ fco2_test_preds %>%
   # theme_bw()
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
-#>      vector_of_metrics
-<<<<<<< HEAD
-#> r            0.8277487
-#> R2           0.6851679
-#> MSE          1.5935510
-#> RMSE         1.2623593
-#> MAE          0.8337241
-#> MAPE        27.3322549
-=======
-#> r            0.7817922
-#> R2           0.6111991
-#> MSE          1.3956239
-#> RMSE         1.1813653
-#> MAE          0.7420816
-#> MAPE        27.6461279
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ##      vector_of_metrics
+    ## r            0.8375458
+    ## R2           0.7014830
+    ## MSE          1.4510734
+    ## RMSE         1.2046051
+    ## MAE          0.7797233
+    ## MAPE        26.3581933
 
 ## Random Forest
 
@@ -989,11 +1332,11 @@ fco2_rf_wf <- workflow()   %>%
 ### Tune
 
 ``` r
-grid_rf <- grid_random(
+grid_rf <- grid_regular(
   min_n(range = c(20, 30)),
   mtry(range = c(10,20)),
   trees(range = c(769,1500) ),
-  size = 10 #<-----------------------
+  levels = 2 #<-----------------------
 )
 ```
 
@@ -1007,40 +1350,23 @@ fco2_rf_tune_grid <- tune_grid(
 autoplot(fco2_rf_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
 
 ``` r
 collect_metrics(fco2_rf_tune_grid)
-<<<<<<< HEAD
-#> # A tibble: 10 x 9
-#>     mtry trees min_n .metric .estimator  mean     n std_err .config             
-#>    <int> <int> <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#>  1    17  1050    28 rmse    standard    1.06     5  0.0334 Preprocessor1_Model~
-#>  2    17  1069    23 rmse    standard    1.05     5  0.0320 Preprocessor1_Model~
-#>  3    16  1217    23 rmse    standard    1.05     5  0.0333 Preprocessor1_Model~
-#>  4    11  1000    20 rmse    standard    1.05     5  0.0334 Preprocessor1_Model~
-#>  5    12  1004    24 rmse    standard    1.06     5  0.0334 Preprocessor1_Model~
-#>  6    12  1436    30 rmse    standard    1.08     5  0.0347 Preprocessor1_Model~
-#>  7    12  1190    29 rmse    standard    1.07     5  0.0345 Preprocessor1_Model~
-#>  8    20  1414    21 rmse    standard    1.04     5  0.0317 Preprocessor1_Model~
-#>  9    20  1035    29 rmse    standard    1.06     5  0.0329 Preprocessor1_Model~
-#> 10    14   951    28 rmse    standard    1.07     5  0.0324 Preprocessor1_Model~
-=======
-#> # A tibble: 10 × 9
-#>     mtry trees min_n .metric .estimator  mean     n std_err .config             
-#>    <int> <int> <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#>  1    18   906    22 rmse    standard    1.10     5  0.0663 Preprocessor1_Model…
-#>  2    16  1276    21 rmse    standard    1.10     5  0.0660 Preprocessor1_Model…
-#>  3    15  1099    22 rmse    standard    1.10     5  0.0659 Preprocessor1_Model…
-#>  4    12  1395    28 rmse    standard    1.11     5  0.0670 Preprocessor1_Model…
-#>  5    16  1371    28 rmse    standard    1.11     5  0.0658 Preprocessor1_Model…
-#>  6    16  1348    26 rmse    standard    1.10     5  0.0665 Preprocessor1_Model…
-#>  7    14  1425    30 rmse    standard    1.11     5  0.0664 Preprocessor1_Model…
-#>  8    16  1118    23 rmse    standard    1.10     5  0.0661 Preprocessor1_Model…
-#>  9    10   887    30 rmse    standard    1.12     5  0.0662 Preprocessor1_Model…
-#> 10    17  1245    20 rmse    standard    1.09     5  0.0665 Preprocessor1_Model…
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 8 x 9
+    ##    mtry trees min_n .metric .estimator  mean     n std_err .config             
+    ##   <int> <int> <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+    ## 1    10   769    20 rmse    standard    1.07     5  0.0389 Preprocessor1_Model1
+    ## 2    10   769    30 rmse    standard    1.10     5  0.0404 Preprocessor1_Model2
+    ## 3    20   769    20 rmse    standard    1.05     5  0.0374 Preprocessor1_Model3
+    ## 4    20   769    30 rmse    standard    1.09     5  0.0403 Preprocessor1_Model4
+    ## 5    10  1500    20 rmse    standard    1.07     5  0.0386 Preprocessor1_Model5
+    ## 6    10  1500    30 rmse    standard    1.11     5  0.0411 Preprocessor1_Model6
+    ## 7    20  1500    20 rmse    standard    1.06     5  0.0382 Preprocessor1_Model7
+    ## 8    20  1500    30 rmse    standard    1.09     5  0.0405 Preprocessor1_Model8
 
 ### Desempenho modelo final
 
@@ -1061,7 +1387,7 @@ fco2_test <- testing(fco2_initial_split)
 visdat::vis_miss(fco2_test)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
 
 ``` r
 fco2_test_preds %>% 
@@ -1070,10 +1396,13 @@ fco2_test_preds %>%
   theme_bw() +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) 
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
+  geom_abline (slope=1, linetype = "dashed", color="Red")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
 
 # Importância
 
@@ -1082,7 +1411,7 @@ fco2_rf_last_fit_model <-fco2_rf_last_fit$.workflow[[1]]$fit$fit
 vip(fco2_rf_last_fit_model)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-57-1.png)<!-- --> \## Métricas
+![](README_files/figure-gfm/unnamed-chunk-61-1.png)<!-- --> \## Métricas
 
 ``` r
 da <- fco2_test_preds %>% 
@@ -1105,7 +1434,9 @@ fco2_test_preds %>%
     label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
 
 ``` r
   # ggplot2::annotate('text',x=10.4,y=16.7,label=paste0('RMSE = ',round(my_rmse,2),', MAPE = '
@@ -1113,23 +1444,15 @@ fco2_test_preds %>%
   # theme_bw()
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
-#>      vector_of_metrics
-<<<<<<< HEAD
-#> r            0.8955432
-#> R2           0.8019976
-#> MSE          1.0068983
-#> RMSE         1.0034432
-#> MAE          0.6387230
-#> MAPE        21.3415904
-=======
-#> r            0.8540438
-#> R2           0.7293909
-#> MSE          0.9579750
-#> RMSE         0.9787620
-#> MAE          0.5753262
-#> MAPE        21.6829855
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ##      vector_of_metrics
+    ## r            0.9125521
+    ## R2           0.8327513
+    ## MSE          0.8252557
+    ## RMSE         0.9084359
+    ## MAE          0.5858878
+    ## MAPE        20.2983144
 
 ## Boosting gradient tree (xgb)
 
@@ -1173,46 +1496,32 @@ fco2_xgb_tune_grid <- tune_grid(
 autoplot(fco2_xgb_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-66-1.png)<!-- -->
 
 ``` r
 fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 6)
-<<<<<<< HEAD
-#> # A tibble: 6 x 8
-#>   trees learn_rate .metric .estimator  mean     n std_err .config             
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1   500       0.3  rmse    standard   0.934     5  0.0358 Preprocessor1_Model6
-#> 2   250       0.3  rmse    standard   0.942     5  0.0350 Preprocessor1_Model5
-#> 3   500       0.05 rmse    standard   0.960     5  0.0336 Preprocessor1_Model3
-#> 4   250       0.05 rmse    standard   1.02      5  0.0361 Preprocessor1_Model2
-#> 5     2       0.3  rmse    standard   2.18      5  0.0642 Preprocessor1_Model4
-#> 6     2       0.05 rmse    standard   3.36      5  0.0566 Preprocessor1_Model1
-=======
-#> # A tibble: 6 × 8
-#>   trees learn_rate .metric .estimator  mean     n std_err .config             
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1   500       0.05 rmse    standard    1.13     5  0.0583 Preprocessor1_Model3
-#> 2   250       0.05 rmse    standard    1.15     5  0.0548 Preprocessor1_Model2
-#> 3   500       0.3  rmse    standard    1.17     5  0.0564 Preprocessor1_Model6
-#> 4   250       0.3  rmse    standard    1.17     5  0.0559 Preprocessor1_Model5
-#> 5     2       0.3  rmse    standard    1.95     5  0.0724 Preprocessor1_Model4
-#> 6     2       0.05 rmse    standard    3.00     5  0.0766 Preprocessor1_Model1
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 6 x 8
+    ##   trees learn_rate .metric .estimator  mean     n std_err .config             
+    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+    ## 1   500       0.3  rmse    standard   0.977     5  0.0389 Preprocessor1_Model6
+    ## 2   250       0.3  rmse    standard   0.985     5  0.0361 Preprocessor1_Model5
+    ## 3   500       0.05 rmse    standard   0.995     5  0.0378 Preprocessor1_Model3
+    ## 4   250       0.05 rmse    standard   1.06      5  0.0395 Preprocessor1_Model2
+    ## 5     2       0.3  rmse    standard   2.19      5  0.0281 Preprocessor1_Model4
+    ## 6     2       0.05 rmse    standard   3.37      5  0.0290 Preprocessor1_Model1
 
 ``` r
 fco2_xgb_select_best_passo1 <- fco2_xgb_tune_grid %>% 
   select_best(metric = "rmse")
 fco2_xgb_select_best_passo1
-#> # A tibble: 1 × 3
-#>   trees learn_rate .config             
-#>   <dbl>      <dbl> <chr>               
-<<<<<<< HEAD
-#> 1   500        0.3 Preprocessor1_Model6
-=======
-#> 1   500       0.05 Preprocessor1_Model3
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 1 x 3
+    ##   trees learn_rate .config             
+    ##   <dbl>      <dbl> <chr>               
+    ## 1   500        0.3 Preprocessor1_Model6
 
 #### Passo 2
 
@@ -1252,40 +1561,30 @@ fco2_xgb_tune_grid <- fco2_xgb_wf   %>%
 autoplot(fco2_xgb_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-65-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-69-1.png)<!-- -->
 
 ``` r
 fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
-<<<<<<< HEAD
-#> # A tibble: 5 x 8
-#>   min_n tree_depth .metric .estimator  mean     n std_err .config             
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1     5          4 rmse    standard   0.944     5  0.0290 Preprocessor1_Model3
-#> 2     5          3 rmse    standard   0.952     5  0.0325 Preprocessor1_Model2
-#> 3    30          4 rmse    standard   0.957     5  0.0328 Preprocessor1_Model6
-#> 4    60          4 rmse    standard   0.975     5  0.0293 Preprocessor1_Model9
-#> 5    30          3 rmse    standard   0.988     5  0.0285 Preprocessor1_Model5
-=======
-#> # A tibble: 5 × 8
-#>   min_n tree_depth .metric .estimator  mean     n std_err .config             
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1    60          4 rmse    standard    1.13     5  0.0556 Preprocessor1_Model9
-#> 2     5          4 rmse    standard    1.14     5  0.0557 Preprocessor1_Model3
-#> 3    30          4 rmse    standard    1.14     5  0.0540 Preprocessor1_Model6
-#> 4    60          3 rmse    standard    1.15     5  0.0554 Preprocessor1_Model8
-#> 5    30          3 rmse    standard    1.16     5  0.0544 Preprocessor1_Model5
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
+```
+
+    ## # A tibble: 5 x 8
+    ##   min_n tree_depth .metric .estimator  mean     n std_err .config             
+    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+    ## 1     5          4 rmse    standard   0.975     5  0.0432 Preprocessor1_Model3
+    ## 2     5          3 rmse    standard   0.984     5  0.0456 Preprocessor1_Model2
+    ## 3    30          4 rmse    standard   0.985     5  0.0324 Preprocessor1_Model6
+    ## 4    60          4 rmse    standard   1.01      5  0.0343 Preprocessor1_Model9
+    ## 5    30          3 rmse    standard   1.02      5  0.0439 Preprocessor1_Model5
+
+``` r
 fco2_xgb_select_best_passo2 <- fco2_xgb_tune_grid  %>%   select_best(metric = "rmse")
 fco2_xgb_select_best_passo2
-#> # A tibble: 1 × 3
-#>   min_n tree_depth .config             
-#>   <dbl>      <dbl> <chr>               
-<<<<<<< HEAD
-#> 1     5          4 Preprocessor1_Model3
-=======
-#> 1    60          4 Preprocessor1_Model9
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 1 x 3
+    ##   min_n tree_depth .config             
+    ##   <dbl>      <dbl> <chr>               
+    ## 1     5          4 Preprocessor1_Model3
 
 ## Passo 3
 
@@ -1324,40 +1623,30 @@ fco2_xgb_tune_grid <- fco2_xgb_wf   %>%
 autoplot(fco2_xgb_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-71-1.png)<!-- -->
 
 ``` r
 fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
-<<<<<<< HEAD
-#> # A tibble: 5 x 7
-#>   loss_reduction .metric .estimator  mean     n std_err .config             
-#>            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1           1    rmse    standard   0.933     5  0.0317 Preprocessor1_Model3
-#> 2           0.01 rmse    standard   0.939     5  0.0322 Preprocessor1_Model1
-#> 3           0.05 rmse    standard   0.940     5  0.0312 Preprocessor1_Model2
-#> 4           2    rmse    standard   0.980     5  0.0311 Preprocessor1_Model4
-#> 5           4    rmse    standard   0.993     5  0.0330 Preprocessor1_Model5
-=======
-#> # A tibble: 5 × 7
-#>   loss_reduction .metric .estimator  mean     n std_err .config             
-#>            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1           0.05 rmse    standard    1.13     5  0.0573 Preprocessor1_Model2
-#> 2           1    rmse    standard    1.13     5  0.0566 Preprocessor1_Model3
-#> 3           0.01 rmse    standard    1.13     5  0.0558 Preprocessor1_Model1
-#> 4           2    rmse    standard    1.13     5  0.0564 Preprocessor1_Model4
-#> 5           4    rmse    standard    1.13     5  0.0593 Preprocessor1_Model5
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
+```
+
+    ## # A tibble: 5 x 7
+    ##   loss_reduction .metric .estimator  mean     n std_err .config             
+    ##            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+    ## 1           1    rmse    standard   0.974     5  0.0414 Preprocessor1_Model3
+    ## 2           0.01 rmse    standard   0.974     5  0.0475 Preprocessor1_Model1
+    ## 3           0.05 rmse    standard   0.977     5  0.0359 Preprocessor1_Model2
+    ## 4           2    rmse    standard   0.999     5  0.0442 Preprocessor1_Model4
+    ## 5           4    rmse    standard   1.01      5  0.0393 Preprocessor1_Model5
+
+``` r
 fco2_xgb_select_best_passo3 <- fco2_xgb_tune_grid %>% select_best(metric = "rmse")
 fco2_xgb_select_best_passo3
-#> # A tibble: 1 × 2
-#>   loss_reduction .config             
-#>            <dbl> <chr>               
-<<<<<<< HEAD
-#> 1              1 Preprocessor1_Model3
-=======
-#> 1           0.05 Preprocessor1_Model2
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 1 x 2
+    ##   loss_reduction .config             
+    ##            <dbl> <chr>               
+    ## 1              1 Preprocessor1_Model3
 
 ### Passo 4
 
@@ -1396,35 +1685,29 @@ fco2_xgb_tune_grid <- fco2_xgb_wf   %>%
 autoplot(fco2_xgb_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-69-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-73-1.png)<!-- -->
 
 ``` r
 fco2_xgb_tune_grid  |>  show_best(metric = "rmse", n = 5)
-#> # A tibble: 4 × 8
-#>    mtry sample_size .metric .estimator  mean     n std_err .config             
-#>   <dbl>       <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-<<<<<<< HEAD
-#> 1   0.1         1   rmse    standard   0.962     5  0.0316 Preprocessor1_Model2
-#> 2   1           0.5 rmse    standard   0.974     5  0.0364 Preprocessor1_Model3
-#> 3   1           1   rmse    standard   0.991     5  0.0403 Preprocessor1_Model4
-#> 4   0.1         0.5 rmse    standard   1.00      5  0.0282 Preprocessor1_Model1
-=======
-#> 1   1           1   rmse    standard    1.12     5  0.0562 Preprocessor1_Model4
-#> 2   0.1         1   rmse    standard    1.13     5  0.0555 Preprocessor1_Model2
-#> 3   1           0.5 rmse    standard    1.14     5  0.0578 Preprocessor1_Model3
-#> 4   0.1         0.5 rmse    standard    1.16     5  0.0624 Preprocessor1_Model1
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
+```
+
+    ## # A tibble: 4 x 8
+    ##    mtry sample_size .metric .estimator  mean     n std_err .config             
+    ##   <dbl>       <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+    ## 1   0.1         1   rmse    standard   0.981     5  0.0338 Preprocessor1_Model2
+    ## 2   1           1   rmse    standard   1.01      5  0.0361 Preprocessor1_Model4
+    ## 3   0.1         0.5 rmse    standard   1.04      5  0.0364 Preprocessor1_Model1
+    ## 4   1           0.5 rmse    standard   1.05      5  0.0459 Preprocessor1_Model3
+
+``` r
 fco2_xgb_select_best_passo4 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
 fco2_xgb_select_best_passo4
-#> # A tibble: 1 × 3
-#>    mtry sample_size .config             
-#>   <dbl>       <dbl> <chr>               
-<<<<<<< HEAD
-#> 1   0.1           1 Preprocessor1_Model2
-=======
-#> 1     1           1 Preprocessor1_Model4
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 1 x 3
+    ##    mtry sample_size .config             
+    ##   <dbl>       <dbl> <chr>               
+    ## 1   0.1           1 Preprocessor1_Model2
 
 ### Passo 5
 
@@ -1464,42 +1747,30 @@ fco2_xgb_tune_grid <- fco2_xgb_wf   %>%
 autoplot(fco2_xgb_tune_grid)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-71-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-75-1.png)<!-- -->
 
 ``` r
 fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
-<<<<<<< HEAD
-#> # A tibble: 5 x 8
-#>   trees learn_rate .metric .estimator  mean     n std_err .config              
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1   500       0.25 rmse    standard   0.962     5  0.0343 Preprocessor1_Model12
-#> 2   500       0.15 rmse    standard   0.964     5  0.0282 Preprocessor1_Model09
-#> 3   500       0.1  rmse    standard   0.981     5  0.0282 Preprocessor1_Model06
-#> 4   250       0.25 rmse    standard   0.983     5  0.0332 Preprocessor1_Model11
-#> 5   250       0.15 rmse    standard   1.00      5  0.0302 Preprocessor1_Model08
-fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
-fco2_xgb_select_best_passo5
-#> # A tibble: 1 x 3
-#>   trees learn_rate .config              
-#>   <dbl>      <dbl> <chr>                
-#> 1   500       0.25 Preprocessor1_Model12
-=======
-#> # A tibble: 5 × 8
-#>   trees learn_rate .metric .estimator  mean     n std_err .config              
-#>   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1   250       0.15 rmse    standard    1.11     5  0.0545 Preprocessor1_Model08
-#> 2   500       0.15 rmse    standard    1.11     5  0.0576 Preprocessor1_Model09
-#> 3   500       0.1  rmse    standard    1.11     5  0.0566 Preprocessor1_Model06
-#> 4   250       0.25 rmse    standard    1.12     5  0.0573 Preprocessor1_Model11
-#> 5   500       0.05 rmse    standard    1.12     5  0.0562 Preprocessor1_Model03
-fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
-fco2_xgb_select_best_passo5
-#> # A tibble: 1 × 3
-#>   trees learn_rate .config              
-#>   <dbl>      <dbl> <chr>                
-#> 1   250       0.15 Preprocessor1_Model08
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ## # A tibble: 5 x 8
+    ##   trees learn_rate .metric .estimator  mean     n std_err .config              
+    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
+    ## 1   500       0.15 rmse    standard   0.991     5  0.0353 Preprocessor1_Model09
+    ## 2   500       0.25 rmse    standard   1.01      5  0.0371 Preprocessor1_Model12
+    ## 3   500       0.1  rmse    standard   1.01      5  0.0355 Preprocessor1_Model06
+    ## 4   250       0.25 rmse    standard   1.03      5  0.0371 Preprocessor1_Model11
+    ## 5   250       0.15 rmse    standard   1.03      5  0.0359 Preprocessor1_Model08
+
+``` r
+fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
+fco2_xgb_select_best_passo5
+```
+
+    ## # A tibble: 1 x 3
+    ##   trees learn_rate .config              
+    ##   <dbl>      <dbl> <chr>                
+    ## 1   500       0.15 Preprocessor1_Model09
 
 ## Desempenho dos modelos finais
 
@@ -1546,17 +1817,20 @@ fco2_test_preds %>%
   theme_bw() +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))+
+  geom_abline (slope=1, linetype = "dashed", color="Red")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-76-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-80-1.png)<!-- -->
 
 ``` r
 fco2_xgb_last_fit_model <-fco2_xgb_last_fit$.workflow[[1]]$fit$fit
 vip(fco2_xgb_last_fit_model)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-77-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-81-1.png)<!-- -->
 
 ## Métricas
 
@@ -1581,7 +1855,9 @@ fco2_test_preds %>%
     label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-78-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-82-1.png)<!-- -->
 
 ``` r
   # ggplot2::annotate('text',x=10.4,y=16.7,label=paste0('RMSE = ',round(my_rmse,2),', MAPE = '
@@ -1589,20 +1865,12 @@ fco2_test_preds %>%
   # theme_bw()
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
-#>      vector_of_metrics
-<<<<<<< HEAD
-#> r            0.9091056
-#> R2           0.8264731
-#> MSE          0.8718466
-#> RMSE         0.9337272
-#> MAE          0.5919247
-#> MAPE        19.7835459
-=======
-#> r            0.8479290
-#> R2           0.7189837
-#> MSE          0.9951377
-#> RMSE         0.9975659
-#> MAE          0.6028209
-#> MAPE        23.0930305
->>>>>>> 67ccc4485e512417847fa620e872a5e0ffee9251
 ```
+
+    ##      vector_of_metrics
+    ## r            0.9159218
+    ## R2           0.8389127
+    ## MSE          0.7802695
+    ## RMSE         0.8833286
+    ## MAE          0.5756237
+    ## MAPE        20.0918718
