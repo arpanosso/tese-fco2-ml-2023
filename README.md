@@ -129,12 +129,6 @@ theme_set(theme_bw())
 Base proveniente de ensaios de campo.
 
 ``` r
-help(data_fco2)
-```
-
-    ## starting httpd help server ... done
-
-``` r
 glimpse(data_fco2)
 ```
 
@@ -300,7 +294,13 @@ Carregando os dados do pacote `{geobr}`
 
 #### Shape dos estados do Brasil
 
+A fonte dos shapes abaixo utiizados é o pacote `{geobr}`, para maiores
+inofrmações acesse o link no
+![GitHub](https://github.com/ipeaGIT/geobr), por comodidade, deixamos
+armazenados no repositório os arquivos que aqui serão utilizados.
+
 ``` r
+# library(geobr)
 # brasil_geobr <- geobr::read_country()
 # estados <- read_state(code_state = "all")
 # write_rds(estados,"data/estados.rds")
@@ -314,9 +314,6 @@ estados <- read_rds("data/estados.rds")
 # muni <- read_municipality()
 # write_rds(muni,"data/municipios.rds")
 muni <- read_rds("data/municipios.rds")
-```
-
-``` r
 sp_ms <- muni %>% 
   filter(abbrev_state == "SP" | abbrev_state == "MS")
 
@@ -344,12 +341,31 @@ ggplot(sp_ms) +
   tema_mapa()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### Conhecendo a base de dados de concentração de CO<sub>2</sub> atmosférico, oriundo do sensor orbital NASA-OCO2.
 
+O satélite OCO-2 foi lançado em órbita em julho de 2014 pela NASA, e
+oferece um grande potencial nas estimativas dos fluxos de dióxido de
+carbono (CO<sub>2</sub>). O satélite mede a concentração de
+CO<sub>2</sub> atmosférico indiretamente por meio da intensidade da
+radiação solar refletida em função da presença de dióxido de carbono em
+uma coluna de ar. Desta forma, faz-se a leitura em três faixas de
+comprimento de onda: a do O2, na faixa de
+![0,757](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;0%2C757 "0,757")
+a
+![0,775](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;0%2C775 "0,775")
+μm, e as do CO<sub>2</sub>, que são subdividas em banda fraca
+![(1,594 – 1,627 \text{ μm})](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%281%2C594%20%E2%80%93%201%2C627%20%5Ctext%7B%20%CE%BCm%7D%29 "(1,594 – 1,627 \text{ μm})")
+e banda forte
+![(2,043 – 2,087 \text{ μm})](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%282%2C043%20%E2%80%93%202%2C087%20%5Ctext%7B%20%CE%BCm%7D%29 "(2,043 – 2,087 \text{ μm})").
+
+Ele foi o primeiro satélite da NASA direcionado para o monitoramento dos
+fluxos de CO<sub>2</sub> atmosférico, sendo um dos mais recentes, e vem
+apresentando usos bem diversificados, mostrando-se capaz de monitorar as
+emissões de combustíveis fósseis, fotossíntese, e produção de biomassa.
+
 ``` r
-help(oco2_br)
 glimpse(oco2_br)
 ```
 
@@ -464,6 +480,15 @@ Data summary
 
 ### Manipulando a base `oco2_br` para criação das variáveis temporais e ajuste de unidade de xco2.
 
+Inicialmente devemos transformar os dados de concentração de
+CO<sub>2</sub>, variável xco2_moles_mole_1 para ppm em seguida devemos
+criar as variáveis de data a partir da variável time_yyyymmddhhmmss.
+Além disso, é necessário ajustar os valores de SIF, para compor a
+variável a partir dos dois sinais fornecidos pelo produto (“YU, L.; WEN,
+J.; CHANG, C. Y.; FRANKENBERG, C.; SUN, Y. High-Resolution Global
+Contiguous SIF of OCO-2. **Geophysical Research Letters**, v. 46, n. 3,
+p. 1449-1458, 2019.”).
+
 ``` r
 oco2_br <- oco2_br  %>% 
         mutate(
@@ -497,7 +522,7 @@ brasil_geobr %>%
 
     ## Scale on map varies by more than 10%, scale bar may be inaccurate
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 composition(xco2,oco2_br)
@@ -505,7 +530,7 @@ composition(xco2,oco2_br)
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 composition(SIF,oco2_br)
@@ -513,7 +538,7 @@ composition(SIF,oco2_br)
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Necessário tratamento dos dados de SIF
 
@@ -530,6 +555,11 @@ oco2_br <- oco2_br %>%
   mutate(SIF = ifelse(SIF > 0, SIF, sif_median))
 ```
 
+Existe uma tendência de aumento monotônica mundial da concentração de
+CO<sub>2</sub> na atmosfera, assim, ela deve ser retirada para podermos
+observar as tendências regionais. Observe que o sinal na variável `XCO2`
+não apresenta a tendência descrita.
+
 ``` r
 oco2_br  %>%  
   ggplot(aes(x=data,y=XCO2)) +
@@ -541,7 +571,25 @@ oco2_br  %>%
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+Compare com os dados da variáveis `xco2` que apresenta a tendência de
+crescimento monotônica.
+
+``` r
+oco2_br  %>%  
+  ggplot(aes(x=data,y=xco2)) +
+  geom_point(shape=21,color="black",fill="gray") +
+  geom_smooth(method = "lm") +
+  stat_regline_equation(ggplot2::aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
 ![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+Agora, deve-se vizualizar os dados perdidos nas bases
 
 ``` r
 visdat::vis_miss(data_fco2)
@@ -1108,25 +1156,25 @@ bake(prep(fco2_recipe), new_data = NULL)
 ```
 
     ## # A tibble: 2,676 x 49
-    ##         Ts       Us      pH      MO      P       K      Ca     Mg    H_Al
-    ##      <dbl>    <dbl>   <dbl>   <dbl>  <dbl>   <dbl>   <dbl>  <dbl>   <dbl>
-    ##  1  0.710  -1.19    -0.361   0.523  -1.17  -0.629  -0.683  -0.332 -0.258 
-    ##  2  0.710  -0.788   -0.0413  1.70   -0.672  0.411   0.362   1.35  -0.108 
-    ##  3  0.473   0.00317 -0.681  -0.872   1.24   4.72   -0.588  -0.145  1.27  
-    ##  4  0.592  -0.788   -0.361   2.03   -0.505 -0.0847 -0.0180  0.790  0.251 
-    ##  5  1.11   -1.28     0.439  -0.121  -0.921 -0.629  -0.588  -0.332 -1.07  
-    ##  6 -2.34    0.889   -0.521  -1.19    0.327 -0.679  -0.493  -1.27   0.251 
-    ##  7 -1.82    0.996    0.119  -0.443   1.49   0.212   0.647   0.603  0.0714
-    ##  8  0.434  -0.399    0.918   0.0939 -0.339 -0.778  -0.113   0.416 -1.07  
-    ##  9  0.513   2.03    -0.681   0.630  -1.09  -0.233  -0.778  -0.705  0.491 
-    ## 10  0.0520 -1.40    -0.0413 -0.0134 -0.672 -0.728  -0.683  -0.705 -0.917 
+    ##         Ts      Us     pH      MO      P      K       Ca      Mg   H_Al     SB
+    ##      <dbl>   <dbl>  <dbl>   <dbl>  <dbl>  <dbl>    <dbl>   <dbl>  <dbl>  <dbl>
+    ##  1  0.513   0.968  -0.833  0.826  -0.759 -0.591 -0.875   -1.62    1.26  -1.30 
+    ##  2 -0.505   0.271  -0.668 -0.877   1.24   4.70  -0.582   -0.138   1.26   0.192
+    ##  3 -0.427  -1.16    1.14   0.613  -1.01  -0.739  0.00303  0.601  -1.11   0.123
+    ##  4  0.422  -0.822   2.63   0.294  -0.842 -0.640  2.93     0.601  -1.72   2.20 
+    ##  5  0.108  -0.117  -0.503  0.507  -1.01  -0.690 -0.485   -1.25    0.226 -0.903
+    ##  6  0.761  -1.35    0.320 -0.0254 -1.26  -0.739 -0.387   -0.323  -0.957 -0.497
+    ##  7  0.592   0.0185 -0.503  0.932  -1.18  -0.343 -0.387    0.0465  0.226 -0.304
+    ##  8  0.944  -0.822  -0.997 -0.877   1.16   0.844 -0.582   -0.508   1.26  -0.483
+    ##  9  0.0562  1.16   -0.668 -0.877   1.24   4.70  -0.582   -0.138   1.26   0.192
+    ## 10  0.892  -1.22    1.14   0.613  -1.01  -0.739  0.00303  0.601  -1.11   0.123
     ## # i 2,666 more rows
-    ## # i 40 more variables: SB <dbl>, CTC <dbl>, V <dbl>, Ds <dbl>, Macro <dbl>,
-    ## #   Micro <dbl>, VTP <dbl>, PLA <dbl>, AT <dbl>, SILTE <dbl>, ARG <dbl>,
-    ## #   HLIFS <dbl>, XCO2 <dbl>, SIF <dbl>, Tmed <dbl>, Tmax <dbl>, Tmin <dbl>,
-    ## #   Umed <dbl>, Umax <dbl>, Umin <dbl>, PkPa <dbl>, Rad <dbl>, PAR <dbl>,
-    ## #   Eto <dbl>, Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>, chuva <dbl>,
-    ## #   inso <dbl>, FCO2 <dbl>, cultura_eucalipto <dbl>, ...
+    ## # i 39 more variables: CTC <dbl>, V <dbl>, Ds <dbl>, Macro <dbl>, Micro <dbl>,
+    ## #   VTP <dbl>, PLA <dbl>, AT <dbl>, SILTE <dbl>, ARG <dbl>, HLIFS <dbl>,
+    ## #   XCO2 <dbl>, SIF <dbl>, Tmed <dbl>, Tmax <dbl>, Tmin <dbl>, Umed <dbl>,
+    ## #   Umax <dbl>, Umin <dbl>, PkPa <dbl>, Rad <dbl>, PAR <dbl>, Eto <dbl>,
+    ## #   Velmax <dbl>, Velmin <dbl>, Dir_vel <dbl>, chuva <dbl>, inso <dbl>,
+    ## #   FCO2 <dbl>, cultura_eucalipto <dbl>, cultura_mata.ciliar <dbl>, ...
 
 ``` r
 visdat::vis_miss(bake(prep(fco2_recipe), new_data = NULL))
@@ -1136,741 +1184,5 @@ visdat::vis_miss(bake(prep(fco2_recipe), new_data = NULL))
 Reamostragem definida e será padrão para todos os modelos
 
 ``` r
-fco2_resamples <- vfold_cv(fco2_train, v = 5) # 10 fold
-grid <- grid_regular(
-  penalty(range = c(-8, 0)),
-  levels = 20
-)
+fco2_resamples <- vfold_cv(fco2_train, v = 10) 
 ```
-
-## Árvore de Decisão
-
-### Definição do modelo
-
-``` r
-fco2_dt_model <- decision_tree(
-  cost_complexity = tune(),
-  tree_depth = tune(),
-  min_n = tune()
-)  %>%  
-  set_mode("regression")  %>%  
-  set_engine("rpart")
-```
-
-### Workflow
-
-``` r
-fco2_dt_wf <- workflow()   %>%  
-  add_model(fco2_dt_model) %>% 
-  add_recipe(fco2_recipe)
-```
-
-### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
-
-``` r
-grid_dt <- grid_random(
-  cost_complexity(c(-6, -4)),
-  tree_depth(range = c(8, 18)),
-  min_n(range = c(42, 52)),
-  size = 10 # <-----------------------------
-)
-glimpse(grid_dt)
-```
-
-    ## Rows: 10
-    ## Columns: 3
-    ## $ cost_complexity <dbl> 3.837068e-06, 3.525887e-05, 9.348907e-06, 1.014590e-05~
-    ## $ tree_depth      <int> 17, 13, 9, 17, 17, 13, 11, 16, 13, 10
-    ## $ min_n           <int> 47, 47, 47, 47, 52, 49, 51, 47, 50, 42
-
-### Tuning de hiperparâmetros
-
-``` r
-fco2_dt_tune_grid <- tune_grid(
-  fco2_dt_wf,
-  resamples = fco2_resamples,
-  grid = grid_dt,
-  metrics = metric_set(rmse)
-)
-```
-
-``` r
-autoplot(fco2_dt_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
-
-``` r
-collect_metrics(fco2_dt_tune_grid)
-```
-
-    ## # A tibble: 10 x 9
-    ##    cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
-    ##              <dbl>      <int> <int> <chr>   <chr>      <dbl> <int>   <dbl>
-    ##  1      0.00000384         17    47 rmse    standard    1.33     5  0.0220
-    ##  2      0.0000353          13    47 rmse    standard    1.33     5  0.0230
-    ##  3      0.00000935          9    47 rmse    standard    1.35     5  0.0300
-    ##  4      0.0000101          17    47 rmse    standard    1.33     5  0.0220
-    ##  5      0.00000187         17    52 rmse    standard    1.34     5  0.0222
-    ##  6      0.00000872         13    49 rmse    standard    1.33     5  0.0210
-    ##  7      0.00000652         11    51 rmse    standard    1.34     5  0.0227
-    ##  8      0.0000184          16    47 rmse    standard    1.33     5  0.0226
-    ##  9      0.00000137         13    50 rmse    standard    1.34     5  0.0203
-    ## 10      0.00000623         10    42 rmse    standard    1.34     5  0.0324
-    ## # i 1 more variable: .config <chr>
-
-### Desempenho dos modelos finais
-
-``` r
-fco2_dt_best_params <- select_best(fco2_dt_tune_grid, "rmse")
-fco2_dt_wf <- fco2_dt_wf %>% finalize_workflow(fco2_dt_best_params)
-fco2_dt_last_fit <- last_fit(fco2_dt_wf, fco2_initial_split)
-```
-
-### Criando os preditos
-
-``` r
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_dt_last_fit)  %>%   mutate(modelo = "dt")
-)
-
-fco2_test <- testing(fco2_initial_split)
-visdat::vis_miss(fco2_test)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
-
-``` r
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=FCO2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](README_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
-
-# Importância
-
-``` r
-fco2_dt_last_fit_model <-fco2_dt_last_fit$.workflow[[1]]$fit$fit
-vip(fco2_dt_last_fit_model)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
-
-## Métricas
-
-``` r
-da <- fco2_test_preds %>% 
-  filter(FCO2 > 0, .pred>0 )
-
-my_r <- cor(da$FCO2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$FCO2,da$.pred)
-my_rmse <- Metrics::rmse(da$FCO2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$FCO2,da$.pred)
-my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
-
-
-fco2_test_preds %>% 
-  ggplot(aes(x=FCO2,y=.pred))+
-  geom_point()+
-  geom_smooth(method = "lm")+
-  stat_regline_equation(ggplot2::aes(
-    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5)
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](README_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
-
-``` r
-  # ggplot2::annotate('text',x=10.4,y=16.7,label=paste0('RMSE = ',round(my_rmse,2),', MAPE = '
-  #                                                     ,round(my_mape,2),'%'),size=5)+
-  # theme_bw()
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-    ##      vector_of_metrics
-    ## r            0.8375458
-    ## R2           0.7014830
-    ## MSE          1.4510734
-    ## RMSE         1.2046051
-    ## MAE          0.7797233
-    ## MAPE        26.3581933
-
-## Random Forest
-
-### Definição do modelo
-
-``` r
-fco2_rf_model <- rand_forest(
-  min_n = tune(),
-  mtry = tune(),
-  trees = tune()
-)   %>%  
-  set_mode("regression")  %>% 
-  set_engine("randomForest")
-```
-
-### Workflow
-
-``` r
-fco2_rf_wf <- workflow()   %>%  
-  add_model(fco2_rf_model) %>%  
-  add_recipe(fco2_recipe)
-```
-
-### Tune
-
-``` r
-grid_rf <- grid_regular(
-  min_n(range = c(20, 30)),
-  mtry(range = c(10,20)),
-  trees(range = c(769,1500) ),
-  levels = 2 #<-----------------------
-)
-```
-
-``` r
-fco2_rf_tune_grid <- tune_grid(
- fco2_rf_wf,
-  resamples = fco2_resamples,
-  grid = grid_rf,
-  metrics = metric_set(rmse)
-) 
-autoplot(fco2_rf_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
-
-``` r
-collect_metrics(fco2_rf_tune_grid)
-```
-
-    ## # A tibble: 8 x 9
-    ##    mtry trees min_n .metric .estimator  mean     n std_err .config             
-    ##   <int> <int> <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1    10   769    20 rmse    standard    1.07     5  0.0389 Preprocessor1_Model1
-    ## 2    10   769    30 rmse    standard    1.10     5  0.0404 Preprocessor1_Model2
-    ## 3    20   769    20 rmse    standard    1.05     5  0.0374 Preprocessor1_Model3
-    ## 4    20   769    30 rmse    standard    1.09     5  0.0403 Preprocessor1_Model4
-    ## 5    10  1500    20 rmse    standard    1.07     5  0.0386 Preprocessor1_Model5
-    ## 6    10  1500    30 rmse    standard    1.11     5  0.0411 Preprocessor1_Model6
-    ## 7    20  1500    20 rmse    standard    1.06     5  0.0382 Preprocessor1_Model7
-    ## 8    20  1500    30 rmse    standard    1.09     5  0.0405 Preprocessor1_Model8
-
-### Desempenho modelo final
-
-``` r
-fco2_rf_best_params <- select_best(fco2_rf_tune_grid, "rmse")
-fco2_rf_wf <- fco2_rf_wf %>% finalize_workflow(fco2_rf_best_params)
-fco2_rf_last_fit <- last_fit(fco2_rf_wf, fco2_initial_split)
-```
-
-### Criando os preditos
-
-``` r
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_rf_last_fit)  %>%   mutate(modelo = "rf")
-)
-
-fco2_test <- testing(fco2_initial_split)
-visdat::vis_miss(fco2_test)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
-
-``` r
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=FCO2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](README_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
-
-# Importância
-
-``` r
-fco2_rf_last_fit_model <-fco2_rf_last_fit$.workflow[[1]]$fit$fit
-vip(fco2_rf_last_fit_model)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-61-1.png)<!-- --> \## Métricas
-
-``` r
-da <- fco2_test_preds %>% 
-  filter(FCO2 > 0, .pred>0 )
-
-my_r <- cor(da$FCO2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$FCO2,da$.pred)
-my_rmse <- Metrics::rmse(da$FCO2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$FCO2,da$.pred)
-my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
-
-
-fco2_test_preds %>% 
-  ggplot(aes(x=FCO2,y=.pred))+
-  geom_point()+
-  geom_smooth(method = "lm")+
-  stat_regline_equation(ggplot2::aes(
-    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5)
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](README_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
-
-``` r
-  # ggplot2::annotate('text',x=10.4,y=16.7,label=paste0('RMSE = ',round(my_rmse,2),', MAPE = '
-  #                                                     ,round(my_mape,2),'%'),size=5)+
-  # theme_bw()
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-    ##      vector_of_metrics
-    ## r            0.9125521
-    ## R2           0.8327513
-    ## MSE          0.8252557
-    ## RMSE         0.9084359
-    ## MAE          0.5858878
-    ## MAPE        20.2983144
-
-## Boosting gradient tree (xgb)
-
-``` r
-cores = 4
-fco2_xgb_model <- boost_tree(
-  mtry = 0.8, 
-  trees = tune(), # <---------------
-  min_n = 5, 
-  tree_depth = 4,
-  loss_reduction = 0, # lambda
-  learn_rate = tune(), # epsilon
-  sample_size = 0.8
-)  %>%   
-  set_mode("regression")  %>% 
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-```
-
-``` r
-fco2_xgb_wf <- workflow()  %>%  
-  add_model(fco2_xgb_model) %>%  
-  add_recipe(fco2_recipe)
-```
-
-``` r
-grid_xgb <- expand.grid(
-  learn_rate =  c(0.05, 0.3),
-  trees = c(2, 250, 500)
-)
-```
-
-#### Passo 1
-
-``` r
-fco2_xgb_tune_grid <- tune_grid(
- fco2_xgb_wf,
-  resamples = fco2_resamples,
-  grid = grid_xgb,
-  metrics = metric_set(rmse)
-)
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-66-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 6)
-```
-
-    ## # A tibble: 6 x 8
-    ##   trees learn_rate .metric .estimator  mean     n std_err .config             
-    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1   500       0.3  rmse    standard   0.977     5  0.0389 Preprocessor1_Model6
-    ## 2   250       0.3  rmse    standard   0.985     5  0.0361 Preprocessor1_Model5
-    ## 3   500       0.05 rmse    standard   0.995     5  0.0378 Preprocessor1_Model3
-    ## 4   250       0.05 rmse    standard   1.06      5  0.0395 Preprocessor1_Model2
-    ## 5     2       0.3  rmse    standard   2.19      5  0.0281 Preprocessor1_Model4
-    ## 6     2       0.05 rmse    standard   3.37      5  0.0290 Preprocessor1_Model1
-
-``` r
-fco2_xgb_select_best_passo1 <- fco2_xgb_tune_grid %>% 
-  select_best(metric = "rmse")
-fco2_xgb_select_best_passo1
-```
-
-    ## # A tibble: 1 x 3
-    ##   trees learn_rate .config             
-    ##   <dbl>      <dbl> <chr>               
-    ## 1   500        0.3 Preprocessor1_Model6
-
-#### Passo 2
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = 0.8,
-  trees = fco2_xgb_select_best_passo1$trees,
-  min_n = tune(),
-  tree_depth = tune(), 
-  loss_reduction = 0, 
-  learn_rate = fco2_xgb_select_best_passo1$learn_rate, 
-  sample_size = 0.8
-) %>% 
-  set_mode("regression")  %>% 
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow() %>%  
-    add_model(fco2_xgb_model)   %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- expand.grid(
-  tree_depth = c(1, 3, 4), 
-  min_n = c(5, 30, 60)
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples =fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, verbose = FALSE, allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-#### Melhores hiperparâmetros
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-69-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 x 8
-    ##   min_n tree_depth .metric .estimator  mean     n std_err .config             
-    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1     5          4 rmse    standard   0.975     5  0.0432 Preprocessor1_Model3
-    ## 2     5          3 rmse    standard   0.984     5  0.0456 Preprocessor1_Model2
-    ## 3    30          4 rmse    standard   0.985     5  0.0324 Preprocessor1_Model6
-    ## 4    60          4 rmse    standard   1.01      5  0.0343 Preprocessor1_Model9
-    ## 5    30          3 rmse    standard   1.02      5  0.0439 Preprocessor1_Model5
-
-``` r
-fco2_xgb_select_best_passo2 <- fco2_xgb_tune_grid  %>%   select_best(metric = "rmse")
-fco2_xgb_select_best_passo2
-```
-
-    ## # A tibble: 1 x 3
-    ##   min_n tree_depth .config             
-    ##   <dbl>      <dbl> <chr>               
-    ## 1     5          4 Preprocessor1_Model3
-
-## Passo 3
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = 0.8,
-  trees = fco2_xgb_select_best_passo1$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction =tune(), 
-  learn_rate = fco2_xgb_select_best_passo1$learn_rate, 
-  sample_size = 0.8
-)  %>%  
-  set_mode("regression")  %>%  
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow()  %>%   
-    add_model(fco2_xgb_model)  %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- expand.grid(
-  loss_reduction = c(0.01, 0.05, 1, 2, 4, 8)
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples = fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, verbose = FALSE, allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-#### Melhores hiperparâmetros
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-71-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 x 7
-    ##   loss_reduction .metric .estimator  mean     n std_err .config             
-    ##            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1           1    rmse    standard   0.974     5  0.0414 Preprocessor1_Model3
-    ## 2           0.01 rmse    standard   0.974     5  0.0475 Preprocessor1_Model1
-    ## 3           0.05 rmse    standard   0.977     5  0.0359 Preprocessor1_Model2
-    ## 4           2    rmse    standard   0.999     5  0.0442 Preprocessor1_Model4
-    ## 5           4    rmse    standard   1.01      5  0.0393 Preprocessor1_Model5
-
-``` r
-fco2_xgb_select_best_passo3 <- fco2_xgb_tune_grid %>% select_best(metric = "rmse")
-fco2_xgb_select_best_passo3
-```
-
-    ## # A tibble: 1 x 2
-    ##   loss_reduction .config             
-    ##            <dbl> <chr>               
-    ## 1              1 Preprocessor1_Model3
-
-### Passo 4
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = tune(),
-  trees = fco2_xgb_select_best_passo1$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = fco2_xgb_select_best_passo1$learn_rate, 
-  sample_size = tune()
-)%>%  
-  set_mode("regression")  |> 
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow()  %>%   
-    add_model(fco2_xgb_model)  %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- expand.grid(
-    sample_size = seq(0.5, 1.0, length.out = 2), ## <---
-    mtry = seq(0.1, 1.0, length.out = 2) ## <---
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples = fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, verbose = FALSE, allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-73-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid  |>  show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 4 x 8
-    ##    mtry sample_size .metric .estimator  mean     n std_err .config             
-    ##   <dbl>       <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1   0.1         1   rmse    standard   0.981     5  0.0338 Preprocessor1_Model2
-    ## 2   1           1   rmse    standard   1.01      5  0.0361 Preprocessor1_Model4
-    ## 3   0.1         0.5 rmse    standard   1.04      5  0.0364 Preprocessor1_Model1
-    ## 4   1           0.5 rmse    standard   1.05      5  0.0459 Preprocessor1_Model3
-
-``` r
-fco2_xgb_select_best_passo4 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
-fco2_xgb_select_best_passo4
-```
-
-    ## # A tibble: 1 x 3
-    ##    mtry sample_size .config             
-    ##   <dbl>       <dbl> <chr>               
-    ## 1   0.1           1 Preprocessor1_Model2
-
-### Passo 5
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = fco2_xgb_select_best_passo4$mtry,
-  trees = tune(),
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = tune(), 
-  sample_size = fco2_xgb_select_best_passo4$sample_size
-) |> 
-  set_mode("regression")  %>%  
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow() %>%   
-    add_model(fco2_xgb_model)  %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- expand.grid(
-    learn_rate = c(0.05, 0.10, 0.15, 0.25),
-    trees = c(100, 250, 500)
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples = fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, verbose = FALSE, allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-#### Melhores hiperparâmetros
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-75-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid  %>%   show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 x 8
-    ##   trees learn_rate .metric .estimator  mean     n std_err .config              
-    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1   500       0.15 rmse    standard   0.991     5  0.0353 Preprocessor1_Model09
-    ## 2   500       0.25 rmse    standard   1.01      5  0.0371 Preprocessor1_Model12
-    ## 3   500       0.1  rmse    standard   1.01      5  0.0355 Preprocessor1_Model06
-    ## 4   250       0.25 rmse    standard   1.03      5  0.0371 Preprocessor1_Model11
-    ## 5   250       0.15 rmse    standard   1.03      5  0.0359 Preprocessor1_Model08
-
-``` r
-fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid   %>%   select_best(metric = "rmse")
-fco2_xgb_select_best_passo5
-```
-
-    ## # A tibble: 1 x 3
-    ##   trees learn_rate .config              
-    ##   <dbl>      <dbl> <chr>                
-    ## 1   500       0.15 Preprocessor1_Model09
-
-## Desempenho dos modelos finais
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = fco2_xgb_select_best_passo4$mtry,
-  trees = fco2_xgb_select_best_passo5$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = fco2_xgb_select_best_passo5$learn_rate, 
-  sample_size = fco2_xgb_select_best_passo4$sample_size
-) %>%  
-  set_mode("regression")  %>%  
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-```
-
-``` r
-df <- data.frame(
-  mtry = fco2_xgb_select_best_passo4$mtry,
-  trees = fco2_xgb_select_best_passo5$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = fco2_xgb_select_best_passo5$learn_rate, 
-  sample_size = fco2_xgb_select_best_passo4$sample_size
-)
-fco2_xgb_wf <- fco2_xgb_wf %>% finalize_workflow(df) # <------
-fco2_xgb_last_fit <- last_fit(fco2_xgb_wf, fco2_initial_split) # <--------
-```
-
-\## Criar Preditos
-
-``` r
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_xgb_last_fit)  %>%   mutate(modelo = "xgb")
-)
-```
-
-``` r
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=FCO2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))+
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](README_files/figure-gfm/unnamed-chunk-80-1.png)<!-- -->
-
-``` r
-fco2_xgb_last_fit_model <-fco2_xgb_last_fit$.workflow[[1]]$fit$fit
-vip(fco2_xgb_last_fit_model)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-81-1.png)<!-- -->
-
-## Métricas
-
-``` r
-da <- fco2_test_preds %>% 
-  filter(FCO2 > 0, .pred>0 )
-
-my_r <- cor(da$FCO2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$FCO2,da$.pred)
-my_rmse <- Metrics::rmse(da$FCO2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$FCO2,da$.pred)
-my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
-
-
-fco2_test_preds %>% 
-  ggplot(aes(x=FCO2,y=.pred))+
-  geom_point()+
-  geom_smooth(method = "lm")+
-  stat_regline_equation(ggplot2::aes(
-    label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5)
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](README_files/figure-gfm/unnamed-chunk-82-1.png)<!-- -->
-
-``` r
-  # ggplot2::annotate('text',x=10.4,y=16.7,label=paste0('RMSE = ',round(my_rmse,2),', MAPE = '
-  #                                                     ,round(my_mape,2),'%'),size=5)+
-  # theme_bw()
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-    ##      vector_of_metrics
-    ## r            0.9159218
-    ## R2           0.8389127
-    ## MSE          0.7802695
-    ## RMSE         0.8833286
-    ## MAE          0.5756237
-    ## MAPE        20.0918718
