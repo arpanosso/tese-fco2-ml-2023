@@ -531,7 +531,7 @@ grid_dt <- grid_regular(
   cost_complexity(c(-6, -4)),
   tree_depth(range = c(8, 18)),
   min_n(range = c(42, 52)),
-  levels = 2 # <-----------------------------
+  levels = 10 # <-----------------------------
 )
 glimpse(grid_dt)
 ```
@@ -562,7 +562,6 @@ fco2_dt_tune_grid %>%   show_best(metric = "rmse", n = 6)
 fco2_dt_best_params <- select_best(fco2_dt_tune_grid, "rmse")
 fco2_dt_wf <- fco2_dt_wf %>% finalize_workflow(fco2_dt_best_params)
 fco2_dt_last_fit <- last_fit(fco2_dt_wf, fco2_initial_split)
-
 ```
 
 ### Criando os preditos
@@ -649,7 +648,7 @@ grid_rf <- grid_regular(
   min_n(range = c(20, 30)),
   mtry(range = c(5,10)),
   trees(range = c(100,500) ),
-  levels = 2 #<-----------------------
+  levels = 4 #<-----------------------
 )
 ```
 
@@ -803,7 +802,7 @@ fco2_xgb_wf <- workflow() %>%
 fco2_xgb_grid <- grid_regular(
   tree_depth(range = c(1, 4)), 
   min_n(range = c(5, 60)),
-  levels = 2
+  levels = 5
 )
 
 fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
@@ -845,7 +844,7 @@ fco2_xgb_wf <- workflow()  %>%
 #### Grid
 fco2_xgb_grid <- grid_regular(
   loss_reduction(range = c(0.01, 8)),
-  levels = 5
+  levels = 6
 )
 
 fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
@@ -888,8 +887,8 @@ fco2_xgb_wf <- workflow()  %>%
 
 #### Grid
 fco2_xgb_grid <- expand.grid(
-    sample_size = seq(0.5, 1.0, length.out = 3), ## <---
-    mtry = seq(0.1, 1.0, length.out = 2) ## <---
+    sample_size = seq(0.5, 1.0, length.out = 4), ## <---
+    mtry = seq(0.1, 1.0, length.out = 4) ## <---
 )
 
 fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
