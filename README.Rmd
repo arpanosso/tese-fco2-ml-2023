@@ -527,11 +527,18 @@ fco2_dt_wf <- workflow()   %>%
 ### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
 
 ```{r}
-grid_dt <- grid_regular(
-  cost_complexity(c(-6, -4)),
-  tree_depth(range = c(8, 18)),
-  min_n(range = c(42, 52)),
-  levels = 10 # <-----------------------------
+# grid_dt <- grid_regular(
+#   cost_complexity(c(-6, -4)),
+#   tree_depth(range = c(8, 18)),
+#   min_n(range = c(42, 52)),
+#   levels = 20 # <-----------------------------
+# )
+
+## melhor hiperparâmetros
+grid_dt <- expand.grid(
+  cost_complexity = c(1.438450e-05, 1.000000e-06),
+  tree_depth = c(12,14),
+  min_n  = c(42, 43)
 )
 glimpse(grid_dt)
 ```
@@ -644,12 +651,20 @@ fco2_rf_wf <- workflow()   %>%
 
 ### Tune
 ```{r}
-grid_rf <- grid_regular(
-  min_n(range = c(20, 30)),
-  mtry(range = c(5,10)),
-  trees(range = c(100,500) ),
-  levels = 4 #<-----------------------
+# grid_rf <- grid_regular(
+#   min_n(range = c(20, 30)),
+#   mtry(range = c(5,10)),
+#   trees(range = c(100,500) ),
+#   levels = 5 #<-----------------------
+# )
+
+
+grid_rf <- expand.grid(
+  min_n = c(20,21),
+  mtry = c(5,10),
+  trees = c(300,500) #<-----------------------
 )
+
 ```
 
 ```{r}
