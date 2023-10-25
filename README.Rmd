@@ -53,6 +53,10 @@ Possíveis problemas na instalação do pacote podem ser sanados com os seguinte
 # Sys.getenv("GITHUB_PAT")
 ```
 
+
+
+# Variabilidade temporal de FCO~2~
+
 ### Carregando os pacotes
 
 ```{r}
