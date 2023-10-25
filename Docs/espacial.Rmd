@@ -307,6 +307,13 @@ for(i in seq_along(dias)){
   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
   geom_abline (slope=1, linetype = "dashed", color="Red")
   # print(g)
+  
+  tree_fit_rpart <- extract_fit_engine(fco2_modelo_load_dt)  
+  png(paste0("../trees/EU_tree_",di,".png"),         # File name
+      width = 1900, height = 1000)
+  rpart.plot::rpart.plot(tree_fit_rpart,cex=.8)
+  dev.off() 
+  
 
 }
 ```
@@ -437,6 +444,13 @@ for(i in seq_along(dias)){
   #     width = 1900, height = 1000)
   # rpart.plot::rpart.plot(tree_fit_rpart,cex=.8)
   # dev.off()
+  
+  
+  tree_fit_rpart <- extract_fit_engine(fco2_modelo_load_dt)   
+  png(paste0("../trees/SI_tree_",di,".png"),         # File name
+      width = 1900, height = 1000)
+  rpart.plot::rpart.plot(tree_fit_rpart,cex=.8)
+  dev.off()
 }
 ```
 
