@@ -1,7 +1,3 @@
----
-output: github_document
----
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE, eval=FALSE}
@@ -52,9 +48,3 @@ Possíveis problemas na instalação do pacote podem ser sanados com os seguinte
 # Sys.unsetenv("GITHUB_PAT")
 # Sys.getenv("GITHUB_PAT")
 ```
-
-
-## [Modelagem Espacial](https://arpanosso.github.io/tese-fco2-ml-2023/Docs/temporal.html)
-
-## [Modelagem Temporal](https://arpanosso.github.io/tese-fco2-ml-2023/Docs/espacial.html)
-
