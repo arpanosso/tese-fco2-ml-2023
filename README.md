@@ -62,6 +62,6 @@ seguintes comandos:
 # Sys.getenv("GITHUB_PAT")
 ```
 
-## [Modelagem Espacial](https://arpanosso.github.io/tese-fco2-ml-2023/Docs/temporal.html)
+## [Modelagem Temporal](https://arpanosso.github.io/tese-fco2-ml-2023/Docs/temporal.html)
 
-## [Modelagem Temporal](https://arpanosso.github.io/tese-fco2-ml-2023/Docs/espacial.html)
+## [Modelagem Espacial](https://arpanosso.github.io/tese-fco2-ml-2023/Docs/espacial.html)
