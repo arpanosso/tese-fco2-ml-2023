@@ -486,15 +486,15 @@ fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) %>%
 ```{r}
 fco2_recipe <- recipe(FCO2 ~ ., 
                       data = fco2_train %>% 
-                        select(cultura, manejo, cobertura, FCO2:HLIFS,XCO2,SIF,Tmed:inso) 
+            select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) 
 ) %>%  
-  step_normalize(all_numeric_predictors())  %>% 
+  # step_normalize(all_numeric_predictors())  %>% 
   step_naomit() %>%  
   step_novel(all_nominal_predictors()) %>% 
   step_zv(all_predictors()) %>%
-  #step_naomit(c(Ts, Us)) %>% 
+  step_naomit(c(Ts, Us)) %>% 
   step_impute_median(where(is.numeric)) %>% # inputação da mediana nos numéricos
-  step_poly(c(Us,Ts), degree = 2)  %>%  
+  # step_poly(c(Us,Ts), degree = 2)  %>%  
   step_dummy(all_nominal_predictors())
 bake(prep(fco2_recipe), new_data = NULL)
 ```
@@ -513,18 +513,22 @@ fco2_resamples <- vfold_cv(fco2_train, v = 5)
 
 ### Definição do modelo
 ```{r}
-# library(e1071)
-# fco2_svm_model <- svm_rbf(cost = tune(), rbf_sigma = tune()) %>%
-#   set_mode("regression") %>%
-#   set_engine("kernlab")
-# 
+library(e1071)
+fco2_svm_model <- svm_rbf(
+  cost = tune(), 
+  rbf_sigma = tune(),
+  margin = tune()) %>%
+  set_mode("regression") %>%
+  set_engine("kernlab") #%>% 
+  #translate()
 
-fco2_svm_model <- svm_linear(
-  cost = tune(),
-  margin = tune()
-) %>%  
-  set_engine("LiblineaR") %>% 
-  set_mode("regression")
+
+# fco2_svm_model <- svm_linear(
+#   cost = tune(),
+#   margin = tune()
+# ) %>%  
+#   set_engine("LiblineaR") %>% 
+#   set_mode("regression")
 ```
 
 
@@ -551,6 +555,7 @@ fco2_svm_wf <- workflow()   %>%
 ## melhor hiperparâmetros
 grid_svm <- expand.grid(
   cost = c(0.01, 1, 10, 20),
+  rbf_sigma = c(0.01),
   margin = c( .01, 0.025,.05, 0.075)
 )
 glimpse(grid_svm)
@@ -610,12 +615,25 @@ fco2_test_preds %>%
 
 ```{r}
 fco2_svm_last_fit_model <- fco2_svm_last_fit$.workflow[[1]]$fit$fit
-# vip(fco2_svm_last_fit_model,
-#     aesthetics = list(color = "black", fill = "orange")) +
-#     theme(axis.text.y=element_text(size=rel(1.5)),
-#           axis.text.x=element_text(size=rel(1.5)),
-#           axis.title.x=element_text(size=rel(1.5))
-#           )
+```
+
+
+```{r}
+fco2_svm_last_fit %>%
+  extract_fit_parsnip() %>%
+  vip(
+    method = "permute", 
+    target = "FCO2", 
+    metric = "rmse",
+    nsim = 10,
+    pred_wrapper = kernlab::predict,
+    train = fco2_train %>% 
+            select(FCO2:HLIFS,XCO2,SIF,Tmed:inso),
+     aesthetics = list(color = "black", fill = "orange")) +
+    theme(axis.text.y=element_text(size=rel(1.5)),
+          axis.text.x=element_text(size=rel(1.5)),
+          axis.title.x=element_text(size=rel(1.5))
+          )
 ```
 
 ## Métricas
