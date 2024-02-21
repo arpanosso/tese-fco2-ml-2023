@@ -71,7 +71,7 @@ library(ISLR)
 library(modeldata)
 library(vip)
 library(ggpubr)
-source("R/graficos.R")
+source("../R/graficos.R")
 theme_set(theme_bw())
 ```
 
@@ -114,14 +114,14 @@ A fonte dos shapes abaixo utiizados é o pacote `{geobr}`, para maiores inofrma�
 # estados <- read_state(code_state = "all")
 # write_rds(estados,"data/estados.rds")
 # write_rds(brasil_geobr,"data/brasil_geobr.rds")
-estados <- read_rds("data/estados.rds")
+estados <- read_rds("../data/estados.rds")
 ```
 
 #### Shape dos municípios
 ```{r}
 # muni <- read_municipality()
 # write_rds(muni,"data/municipios.rds")
-muni <- read_rds("data/municipios.rds")
+muni <- read_rds("../data/municipios.rds")
 sp_ms <- muni %>% 
   filter(abbrev_state == "SP" | abbrev_state == "MS")
 
@@ -184,7 +184,7 @@ oco2_br <- oco2_br  %>%
 Mapa das leituras do satélite OCO2-NASA
 
 ```{r}
-brasil_geobr <- read_rds("data/brasil_geobr.rds")
+brasil_geobr <- read_rds("../data/brasil_geobr.rds")
 brasil_geobr %>% 
   ggplot() +
   geom_sf(fill="white", color="black",
@@ -409,7 +409,7 @@ data_set_espacial <- data_set %>%
 # Carregando dados Meteorológicos de Ilha Solteira
 
 ```{r}
-dados_estacao <- read_excel("data-raw/xlsx/estacao_meteorologia_ilha_solteira.xlsx", na = "NA") 
+dados_estacao <- read_excel("../data-raw/xlsx/estacao_meteorologia_ilha_solteira.xlsx", na = "NA") 
 glimpse(dados_estacao)
 dados_estacao <- dados_estacao %>% 
                    drop_na()
@@ -445,7 +445,8 @@ visdat::vis_miss(data_set_temporal)
 ### Definindo a Base de treino e teste
 ```{r}
 # data_set_ml <- data_set_espacial  # <-------
-data_set_ml <- data_set_temporal # <-------
+data_set_ml <- data_set_temporal %>% #<-------
+  drop_na()
 fco2_initial_split <- initial_split(data_set_ml, prop = 0.75)
 ```
 
@@ -488,6 +489,7 @@ fco2_recipe <- recipe(FCO2 ~ .,
                         select(cultura, manejo, cobertura, FCO2:HLIFS,XCO2,SIF,Tmed:inso) 
 ) %>%  
   step_normalize(all_numeric_predictors())  %>% 
+  step_naomit() %>%  
   step_novel(all_nominal_predictors()) %>% 
   step_zv(all_predictors()) %>%
   #step_naomit(c(Ts, Us)) %>% 
@@ -504,8 +506,138 @@ visdat::vis_miss(bake(prep(fco2_recipe), new_data = NULL))
 ### Reamostragem definida e será padrão para todos os modelos
 
 ```{r}
-fco2_resamples <- vfold_cv(fco2_train, v = 10) 
+fco2_resamples <- vfold_cv(fco2_train, v = 5) 
 ```
+
+## Support Vector Machine
+
+### Definição do modelo
+```{r}
+# library(e1071)
+# fco2_svm_model <- svm_rbf(cost = tune(), rbf_sigma = tune()) %>%
+#   set_mode("regression") %>%
+#   set_engine("kernlab")
+# 
+
+fco2_svm_model <- svm_linear(
+  cost = tune(),
+  margin = tune()
+) %>%  
+  set_engine("LiblineaR") %>% 
+  set_mode("regression")
+```
+
+
+### Workflow
+```{r}
+fco2_svm_wf <- workflow()   %>%  
+  add_model(fco2_svm_model) %>% 
+  add_recipe(fco2_recipe)
+```
+
+### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
+
+```{r}
+# grid_dt <- grid_regular(
+#   cost_complexity(c(-6, -4)),
+#   tree_depth(range = c(8, 18)),
+#   min_n(range = c(42, 52)),
+#   levels = 20 # <-----------------------------
+# )
+```
+
+
+```{r}
+## melhor hiperparâmetros
+grid_svm <- expand.grid(
+  cost = c(0.01, 1, 10, 20),
+  margin = c( .01, 0.025,.05, 0.075)
+)
+glimpse(grid_svm)
+```
+### Tuning de hiperparâmetros
+
+```{r}
+fco2_svm_tune_grid <- tune_grid(
+  fco2_svm_wf,
+  resamples = fco2_resamples,
+  grid = grid_svm,
+  metrics = metric_set(rmse)
+)
+```
+
+```{r}
+autoplot(fco2_svm_tune_grid)
+```
+
+```{r}
+collect_metrics(fco2_svm_tune_grid)
+fco2_svm_tune_grid %>%   show_best(metric = "rmse", n = 6)
+```
+
+
+### Desempenho dos modelos finais
+
+```{r}
+fco2_svm_best_params <- select_best(fco2_svm_tune_grid, "rmse")
+fco2_svm_wf <- fco2_svm_wf %>% finalize_workflow(fco2_svm_best_params)
+fco2_svm_last_fit <- last_fit(fco2_svm_wf, fco2_initial_split)
+```
+
+### Criando os preditos
+
+```{r}
+fco2_test_preds <- bind_rows(
+  collect_predictions(fco2_svm_last_fit)  %>%   mutate(modelo = "svm")
+)
+
+fco2_test <- testing(fco2_initial_split)
+visdat::vis_miss(fco2_test)
+```
+
+```{r}
+fco2_test_preds %>% 
+  ggplot(aes(x=.pred, y=FCO2)) +
+  geom_point()+
+  theme_bw() +
+  geom_smooth(method = "lm") +
+  stat_regline_equation(ggplot2::aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
+  geom_abline (slope=1, linetype = "dashed", color="Red")
+```
+
+# Importância
+
+```{r}
+fco2_svm_last_fit_model <- fco2_svm_last_fit$.workflow[[1]]$fit$fit
+# vip(fco2_svm_last_fit_model,
+#     aesthetics = list(color = "black", fill = "orange")) +
+#     theme(axis.text.y=element_text(size=rel(1.5)),
+#           axis.text.x=element_text(size=rel(1.5)),
+#           axis.title.x=element_text(size=rel(1.5))
+#           )
+```
+
+## Métricas
+
+```{r}
+da <- fco2_test_preds %>% 
+  filter(FCO2 > 0, .pred>0 )
+
+my_r <- cor(da$FCO2,da$.pred)
+my_r2 <- my_r*my_r
+my_mse <- Metrics::mse(da$FCO2,da$.pred)
+my_rmse <- Metrics::rmse(da$FCO2,
+                         da$.pred)
+my_mae <- Metrics::mae(da$FCO2,da$.pred)
+my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
+
+vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
+print(data.frame(vector_of_metrics))
+```
+
+
+
 
 ## Árvore de Decisão
 
