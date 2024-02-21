@@ -81,6 +81,8 @@ theme_set(theme_bw())
 Base proveniente de ensaios de campo.
 
 ```{r}
+data_fco2 %>% 
+  janitor::clean_names() -> data_fco2
 glimpse(data_fco2)
 ```
 
@@ -94,13 +96,13 @@ skimr::skim(data_fco2)
 ### Alguns gráficos a respeito de nossa variável alvo, emissão de CO~2~ do solo (FCO~2~).
 
 ```{r,fig.width=15, fig.height=10}
-composition(FCO2,data_fco2)
+composition(fco2,data_fco2)
 ```
 
 ### Aplicando a transformação logarítmica nos dados de FCO~2~
 
 ```{r,fig.width=15, fig.height=10}
-composition(log10(FCO2) ,data_fco2)
+composition(log10(fco2) ,data_fco2)
 ```
 ### Carregando os dados do pacote `{geobr}`
 
@@ -156,6 +158,8 @@ O satélite OCO-2 foi lançado em órbita em julho de 2014 pela NASA, e oferece 
 Ele foi o primeiro satélite da NASA direcionado para o monitoramento dos fluxos de CO~2~ atmosférico, sendo um dos mais recentes, e vem apresentando usos bem diversificados, mostrando-se capaz de monitorar as emissões de combustíveis fósseis, fotossíntese, e produção de biomassa.
 
 ```{r}
+oco2_br %>% 
+  janitor::clean_names() -> oco2_br
 glimpse(oco2_br)
 ```
 
@@ -177,7 +181,7 @@ oco2_br <- oco2_br  %>%
            mes = month(data),
            dia = day(data),
            dia_semana = wday(data),
-           SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
+           sif = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
            )
 ```
 
@@ -205,23 +209,25 @@ composition(xco2,oco2_br)
 ```
 
 ```{r,fig.width=15, fig.height=10}
-composition(SIF,oco2_br)
+composition(sif,oco2_br)
 ```
 
 Necessário tratamento dos dados de SIF
 
 ```{r}
-oco2_br %>% filter (SIF > 0) %>%  pull(SIF) %>% summary
-sif_median <- 0.64297
+oco2_br %>% 
+  filter (sif > 0) %>%  
+  pull(sif) %>% median() -> sif_median
+
 oco2_br <- oco2_br %>% 
-  mutate(SIF = ifelse(SIF > 0, SIF, sif_median))
+  mutate(sif = ifelse(sif > 0, sif, sif_median))
 ```
 
 Existe uma tendência de aumento monotônica mundial da concentração de CO~2~ na atmosfera, assim, ela deve ser retirada para podermos observar as tendências regionais. Observe que o sinal na variável `XCO2` não apresenta a tendência descrita.
 
 ```{r}
 oco2_br  %>%  
-  ggplot(aes(x=data,y=XCO2)) +
+  ggplot(aes(x=data,y=xco2_moles_mole_1)) +
   geom_point(shape=21,color="black",fill="gray") +
   geom_smooth(method = "lm") +
   stat_regline_equation(ggplot2::aes(
@@ -249,7 +255,8 @@ visdat::vis_miss(data_fco2)
 ```{r}
 lista_data_fco2 <- unique(data_fco2$data)
 lista_data_oco2 <- unique(oco2_br$data)
-datas_fco2 <- paste0(lubridate::year(lista_data_fco2),"-",lubridate::month(lista_data_fco2)) %>% unique()
+datas_fco2 <- paste0(lubridate::year(lista_data_fco2),"-",lubridate::month(lista_data_fco2)) %>% 
+  unique()
 
 datas_oco2 <- paste0(lubridate::year(lista_data_oco2),"-",lubridate::month(lista_data_oco2)) %>% unique()
 datas <- datas_fco2[datas_fco2 %in% datas_oco2]
@@ -283,7 +290,7 @@ data_set <- left_join(fco2 %>%
                    mes = lubridate::month(data)
                    ), 
           xco2 %>% 
-            select(data,mes,dia,longitude,latitude,XCO2,SIF,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
+            select(data,mes,dia,longitude,latitude,xco2,sif,fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1,fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1, ano_mes), by = "ano_mes") %>% 
   mutate(dist = sqrt((longitude-(-51.423519))^2+(latitude-(-20.362911))^2),
          # SIF = (fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1*2.6250912*10^(-19)  + 1.5*fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1* 2.57743*10^(-19))/2
          )
@@ -291,12 +298,12 @@ data_set <- left_join(fco2 %>%
 
 data_set<-data_set %>%
   select(-fluorescence_radiance_757nm_idp_ph_sec_1_m_2_sr_1_um_1, -fluorescence_radiance_771nm_idp_ph_sec_1_m_2_sr_1_um_1 )  %>% 
-  filter(dist <= .16, FCO2 <= 30 ) 
+  filter(dist <= .16, fco2 <= 30 ) 
 ```
 
 
 ```{r,fig.width=15, fig.height=10}
-composition(SIF,data_set)
+composition(sif,data_set)
 ```
 
 
@@ -313,36 +320,36 @@ visdat::vis_miss(data_set)
 tab_medias <- data_set %>% 
   # mutate(SIF = ifelse(SIF <=0, mean(data_set$SIF, na.rm=TRUE),SIF)) %>% 
   group_by(ano_mes, cultura) %>% 
-  summarise(FCO2 = mean(FCO2, na.rm=TRUE),
-            XCO2 = mean(XCO2, na.rm=TRUE),
-            SIF = mean(SIF, na.rm=TRUE))
+  summarise(fco2 = mean(fco2, na.rm=TRUE),
+            xco2 = mean(xco2, na.rm=TRUE),
+            sif = mean(sif, na.rm=TRUE))
 
-tab_medias %>% filter(SIF > 0) %>% 
-  ggplot(aes(y=XCO2, x=SIF)) +
+tab_medias %>% filter(sif > 0) %>% 
+  ggplot(aes(y=xco2, x=sif)) +
   geom_point(size=3, shape=21, fill="gray")+
   geom_smooth(method = "lm", se=FALSE,
               ldw=2,color="red")+
   stat_regline_equation(aes(
     label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5, label.x.npc = .4)
 
-lm(XCO2 ~ SIF,
-           data = tab_medias %>% filter(SIF > 0) ) %>% 
+lm(xco2 ~ sif,
+           data = tab_medias %>% filter(sif > 0) ) %>% 
   summary.lm()
 
-lm(XCO2 ~ SIF + SIF2,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2))  %>% 
+lm(xco2 ~ sif + sif2,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(sif2 = sif^2))  %>% 
   summary.lm()
 
-lm(XCO2 ~ SIF + SIF2 + SIF3,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2,
-                                                            SIF3 = SIF^3))  %>% 
+lm(xco2 ~ sif + sif2 + sif3,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(sif2 = sif^2,
+                                                            sif3 = sif^3))  %>% 
   summary.lm()
 ```
 
 ```{r}
 formula <- y ~ poly(x, 3, raw = TRUE)
-tab_medias %>% filter(SIF > 0) %>%
-  ggplot(aes(x=XCO2, y=FCO2)) +
+tab_medias %>% filter(sif > 0) %>%
+  ggplot(aes(x=xco2, y=fco2)) +
   geom_point(size=3, shape=21, fill="gray")+
   geom_smooth(method = "lm", se=FALSE,
               ldw=2,color="red") +
@@ -354,46 +361,46 @@ tab_medias %>% filter(SIF > 0) %>%
     label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")), formula = y ~ poly(x, 3, raw = TRUE)
     ,size=5,label.x.npc = .2,label.y.npc = .85)
 
-lm(XCO2 ~ FCO2,
-           data = tab_medias %>% filter(SIF > 0) ) %>% 
+lm(xco2 ~ fco2,
+           data = tab_medias %>% filter(sif > 0) ) %>% 
   summary.lm()
 
-lm(XCO2 ~ FCO2 + FCO22,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2))  %>% 
+lm(xco2 ~ fco2 + fco22,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(fco22 = fco2^2))  %>% 
   summary.lm()
 
-lm(XCO2 ~ FCO2 + FCO22 + FCO23,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2,
-                                                            FCO23 = FCO2^3))  %>% 
+lm(xco2 ~ fco2 + fco22 + fco23,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(fco22 = fco2^2,
+                                                            fco23 = fco2^3))  %>% 
   summary.lm()
 
-lm(XCO2 ~ FCO2 + FCO22 + FCO23+ FCO24,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(FCO22 = FCO2^2,
-                                                            FCO23 = FCO2^3,
-                                                            FCO24 = FCO2^4))  %>% 
+lm(xco2 ~ fco2 + fco22 + fco23+ fco24,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(fco22 = fco2^2,
+                                                            fco23 = fco2^3,
+                                                            fco24 = fco2^4))  %>% 
   summary.lm()
 ```
 
 ```{r}
-tab_medias %>% filter(SIF > 0) %>%
-  ggplot(aes(y=FCO2, x=SIF)) +
+tab_medias %>% filter(sif > 0) %>%
+  ggplot(aes(y=fco2, x=sif)) +
   geom_point(size=3, shape=21, fill="gray")+
   geom_smooth(method = "lm", se=FALSE,
               ldw=2,color="red")+
   stat_regline_equation(aes(
     label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")),size=5,label.x.npc = .4,label.y.npc = .1)
 
-lm(FCO2 ~ SIF,
-           data = tab_medias %>% filter(SIF > 0) ) %>% 
+lm(fco2 ~ sif,
+           data = tab_medias %>% filter(sif > 0) ) %>% 
   summary.lm()
 
-lm(FCO2 ~ SIF + SIF2,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2))  %>% 
+lm(fco2 ~ sif + sif2,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(sif2 = sif^2))  %>% 
   summary.lm()
 
-lm(FCO2 ~ SIF + SIF2 + SIF3,
-           data = tab_medias %>% filter(SIF > 0) %>% mutate(SIF2 = SIF^2,
-                                                            SIF3 = SIF^3))  %>% 
+lm(fco2 ~ sif + sif2 + sif3,
+           data = tab_medias %>% filter(sif > 0) %>% mutate(sif2 = sif^2,
+                                                            sif3 = sif^3))  %>% 
   summary.lm()
 ```
 
@@ -409,13 +416,14 @@ data_set_espacial <- data_set %>%
 # Carregando dados Meteorológicos de Ilha Solteira
 
 ```{r}
-dados_estacao <- read_excel("../data-raw/xlsx/estacao_meteorologia_ilha_solteira.xlsx", na = "NA") 
+dados_estacao <- read_excel("../data-raw/xlsx/estacao_meteorologia_ilha_solteira.xlsx", na = "NA") %>% 
+  janitor::clean_names()
 glimpse(dados_estacao)
 dados_estacao <- dados_estacao %>% 
                    drop_na()
 visdat::vis_miss(dados_estacao)
 data_set_est_isa <- left_join(data_set %>% 
-                         rename(data=data.x), dados_estacao, by = "data") %>%                           mutate(range_T = Tmax-Tmin) 
+                         rename(data=data.x), dados_estacao, by = "data") %>%                           mutate(range_t = tmax-tmin) 
 ```
 
 
@@ -455,27 +463,29 @@ fco2_train <- training(fco2_initial_split)
 # fco2_test <- testing(fco2_initial_split)
 # visdat::vis_miss(fco2_test)
 fco2_train  %>% 
-  ggplot(aes(x=FCO2, y=..density..))+
+  ggplot(aes(x=fco2, y=..density..))+
   geom_histogram(bins = 30, color="black",  fill="lightgray")+
   geom_density(alpha=.05,fill="red")+
   theme_bw() +
-  labs(x="FCO2 - treino", y = "Densidade")
+  labs(x="fco2 - treino", y = "Densidade")
 ```
 
 
 ```{r}
 fco2_testing <- testing(fco2_initial_split)
 fco2_testing  %>% 
-  ggplot(aes(x=FCO2, y=..density..))+
+  ggplot(aes(x=fco2, y=..density..))+
   geom_histogram(bins = 30, color="black",  fill="lightgray")+
   geom_density(alpha=.05,fill="blue")+
   theme_bw() +
-  labs(x="FCO2 - teste", y = "Densidade")
+  labs(x="fco2 - teste", y = "Densidade")
 ```
 
 ```{r}
-fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) %>% 
-  mutate(range_T = Tmax-Tmin) %>% select(-c(Tmax,Tmin,Umax,Umin,Dir_vel)) %>%   select(where(is.numeric)) %>%
+fco2_train   %>%    select(fco2:hlifs,xco2,sif,tmed:inso) %>% 
+  mutate(range_t = tmax-tmin) %>% 
+  select(-c(tmax,tmin,umax,umin,dir_vel)) %>%   
+  select(where(is.numeric)) %>%
   drop_na() %>% 
   cor()  %>%  
   corrplot::corrplot()
@@ -484,15 +494,15 @@ fco2_train   %>%    select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) %>%
 
 ### data prep
 ```{r}
-fco2_recipe <- recipe(FCO2 ~ ., 
+fco2_recipe <- recipe(fco2 ~ ., 
                       data = fco2_train %>% 
-            select(FCO2:HLIFS,XCO2,SIF,Tmed:inso) 
+            select(fco2:hlifs,xco2,sif,tmed:inso) 
 ) %>%  
   # step_normalize(all_numeric_predictors())  %>% 
   step_naomit() %>%  
   step_novel(all_nominal_predictors()) %>% 
   step_zv(all_predictors()) %>%
-  step_naomit(c(Ts, Us)) %>% 
+  step_naomit(c(ts, us)) %>% 
   step_impute_median(where(is.numeric)) %>% # inputação da mediana nos numéricos
   # step_poly(c(Us,Ts), degree = 2)  %>%  
   step_dummy(all_nominal_predictors())
@@ -510,14 +520,16 @@ fco2_resamples <- vfold_cv(fco2_train, v = 5)
 ```
 
 ## Support Vector Machine
+#### ϵ-insensitive loss regression (Flavor).
+https://bradleyboehmke.github.io/HOML/svm.html
+https://stackoverflow.com/questions/77735850/variable-importance-plot-for-support-vector-machine-with-tidymodel-framework-is
 
 ### Definição do modelo
 ```{r}
-library(e1071)
 fco2_svm_model <- svm_rbf(
   cost = tune(), 
   rbf_sigma = tune(),
-  margin = tune()) %>%
+  margin = tune()) %>% # margin sempre para regressão
   set_mode("regression") %>%
   set_engine("kernlab") #%>% 
   #translate()
@@ -541,22 +553,12 @@ fco2_svm_wf <- workflow()   %>%
 
 ### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
 
-```{r}
-# grid_dt <- grid_regular(
-#   cost_complexity(c(-6, -4)),
-#   tree_depth(range = c(8, 18)),
-#   min_n(range = c(42, 52)),
-#   levels = 20 # <-----------------------------
-# )
-```
-
 
 ```{r}
-## melhor hiperparâmetros
 grid_svm <- expand.grid(
-  cost = c(0.01, 1, 10, 20),
-  rbf_sigma = c(0.01),
-  margin = c( .01, 0.025,.05, 0.075)
+  cost = c(0.01, 0.0625, 0.1, 0.5, 1, 10, 20, 50),
+  rbf_sigma = c(0.001, 0.01, 0.095, 0.5),
+  margin = c( .001, 0.025,.05, 0.175)
 )
 glimpse(grid_svm)
 ```
@@ -577,7 +579,8 @@ autoplot(fco2_svm_tune_grid)
 
 ```{r}
 collect_metrics(fco2_svm_tune_grid)
-fco2_svm_tune_grid %>%   show_best(metric = "rmse", n = 6)
+fco2_svm_tune_grid %>%   
+  show_best(metric = "rmse", n = 5)
 ```
 
 
@@ -585,7 +588,8 @@ fco2_svm_tune_grid %>%   show_best(metric = "rmse", n = 6)
 
 ```{r}
 fco2_svm_best_params <- select_best(fco2_svm_tune_grid, "rmse")
-fco2_svm_wf <- fco2_svm_wf %>% finalize_workflow(fco2_svm_best_params)
+fco2_svm_wf <- fco2_svm_wf %>% 
+  finalize_workflow(fco2_svm_best_params)
 fco2_svm_last_fit <- last_fit(fco2_svm_wf, fco2_initial_split)
 ```
 
@@ -593,7 +597,8 @@ fco2_svm_last_fit <- last_fit(fco2_svm_wf, fco2_initial_split)
 
 ```{r}
 fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_svm_last_fit)  %>%   mutate(modelo = "svm")
+  collect_predictions(fco2_svm_last_fit)  %>%  
+    mutate(modelo = "svm")
 )
 
 fco2_test <- testing(fco2_initial_split)
@@ -602,7 +607,7 @@ visdat::vis_miss(fco2_test)
 
 ```{r}
 fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=FCO2)) +
+  ggplot(aes(x=.pred, y=fco2)) +
   geom_point()+
   theme_bw() +
   geom_smooth(method = "lm") +
@@ -613,22 +618,22 @@ fco2_test_preds %>%
 
 # Importância
 
+To compute the variable importance scores we just call vip() with method = "permute" and pass our previously defined predictions wrapper to the pred_wrapper argument. `estimate` should be a numeric vector, not a numeric matrix.
+
+
 ```{r}
 fco2_svm_last_fit_model <- fco2_svm_last_fit$.workflow[[1]]$fit$fit
-```
-
-
-```{r}
 fco2_svm_last_fit %>%
   extract_fit_parsnip() %>%
   vip(
     method = "permute", 
-    target = "FCO2", 
+    target = "fco2", 
     metric = "rmse",
-    nsim = 10,
-    pred_wrapper = kernlab::predict,
+    nsim = 5,
+    pred_wrapper = function(object, newdata)
+      as.vector(kernlab::predict(object, newdata)),
     train = fco2_train %>% 
-            select(FCO2:HLIFS,XCO2,SIF,Tmed:inso),
+            select(fco2:hlifs,xco2,sif,tmed:inso),
      aesthetics = list(color = "black", fill = "orange")) +
     theme(axis.text.y=element_text(size=rel(1.5)),
           axis.text.x=element_text(size=rel(1.5)),
@@ -640,31 +645,28 @@ fco2_svm_last_fit %>%
 
 ```{r}
 da <- fco2_test_preds %>% 
-  filter(FCO2 > 0, .pred>0 )
+  filter(fco2 > 0, .pred>0 )
 
-my_r <- cor(da$FCO2,da$.pred)
+my_r <- cor(da$fco2,da$.pred)
 my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$FCO2,da$.pred)
-my_rmse <- Metrics::rmse(da$FCO2,
+my_mse <- Metrics::mse(da$fco2,da$.pred)
+my_rmse <- Metrics::rmse(da$fco2,
                          da$.pred)
-my_mae <- Metrics::mae(da$FCO2,da$.pred)
-my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
+my_mae <- Metrics::mae(da$fco2,da$.pred)
+my_mape <- Metrics::mape(da$fco2,da$.pred)*100
 
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
 ```
-
-
-
 
 ## Árvore de Decisão
 
 ### Definição do modelo
 ```{r}
 fco2_dt_model <- decision_tree(
-  cost_complexity = tune(),
-  tree_depth = tune(),
-  min_n = tune()
+  cost_complexity = tune(), # Quanto maior mais poda é realizada na árvore,
+  tree_depth = tune(),  # Limitar evita criação de regras complexas
+  min_n = tune() #número mín de obs em um nó para ser / em sub-nós.
 )  %>%  
   set_mode("regression")  %>%  
   set_engine("rpart")
@@ -682,17 +684,17 @@ fco2_dt_wf <- workflow()   %>%
 
 ```{r}
 # grid_dt <- grid_regular(
-#   cost_complexity(c(-6, -4)),
-#   tree_depth(range = c(8, 18)),
-#   min_n(range = c(42, 52)),
+#   cost_complexity(c(1e-1, 1e-7)),
+#   tree_depth(range = c(2, 30)),
+#   min_n(range = c(2, 93)),
 #   levels = 20 # <-----------------------------
 # )
 
 ## melhor hiperparâmetros
 grid_dt <- expand.grid(
-  cost_complexity = c(1.438450e-05, 1.000000e-06),
-  tree_depth = c(12,14),
-  min_n  = c(42, 43)
+  cost_complexity = c(1e-1, 1e-2, 1e-3, 1e-05, 1.e-06, 1e-7),
+  tree_depth = c(2, 5, 15, 30),
+  min_n  = c(2, 42, 93)
 )
 glimpse(grid_dt)
 ```
@@ -738,7 +740,7 @@ visdat::vis_miss(fco2_test)
 
 ```{r}
 fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=FCO2)) +
+  ggplot(aes(x=.pred, y=fco2)) +
   geom_point()+
   theme_bw() +
   geom_smooth(method = "lm") +
@@ -763,15 +765,15 @@ vip(fco2_dt_last_fit_model,
 
 ```{r}
 da <- fco2_test_preds %>% 
-  filter(FCO2 > 0, .pred>0 )
+  filter(fco2 > 0, .pred>0 )
 
-my_r <- cor(da$FCO2,da$.pred)
+my_r <- cor(da$fco2,da$.pred)
 my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$FCO2,da$.pred)
-my_rmse <- Metrics::rmse(da$FCO2,
+my_mse <- Metrics::mse(da$fco2,da$.pred)
+my_rmse <- Metrics::rmse(da$fco2,
                          da$.pred)
-my_mae <- Metrics::mae(da$FCO2,da$.pred)
-my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
+my_mae <- Metrics::mae(da$fco2,da$.pred)
+my_mape <- Metrics::mape(da$fco2,da$.pred)*100
 
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
 print(data.frame(vector_of_metrics))
@@ -814,11 +816,11 @@ fco2_rf_wf <- workflow()   %>%
 
 
 grid_rf <- expand.grid(
-  min_n = c(20,21),
-  mtry = c(5,10),
-  trees = c(300,500) #<-----------------------
+  min_n = c(2, 5), #número mínimo de observações necessárias em um nó
+  mtry = c(5,10, 20), #quantas variáveis  em cada divisão de árvore
+  # usar a raiz quadrada do número total de variáveis em seus dados mtry REGRA
+  trees = c(100, 500) #número de árvores MENOS CRITICO 500 o mais usado.
 )
-
 ```
 
 ```{r}
@@ -827,7 +829,11 @@ fco2_rf_tune_grid <- tune_grid(
   resamples = fco2_resamples,
   grid = grid_rf,
   metrics = metric_set(rmse)
-) 
+)
+```
+
+
+```{r}
 autoplot(fco2_rf_tune_grid)
 ```
 
@@ -856,7 +862,7 @@ visdat::vis_miss(fco2_test)
 
 ```{r}
 fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=FCO2)) +
+  ggplot(aes(x=.pred, y=fco2)) +
   geom_point()+
   theme_bw() +
   geom_smooth(method = "lm") +
@@ -880,15 +886,15 @@ vip(fco2_rf_last_fit_model,
 
 ```{r}
 da <- fco2_test_preds %>% 
-  filter(FCO2 > 0, .pred>0 )
+  filter(fco2 > 0, .pred>0 )
 
-my_r <- cor(da$FCO2,da$.pred)
+my_r <- cor(da$fco2,da$.pred)
 my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$FCO2,da$.pred)
-my_rmse <- Metrics::rmse(da$FCO2,
+my_mse <- Metrics::mse(da$fco2,da$.pred)
+my_rmse <- Metrics::rmse(da$fco2,
                          da$.pred)
-my_mae <- Metrics::mae(da$FCO2,da$.pred)
-my_mape <- Metrics::mape(da$FCO2,da$.pred)*100
+my_mae <- Metrics::mae(da$fco2,da$.pred)
+my_mape <- Metrics::mape(da$fco2,da$.pred)*100
 
 
 vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
