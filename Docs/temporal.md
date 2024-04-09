@@ -1113,16 +1113,16 @@ bake(prep(fco2_recipe), new_data = NULL)
     ## # A tibble: 852 × 39
     ##       ts    us   p_h    mo     p     k    ca    mg  h_al    sb   ctc     v    ds
     ##    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-    ##  1  21.2   0     5.2    16    12   0.3    14    13    16  27.3  43.3  63    1.68
-    ##  2   3    22.8   4.4     8    31   2.8    16    17    52  35.8  87.8  41    1.38
-    ##  3  17.5   3.5   5.7    28    12   1.4    37    19     0  57.4  73.4  78.2  1.45
-    ##  4   8    23     4.1     4    23   1       9    11    58  21    79    27    1.41
-    ##  5  24.9   7.3   4.8    15    15   0.6     7     9    20  16.6  36.6  45    1.68
-    ##  6  28.4  10.2   5.3    10     2   0.5    10     5     0  15.5  28.5  54.4  1.52
-    ##  7   4    22     4.4     6    27   1.9    12     9    52  22.9  74.9  31    1.55
-    ##  8  27.3   6     5.2    10     2   0.6    12     6     0  18.6  28.6  65.0  1.52
-    ##  9  20     8     6      22     8   0.7    35    16     0  51.7  63.7  81.2  1.66
-    ## 10  14    25.7   3.9    15    17   0.6     3     2    98   5.6 104.    5    1.52
+    ##  1   3   21.8    4.1     4    19   0.4     6     7    88  13.4 101.   13    1.62
+    ##  2  22.1  4.4    6.5    23    16   1.2    45    22     0  68.2  79.2  86.1  1.4 
+    ##  3  12.6  8.8    6.5    23    16   1.2    45    22     0  68.2  79.2  86.1  1.4 
+    ##  4  22.3  4.06   4.8    15    15   0.6     7     9    20  16.6  36.6  45    1.68
+    ##  5   4   20.3    3.9     4    17   0.2     4     2    64   6.2  70.2   9    1.6 
+    ##  6  21.7  4.14   5.7    18     3   0.8    18    18    12  36.8  48.8  75    1.6 
+    ##  7  28.8  9.5    4.9    10     2   0.4     7     4     0  11.4  26.4  43.2  1.53
+    ##  8  11.7 10.3    5.4    12     4   0.4    12     5     0  17.4  30.4  57.2  1.71
+    ##  9  22.1  3.3    5.2    10     2   0.3    11     5     0  16.3  28.3  57.6  1.56
+    ## 10  17.4  2.3    5.3    13     3   0.3     9     5     0  14.3  29.3  48.8  1.63
     ## # ℹ 842 more rows
     ## # ℹ 26 more variables: macro <dbl>, micro <dbl>, vtp <dbl>, pla <dbl>,
     ## #   at <dbl>, silte <dbl>, arg <dbl>, hlifs <dbl>, xco2 <dbl>, sif <dbl>,
@@ -1224,16 +1224,16 @@ collect_metrics(fco2_nn_tune_grid)
     ## # A tibble: 84 × 9
     ##    hidden_units penalty epochs .metric .estimator  mean     n std_err .config   
     ##           <dbl>   <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>     
-    ##  1            1       1    100 rmse    standard    1.39     5  0.0842 Preproces…
-    ##  2            2       1    100 rmse    standard    1.54     5  0.0904 Preproces…
-    ##  3            3       1    100 rmse    standard    1.50     5  0.0667 Preproces…
-    ##  4            4       1    100 rmse    standard    1.46     5  0.0649 Preproces…
-    ##  5            5       1    100 rmse    standard    1.56     5  0.0859 Preproces…
-    ##  6            6       1    100 rmse    standard    1.50     5  0.0744 Preproces…
-    ##  7            7       1    100 rmse    standard    1.59     5  0.0521 Preproces…
-    ##  8            1       5    100 rmse    standard    1.40     5  0.0730 Preproces…
-    ##  9            2       5    100 rmse    standard    1.47     5  0.0734 Preproces…
-    ## 10            3       5    100 rmse    standard    1.48     5  0.0690 Preproces…
+    ##  1            1       1    100 rmse    standard    1.54     5  0.123  Preproces…
+    ##  2            2       1    100 rmse    standard    1.38     5  0.0894 Preproces…
+    ##  3            3       1    100 rmse    standard    1.49     5  0.0734 Preproces…
+    ##  4            4       1    100 rmse    standard    1.49     5  0.0488 Preproces…
+    ##  5            5       1    100 rmse    standard    1.48     5  0.0782 Preproces…
+    ##  6            6       1    100 rmse    standard    1.44     5  0.0594 Preproces…
+    ##  7            7       1    100 rmse    standard    1.44     5  0.0618 Preproces…
+    ##  8            1       5    100 rmse    standard    1.57     5  0.156  Preproces…
+    ##  9            2       5    100 rmse    standard    1.42     5  0.0572 Preproces…
+    ## 10            3       5    100 rmse    standard    1.44     5  0.0830 Preproces…
     ## # ℹ 74 more rows
 
 ``` r
@@ -1244,11 +1244,11 @@ fco2_nn_tune_grid %>%
     ## # A tibble: 5 × 9
     ##   hidden_units penalty epochs .metric .estimator  mean     n std_err .config    
     ##          <dbl>   <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>      
-    ## 1            7      15   5000 rmse    standard    1.03     5  0.0588 Preprocess…
-    ## 2            4       5   1000 rmse    standard    1.04     5  0.0571 Preprocess…
-    ## 3            7       5   1000 rmse    standard    1.05     5  0.0379 Preprocess…
-    ## 4            4       5   5000 rmse    standard    1.05     5  0.0500 Preprocess…
-    ## 5            7      10   1000 rmse    standard    1.05     5  0.0827 Preprocess…
+    ## 1            6       5   5000 rmse    standard    1.04     5  0.0491 Preprocess…
+    ## 2            7       5   1000 rmse    standard    1.05     5  0.0500 Preprocess…
+    ## 3            7      15   5000 rmse    standard    1.05     5  0.0362 Preprocess…
+    ## 4            6      10   1000 rmse    standard    1.07     5  0.0326 Preprocess…
+    ## 5            7       5   5000 rmse    standard    1.07     5  0.0228 Preprocess…
 
 ### Desempenho dos modelos finais
 
@@ -1326,12 +1326,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8277344
-    ## R2           0.6851443
-    ## MSE          0.9531908
-    ## RMSE         0.9763149
-    ## MAE          0.6799070
-    ## MAPE        35.2693060
+    ## r            0.8239823
+    ## R2           0.6789468
+    ## MSE          1.1037050
+    ## RMSE         1.0505737
+    ## MAE          0.6821857
+    ## MAPE        32.9579187
 
 ## Support Vector Machine - RDF
 
@@ -1409,16 +1409,16 @@ collect_metrics(fco2_svm_tune_grid)
     ## # A tibble: 128 × 9
     ##       cost rbf_sigma margin .metric .estimator  mean     n std_err .config      
     ##      <dbl>     <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>        
-    ##  1  0.01       0.001  0.001 rmse    standard    1.98     5  0.0575 Preprocessor…
-    ##  2  0.0625     0.001  0.001 rmse    standard    1.85     5  0.0599 Preprocessor…
-    ##  3  0.1        0.001  0.001 rmse    standard    1.78     5  0.0577 Preprocessor…
-    ##  4  0.5        0.001  0.001 rmse    standard    1.51     5  0.0635 Preprocessor…
-    ##  5  1          0.001  0.001 rmse    standard    1.41     5  0.0643 Preprocessor…
-    ##  6 10          0.001  0.001 rmse    standard    1.25     5  0.0625 Preprocessor…
-    ##  7 20          0.001  0.001 rmse    standard    1.22     5  0.0621 Preprocessor…
-    ##  8 50          0.001  0.001 rmse    standard    1.18     5  0.0611 Preprocessor…
-    ##  9  0.01       0.01   0.001 rmse    standard    1.86     5  0.0589 Preprocessor…
-    ## 10  0.0625     0.01   0.001 rmse    standard    1.53     5  0.0648 Preprocessor…
+    ##  1  0.01       0.001  0.001 rmse    standard    1.92     5  0.0751 Preprocessor…
+    ##  2  0.0625     0.001  0.001 rmse    standard    1.80     5  0.0780 Preprocessor…
+    ##  3  0.1        0.001  0.001 rmse    standard    1.74     5  0.0778 Preprocessor…
+    ##  4  0.5        0.001  0.001 rmse    standard    1.48     5  0.0686 Preprocessor…
+    ##  5  1          0.001  0.001 rmse    standard    1.39     5  0.0641 Preprocessor…
+    ##  6 10          0.001  0.001 rmse    standard    1.22     5  0.0568 Preprocessor…
+    ##  7 20          0.001  0.001 rmse    standard    1.18     5  0.0504 Preprocessor…
+    ##  8 50          0.001  0.001 rmse    standard    1.14     5  0.0470 Preprocessor…
+    ##  9  0.01       0.01   0.001 rmse    standard    1.79     5  0.0775 Preprocessor…
+    ## 10  0.0625     0.01   0.001 rmse    standard    1.48     5  0.0687 Preprocessor…
     ## # ℹ 118 more rows
 
 ``` r
@@ -1429,11 +1429,11 @@ fco2_svm_tune_grid %>%
     ## # A tibble: 5 × 9
     ##    cost rbf_sigma margin .metric .estimator  mean     n std_err .config         
     ##   <dbl>     <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>           
-    ## 1    50      0.01  0.05  rmse    standard    1.01     5  0.0635 Preprocessor1_M…
-    ## 2    50      0.01  0.025 rmse    standard    1.01     5  0.0630 Preprocessor1_M…
-    ## 3    50      0.01  0.001 rmse    standard    1.01     5  0.0618 Preprocessor1_M…
-    ## 4    50      0.01  0.175 rmse    standard    1.02     5  0.0588 Preprocessor1_M…
-    ## 5    20      0.01  0.175 rmse    standard    1.04     5  0.0610 Preprocessor1_M…
+    ## 1    50      0.01  0.025 rmse    standard   0.987     5  0.0301 Preprocessor1_M…
+    ## 2    50      0.01  0.001 rmse    standard   0.987     5  0.0281 Preprocessor1_M…
+    ## 3    50      0.01  0.05  rmse    standard   0.987     5  0.0304 Preprocessor1_M…
+    ## 4    50      0.01  0.175 rmse    standard   1.00      5  0.0342 Preprocessor1_M…
+    ## 5    20      0.01  0.175 rmse    standard   1.01      5  0.0394 Preprocessor1_M…
 
 ### Desempenho dos modelos finais
 
@@ -1521,12 +1521,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8818180
-    ## R2           0.7776030
-    ## MSE          0.6743517
-    ## RMSE         0.8211892
-    ## MAE          0.5175683
-    ## MAPE        26.1792165
+    ## r            0.8528598
+    ## R2           0.7273699
+    ## MSE          0.9301085
+    ## RMSE         0.9644213
+    ## MAE          0.5156672
+    ## MAPE        23.5450683
 
 ## Support Vector Machine - Linear
 
@@ -1601,16 +1601,16 @@ collect_metrics(fco2_svml_tune_grid)
     ## # A tibble: 40 × 8
     ##       cost margin .metric .estimator  mean     n std_err .config              
     ##      <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ##  1  0.01    0.175 rmse    standard    1.31     5  0.0610 Preprocessor1_Model01
-    ##  2  0.0625  0.175 rmse    standard    1.28     5  0.0547 Preprocessor1_Model02
-    ##  3  0.1     0.175 rmse    standard    1.27     5  0.0523 Preprocessor1_Model03
-    ##  4  0.5     0.175 rmse    standard    1.27     5  0.0480 Preprocessor1_Model04
-    ##  5  1       0.175 rmse    standard    1.27     5  0.0454 Preprocessor1_Model05
-    ##  6 10       0.175 rmse    standard    1.26     5  0.0459 Preprocessor1_Model06
-    ##  7 20       0.175 rmse    standard    1.26     5  0.0459 Preprocessor1_Model07
-    ##  8 50       0.175 rmse    standard    1.26     5  0.0462 Preprocessor1_Model08
-    ##  9  0.01    0.5   rmse    standard    1.32     5  0.0448 Preprocessor1_Model09
-    ## 10  0.0625  0.5   rmse    standard    1.25     5  0.0406 Preprocessor1_Model10
+    ##  1  0.01    0.175 rmse    standard    1.29     5  0.0594 Preprocessor1_Model01
+    ##  2  0.0625  0.175 rmse    standard    1.25     5  0.0556 Preprocessor1_Model02
+    ##  3  0.1     0.175 rmse    standard    1.24     5  0.0519 Preprocessor1_Model03
+    ##  4  0.5     0.175 rmse    standard    1.23     5  0.0468 Preprocessor1_Model04
+    ##  5  1       0.175 rmse    standard    1.23     5  0.0455 Preprocessor1_Model05
+    ##  6 10       0.175 rmse    standard    1.23     5  0.0430 Preprocessor1_Model06
+    ##  7 20       0.175 rmse    standard    1.23     5  0.0427 Preprocessor1_Model07
+    ##  8 50       0.175 rmse    standard    1.23     5  0.0426 Preprocessor1_Model08
+    ##  9  0.01    0.5   rmse    standard    1.29     5  0.0568 Preprocessor1_Model09
+    ## 10  0.0625  0.5   rmse    standard    1.22     5  0.0489 Preprocessor1_Model10
     ## # ℹ 30 more rows
 
 ``` r
@@ -1619,13 +1619,13 @@ fco2_svml_tune_grid %>%
 ```
 
     ## # A tibble: 5 × 8
-    ##     cost margin .metric .estimator  mean     n std_err .config              
-    ##    <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1 0.1      0.5  rmse    standard    1.24     5  0.0403 Preprocessor1_Model11
-    ## 2 0.0625   0.5  rmse    standard    1.25     5  0.0406 Preprocessor1_Model10
-    ## 3 0.1      0.55 rmse    standard    1.25     5  0.0355 Preprocessor1_Model19
-    ## 4 0.5      0.5  rmse    standard    1.25     5  0.0342 Preprocessor1_Model12
-    ## 5 0.5      0.55 rmse    standard    1.25     5  0.0297 Preprocessor1_Model20
+    ##    cost margin .metric .estimator  mean     n std_err .config              
+    ##   <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
+    ## 1   0.5   0.5  rmse    standard    1.21     5  0.0393 Preprocessor1_Model12
+    ## 2   0.1   0.55 rmse    standard    1.21     5  0.0449 Preprocessor1_Model19
+    ## 3   1     0.5  rmse    standard    1.21     5  0.0370 Preprocessor1_Model13
+    ## 4  50     0.5  rmse    standard    1.22     5  0.0364 Preprocessor1_Model16
+    ## 5  20     0.5  rmse    standard    1.22     5  0.0369 Preprocessor1_Model15
 
 ### Desempenho dos modelos finais
 
@@ -1713,12 +1713,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.7825552
-    ## R2           0.6123927
-    ## MSE          1.1776857
-    ## RMSE         1.0852123
-    ## MAE          0.8276035
-    ## MAPE        51.5878617
+    ## r            0.7803436
+    ## R2           0.6089361
+    ## MSE          1.3403224
+    ## RMSE         1.1577229
+    ## MAE          0.8000502
+    ## MAPE        43.4099297
 
 ## Árvore de Decisão
 
@@ -1791,16 +1791,16 @@ collect_metrics(fco2_dt_tune_grid)
     ## # A tibble: 72 × 9
     ##    cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
     ##              <dbl>      <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl>
-    ##  1       0.1                2     2 rmse    standard    1.56     5  0.0355
-    ##  2       0.01               2     2 rmse    standard    1.48     5  0.0210
-    ##  3       0.001              2     2 rmse    standard    1.48     5  0.0210
-    ##  4       0.00001            2     2 rmse    standard    1.48     5  0.0210
-    ##  5       0.000001           2     2 rmse    standard    1.48     5  0.0210
-    ##  6       0.0000001          2     2 rmse    standard    1.48     5  0.0210
-    ##  7       0.1                5     2 rmse    standard    1.43     5  0.0793
-    ##  8       0.01               5     2 rmse    standard    1.20     5  0.0417
-    ##  9       0.001              5     2 rmse    standard    1.20     5  0.0232
-    ## 10       0.00001            5     2 rmse    standard    1.20     5  0.0225
+    ##  1       0.1                2     2 rmse    standard    1.59     5  0.0283
+    ##  2       0.01               2     2 rmse    standard    1.47     5  0.0474
+    ##  3       0.001              2     2 rmse    standard    1.47     5  0.0474
+    ##  4       0.00001            2     2 rmse    standard    1.47     5  0.0474
+    ##  5       0.000001           2     2 rmse    standard    1.47     5  0.0474
+    ##  6       0.0000001          2     2 rmse    standard    1.47     5  0.0474
+    ##  7       0.1                5     2 rmse    standard    1.41     5  0.0900
+    ##  8       0.01               5     2 rmse    standard    1.15     5  0.0613
+    ##  9       0.001              5     2 rmse    standard    1.11     5  0.0568
+    ## 10       0.00001            5     2 rmse    standard    1.10     5  0.0591
     ## # ℹ 62 more rows
     ## # ℹ 1 more variable: .config <chr>
 
@@ -1811,12 +1811,12 @@ fco2_dt_tune_grid %>%   show_best(metric = "rmse", n = 6)
     ## # A tibble: 6 × 9
     ##   cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
     ##             <dbl>      <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl>
-    ## 1       0.00001           15    42 rmse    standard    1.11     5  0.0473
-    ## 2       0.000001          15    42 rmse    standard    1.11     5  0.0473
-    ## 3       0.0000001         15    42 rmse    standard    1.11     5  0.0473
-    ## 4       0.00001           30    42 rmse    standard    1.11     5  0.0473
-    ## 5       0.000001          30    42 rmse    standard    1.11     5  0.0473
-    ## 6       0.0000001         30    42 rmse    standard    1.11     5  0.0473
+    ## 1       0.00001           15    42 rmse    standard    1.08     5  0.0218
+    ## 2       0.000001          15    42 rmse    standard    1.08     5  0.0218
+    ## 3       0.0000001         15    42 rmse    standard    1.08     5  0.0218
+    ## 4       0.00001           30    42 rmse    standard    1.08     5  0.0218
+    ## 5       0.000001          30    42 rmse    standard    1.08     5  0.0218
+    ## 6       0.0000001         30    42 rmse    standard    1.08     5  0.0218
     ## # ℹ 1 more variable: .config <chr>
 
 ### Desempenho dos modelos finais
@@ -1888,12 +1888,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8264244
-    ## R2           0.6829772
-    ## MSE          0.9883718
-    ## RMSE         0.9941689
-    ## MAE          0.6756902
-    ## MAPE        33.7104967
+    ## r            0.8078749
+    ## R2           0.6526618
+    ## MSE          1.2000949
+    ## RMSE         1.0954884
+    ## MAE          0.7044035
+    ## MAPE        34.3924176
 
 ``` r
 tree_fit_rpart <- extract_fit_engine(fco2_dt_last_fit)  
@@ -1970,18 +1970,18 @@ collect_metrics(fco2_rf_tune_grid)
     ## # A tibble: 12 × 9
     ##     mtry trees min_n .metric .estimator  mean     n std_err .config             
     ##    <dbl> <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ##  1     5   100     2 rmse    standard   0.811     5  0.0655 Preprocessor1_Model…
-    ##  2     5   100     5 rmse    standard   0.821     5  0.0608 Preprocessor1_Model…
-    ##  3    10   100     2 rmse    standard   0.811     5  0.0600 Preprocessor1_Model…
-    ##  4    10   100     5 rmse    standard   0.822     5  0.0600 Preprocessor1_Model…
-    ##  5    20   100     2 rmse    standard   0.817     5  0.0589 Preprocessor1_Model…
-    ##  6    20   100     5 rmse    standard   0.819     5  0.0571 Preprocessor1_Model…
-    ##  7     5   500     2 rmse    standard   0.810     5  0.0640 Preprocessor1_Model…
-    ##  8     5   500     5 rmse    standard   0.831     5  0.0630 Preprocessor1_Model…
-    ##  9    10   500     2 rmse    standard   0.813     5  0.0640 Preprocessor1_Model…
-    ## 10    10   500     5 rmse    standard   0.818     5  0.0617 Preprocessor1_Model…
-    ## 11    20   500     2 rmse    standard   0.814     5  0.0626 Preprocessor1_Model…
-    ## 12    20   500     5 rmse    standard   0.819     5  0.0611 Preprocessor1_Model…
+    ##  1     5   100     2 rmse    standard   0.921     5  0.0252 Preprocessor1_Model…
+    ##  2     5   100     5 rmse    standard   0.909     5  0.0243 Preprocessor1_Model…
+    ##  3    10   100     2 rmse    standard   0.906     5  0.0225 Preprocessor1_Model…
+    ##  4    10   100     5 rmse    standard   0.906     5  0.0199 Preprocessor1_Model…
+    ##  5    20   100     2 rmse    standard   0.907     5  0.0238 Preprocessor1_Model…
+    ##  6    20   100     5 rmse    standard   0.894     5  0.0254 Preprocessor1_Model…
+    ##  7     5   500     2 rmse    standard   0.907     5  0.0181 Preprocessor1_Model…
+    ##  8     5   500     5 rmse    standard   0.911     5  0.0197 Preprocessor1_Model…
+    ##  9    10   500     2 rmse    standard   0.904     5  0.0219 Preprocessor1_Model…
+    ## 10    10   500     5 rmse    standard   0.901     5  0.0217 Preprocessor1_Model…
+    ## 11    20   500     2 rmse    standard   0.892     5  0.0239 Preprocessor1_Model…
+    ## 12    20   500     5 rmse    standard   0.896     5  0.0231 Preprocessor1_Model…
 
 ``` r
 fco2_rf_tune_grid %>%   
@@ -1991,12 +1991,12 @@ fco2_rf_tune_grid %>%
     ## # A tibble: 6 × 9
     ##    mtry trees min_n .metric .estimator  mean     n std_err .config              
     ##   <dbl> <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1     5   500     2 rmse    standard   0.810     5  0.0640 Preprocessor1_Model07
-    ## 2     5   100     2 rmse    standard   0.811     5  0.0655 Preprocessor1_Model01
-    ## 3    10   100     2 rmse    standard   0.811     5  0.0600 Preprocessor1_Model03
-    ## 4    10   500     2 rmse    standard   0.813     5  0.0640 Preprocessor1_Model09
-    ## 5    20   500     2 rmse    standard   0.814     5  0.0626 Preprocessor1_Model11
-    ## 6    20   100     2 rmse    standard   0.817     5  0.0589 Preprocessor1_Model05
+    ## 1    20   500     2 rmse    standard   0.892     5  0.0239 Preprocessor1_Model11
+    ## 2    20   100     5 rmse    standard   0.894     5  0.0254 Preprocessor1_Model06
+    ## 3    20   500     5 rmse    standard   0.896     5  0.0231 Preprocessor1_Model12
+    ## 4    10   500     5 rmse    standard   0.901     5  0.0217 Preprocessor1_Model10
+    ## 5    10   500     2 rmse    standard   0.904     5  0.0219 Preprocessor1_Model09
+    ## 6    10   100     2 rmse    standard   0.906     5  0.0225 Preprocessor1_Model03
 
 ### Desempenho modelo final
 
@@ -2068,12 +2068,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8887049
-    ## R2           0.7897963
-    ## MSE          0.6339609
-    ## RMSE         0.7962166
-    ## MAE          0.4815212
-    ## MAPE        24.5300825
+    ## r            0.9031413
+    ## R2           0.8156643
+    ## MSE          0.6262449
+    ## RMSE         0.7913563
+    ## MAE          0.4468458
+    ## MAPE        21.2551532
 
 ## Boosting gradient tree (xgb)
 
@@ -2127,11 +2127,11 @@ fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
     ## # A tibble: 5 × 8
     ##   trees learn_rate .metric .estimator  mean     n std_err .config              
     ##   <int>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1    27       1.01 rmse    standard    1.03     5  0.0602 Preprocessor1_Model02
-    ## 2    75       1.01 rmse    standard    1.04     5  0.0644 Preprocessor1_Model04
-    ## 3   100       1.01 rmse    standard    1.04     5  0.0613 Preprocessor1_Model05
-    ## 4    51       1.01 rmse    standard    1.04     5  0.0641 Preprocessor1_Model03
-    ## 5     3       1.01 rmse    standard    1.12     5  0.0433 Preprocessor1_Model01
+    ## 1    75       1.01 rmse    standard    1.10     5  0.0639 Preprocessor1_Model04
+    ## 2   100       1.01 rmse    standard    1.11     5  0.0592 Preprocessor1_Model05
+    ## 3    51       1.01 rmse    standard    1.11     5  0.0677 Preprocessor1_Model03
+    ## 4    27       1.01 rmse    standard    1.12     5  0.0660 Preprocessor1_Model02
+    ## 5     3       1.20 rmse    standard    1.15     5  0.0387 Preprocessor1_Model06
 
 ``` r
 fco2_xgb_select_best_passo1 <- fco2_xgb_tune_grid %>% 
@@ -2142,7 +2142,7 @@ fco2_xgb_select_best_passo1
     ## # A tibble: 1 × 3
     ##   trees learn_rate .config              
     ##   <int>      <dbl> <chr>                
-    ## 1    27       1.01 Preprocessor1_Model02
+    ## 1    75       1.01 Preprocessor1_Model04
 
 #### Passo 2
 
@@ -2193,11 +2193,11 @@ fco2_xgb_tune_grid  %>%
     ## # A tibble: 5 × 8
     ##   min_n tree_depth .metric .estimator  mean     n std_err .config              
     ##   <int>      <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1    32          3 rmse    standard   0.933     5  0.0377 Preprocessor1_Model11
-    ## 2    46          4 rmse    standard   0.934     5  0.0541 Preprocessor1_Model16
-    ## 3    46          3 rmse    standard   0.940     5  0.0449 Preprocessor1_Model15
-    ## 4    32          4 rmse    standard   0.962     5  0.0439 Preprocessor1_Model12
-    ## 5    46          2 rmse    standard   0.968     5  0.0379 Preprocessor1_Model14
+    ## 1    46          1 rmse    standard   0.956     5  0.0121 Preprocessor1_Model13
+    ## 2    32          1 rmse    standard   0.973     5  0.0207 Preprocessor1_Model09
+    ## 3    18          1 rmse    standard   0.982     5  0.0266 Preprocessor1_Model05
+    ## 4    18          2 rmse    standard   0.983     5  0.0280 Preprocessor1_Model06
+    ## 5    60          1 rmse    standard   0.989     5  0.0241 Preprocessor1_Model17
 
 ``` r
 fco2_xgb_select_best_passo2 <- fco2_xgb_tune_grid  %>% 
@@ -2208,7 +2208,7 @@ fco2_xgb_select_best_passo2
     ## # A tibble: 1 × 3
     ##   min_n tree_depth .config              
     ##   <int>      <int> <chr>                
-    ## 1    32          3 Preprocessor1_Model11
+    ## 1    46          1 Preprocessor1_Model13
 
 ## Passo 3
 
@@ -2259,11 +2259,11 @@ fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
     ## # A tibble: 5 × 7
     ##   loss_reduction .metric .estimator  mean     n std_err .config             
     ##            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1           1.02 rmse    standard   0.956     5  0.0268 Preprocessor1_Model1
-    ## 2          40.6  rmse    standard   1.23      5  0.0297 Preprocessor1_Model2
-    ## 3   100000000    rmse    standard   1.92      5  0.0456 Preprocessor1_Model6
-    ## 4       63680.   rmse    standard   1.92      5  0.0458 Preprocessor1_Model4
-    ## 5     2523481.   rmse    standard   1.92      5  0.0452 Preprocessor1_Model5
+    ## 1           1.02 rmse    standard   0.956     5  0.0199 Preprocessor1_Model1
+    ## 2          40.6  rmse    standard   1.19      5  0.0228 Preprocessor1_Model2
+    ## 3   100000000    rmse    standard   1.88      5  0.0743 Preprocessor1_Model6
+    ## 4       63680.   rmse    standard   1.88      5  0.0733 Preprocessor1_Model4
+    ## 5        1607.   rmse    standard   1.88      5  0.0741 Preprocessor1_Model3
 
 ``` r
 fco2_xgb_select_best_passo3 <- fco2_xgb_tune_grid %>% select_best(metric = "rmse")
@@ -2324,11 +2324,11 @@ fco2_xgb_tune_grid  %>%
     ## # A tibble: 5 × 8
     ##    mtry sample_size .metric .estimator  mean     n std_err .config              
     ##   <dbl>       <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1   0.4       1     rmse    standard   0.935     5  0.0404 Preprocessor1_Model08
-    ## 2   1         1     rmse    standard   0.942     5  0.0458 Preprocessor1_Model16
-    ## 3   0.7       1     rmse    standard   0.953     5  0.0418 Preprocessor1_Model12
-    ## 4   1         0.833 rmse    standard   0.981     5  0.0509 Preprocessor1_Model15
-    ## 5   0.4       0.833 rmse    standard   0.986     5  0.0363 Preprocessor1_Model07
+    ## 1   0.7       1     rmse    standard   0.937     5 0.0139  Preprocessor1_Model12
+    ## 2   1         0.833 rmse    standard   0.949     5 0.0102  Preprocessor1_Model15
+    ## 3   1         1     rmse    standard   0.949     5 0.00995 Preprocessor1_Model16
+    ## 4   0.7       0.833 rmse    standard   0.961     5 0.0158  Preprocessor1_Model11
+    ## 5   0.4       1     rmse    standard   0.963     5 0.0127  Preprocessor1_Model08
 
 ``` r
 fco2_xgb_select_best_passo4 <- fco2_xgb_tune_grid   %>%
@@ -2339,7 +2339,7 @@ fco2_xgb_select_best_passo4
     ## # A tibble: 1 × 3
     ##    mtry sample_size .config              
     ##   <dbl>       <dbl> <chr>                
-    ## 1   0.4           1 Preprocessor1_Model08
+    ## 1   0.7           1 Preprocessor1_Model12
 
 ### Passo 5
 
@@ -2391,11 +2391,11 @@ fco2_xgb_tune_grid  %>%
     ## # A tibble: 5 × 8
     ##   trees learn_rate .metric .estimator  mean     n std_err .config              
     ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1   500       0.25 rmse    standard   0.822     5  0.0432 Preprocessor1_Model09
-    ## 2   250       0.25 rmse    standard   0.838     5  0.0424 Preprocessor1_Model08
-    ## 3   500       0.5  rmse    standard   0.848     5  0.0447 Preprocessor1_Model12
-    ## 4   250       0.5  rmse    standard   0.852     5  0.0438 Preprocessor1_Model11
-    ## 5   500       0.15 rmse    standard   0.854     5  0.0458 Preprocessor1_Model06
+    ## 1   250       0.5  rmse    standard   0.952     5  0.0139 Preprocessor1_Model11
+    ## 2   500       0.5  rmse    standard   0.952     5  0.0139 Preprocessor1_Model12
+    ## 3   500       0.25 rmse    standard   0.959     5  0.0159 Preprocessor1_Model09
+    ## 4   250       0.25 rmse    standard   0.959     5  0.0159 Preprocessor1_Model08
+    ## 5   100       0.5  rmse    standard   0.959     5  0.0154 Preprocessor1_Model10
 
 ``` r
 fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid %>%
@@ -2406,7 +2406,7 @@ fco2_xgb_select_best_passo5
     ## # A tibble: 1 × 3
     ##   trees learn_rate .config              
     ##   <dbl>      <dbl> <chr>                
-    ## 1   500       0.25 Preprocessor1_Model09
+    ## 1   250        0.5 Preprocessor1_Model11
 
 ## Desempenho dos modelos finais
 
@@ -2493,9 +2493,9 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8903645
-    ## R2           0.7927490
-    ## MSE          0.6284509
-    ## RMSE         0.7927490
-    ## MAE          0.5137851
-    ## MAPE        26.0740362
+    ## r            0.8239692
+    ## R2           0.6789253
+    ## MSE          1.0901307
+    ## RMSE         1.0440932
+    ## MAE          0.6277181
+    ## MAPE        31.9303174
