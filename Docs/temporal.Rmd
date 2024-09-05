@@ -554,19 +554,19 @@ NeuralNetTools::plotnet(fco2_nn_model$fit)
 
 ```{r}
 fco2_nn_model <- mlp(
-  hidden_units = tune(), 
+  hidden_units = tune(),
   penalty = tune(),
   epochs = tune()
   ) %>% # margin sempre para regressão
   set_mode("regression") %>%
-  set_engine("nnet") 
+  set_engine("nnet")
 ```
 
 
 ### Workflow
 ```{r}
-fco2_nn_wf <- workflow()   %>%  
-  add_model(fco2_nn_model) %>% 
+fco2_nn_wf <- workflow()   %>%
+  add_model(fco2_nn_model) %>%
   add_recipe(fco2_recipe)
 ```
 
@@ -598,7 +598,7 @@ autoplot(fco2_nn_tune_grid)
 
 ```{r}
 collect_metrics(fco2_nn_tune_grid)
-fco2_nn_tune_grid %>%   
+fco2_nn_tune_grid %>%
   show_best(metric = "rmse", n = 5)
 ```
 
@@ -607,7 +607,7 @@ fco2_nn_tune_grid %>%
 
 ```{r}
 fco2_nn_best_params <- select_best(fco2_nn_tune_grid, metric = "rmse")
-fco2_nn_wf <- fco2_nn_wf %>% 
+fco2_nn_wf <- fco2_nn_wf %>%
   finalize_workflow(fco2_nn_best_params)
 fco2_nn_last_fit <- last_fit(fco2_nn_wf, fco2_initial_split)
 ```
@@ -616,7 +616,7 @@ fco2_nn_last_fit <- last_fit(fco2_nn_wf, fco2_initial_split)
 
 ```{r}
 fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_nn_last_fit)  %>%  
+  collect_predictions(fco2_nn_last_fit)  %>%
     mutate(modelo = "nn")
 )
 
@@ -625,7 +625,7 @@ visdat::vis_miss(fco2_test)
 ```
 
 ```{r}
-fco2_test_preds %>% 
+fco2_test_preds %>%
   ggplot(aes(x=.pred, y=fco2)) +
   geom_point()+
   theme_bw() +
@@ -653,7 +653,7 @@ vip(fco2_nn_last_fit_model,
 ## Métricas
 
 ```{r}
-da <- fco2_test_preds %>% 
+da <- fco2_test_preds %>%
   filter(fco2 > 0, .pred>0 )
 
 my_r <- cor(da$fco2,da$.pred)
@@ -671,410 +671,410 @@ print(data.frame(vector_of_metrics))
 
 
 
-## Support Vector Machine - RDF
-#### ϵ-insensitive loss regression (Flavor).
-https://bradleyboehmke.github.io/HOML/svm.html
-https://stackoverflow.com/questions/77735850/variable-importance-plot-for-support-vector-machine-with-tidymodel-framework-is
-
-### Definição do modelo
-```{r}
-fco2_svm_model <- svm_rbf(
-  cost = tune(), 
-  rbf_sigma = tune(),
-  margin = tune()) %>% # margin sempre para regressão
-  set_mode("regression") %>%
-  set_engine("kernlab") #%>% 
-  #translate()
-
-
-# fco2_svm_model <- svm_linear(
-#   cost = tune(),
-#   margin = tune()
-# ) %>%  
-#   set_engine("LiblineaR") %>% 
-#   set_mode("regression")
-```
-
-
-### Workflow
-```{r}
-fco2_svm_wf <- workflow()   %>%  
-  add_model(fco2_svm_model) %>% 
-  add_recipe(fco2_recipe)
-```
-
-### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
-
-
-```{r}
-grid_svm <- expand.grid(
-  cost = c(0.01, 0.0625, 0.1, 0.5, 1, 10, 20, 50),
-  rbf_sigma = c(0.001, 0.01, 0.095, 0.5),
-  margin = c( .001, 0.025,.05, 0.175)
-)
-glimpse(grid_svm)
-```
-### Tuning de hiperparâmetros
-
-```{r}
-fco2_svm_tune_grid <- tune_grid(
-  fco2_svm_wf,
-  resamples = fco2_resamples,
-  grid = grid_svm,
-  metrics = metric_set(rmse)
-)
-```
-
-```{r}
-autoplot(fco2_svm_tune_grid)
-```
-
-```{r}
-collect_metrics(fco2_svm_tune_grid)
-fco2_svm_tune_grid %>%   
-  show_best(metric = "rmse", n = 5)
-```
-
-
-### Desempenho dos modelos finais
-
-```{r}
-fco2_svm_best_params <- select_best(fco2_svm_tune_grid, metric = "rmse")
-fco2_svm_wf <- fco2_svm_wf %>% 
-  finalize_workflow(fco2_svm_best_params)
-fco2_svm_last_fit <- last_fit(fco2_svm_wf, fco2_initial_split)
-```
-
-### Criando os preditos
-
-```{r}
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_svm_last_fit)  %>%  
-    mutate(modelo = "svm")
-)
-
-fco2_test <- testing(fco2_initial_split)
-visdat::vis_miss(fco2_test)
-```
-
-```{r}
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=fco2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-# Importância
-
-To compute the variable importance scores we just call vip() with method = "permute" and pass our previously defined predictions wrapper to the pred_wrapper argument. `estimate` should be a numeric vector, not a numeric matrix.
-
+<!-- ## Support Vector Machine - RDF -->
+<!-- #### ϵ-insensitive loss regression (Flavor). -->
+<!-- https://bradleyboehmke.github.io/HOML/svm.html -->
+<!-- https://stackoverflow.com/questions/77735850/variable-importance-plot-for-support-vector-machine-with-tidymodel-framework-is -->
+
+<!-- ### Definição do modelo -->
+<!-- ```{r} -->
+<!-- fco2_svm_model <- svm_rbf( -->
+<!--   cost = tune(), -->
+<!--   rbf_sigma = tune(), -->
+<!--   margin = tune()) %>% # margin sempre para regressão -->
+<!--   set_mode("regression") %>% -->
+<!--   set_engine("kernlab") #%>% -->
+<!--   #translate() -->
+
+
+<!-- # fco2_svm_model <- svm_linear( -->
+<!-- #   cost = tune(), -->
+<!-- #   margin = tune() -->
+<!-- # ) %>% -->
+<!-- #   set_engine("LiblineaR") %>% -->
+<!-- #   set_mode("regression") -->
+<!-- ``` -->
+
+
+<!-- ### Workflow -->
+<!-- ```{r} -->
+<!-- fco2_svm_wf <- workflow()   %>% -->
+<!--   add_model(fco2_svm_model) %>% -->
+<!--   add_recipe(fco2_recipe) -->
+<!-- ``` -->
+
+<!-- ### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados -->
+
+
+<!-- ```{r} -->
+<!-- grid_svm <- expand.grid( -->
+<!--   cost = c(0.01, 0.0625, 0.1, 0.5, 1, 10, 20, 50), -->
+<!--   rbf_sigma = c(0.001, 0.01, 0.095, 0.5), -->
+<!--   margin = c( .001, 0.025,.05, 0.175) -->
+<!-- ) -->
+<!-- glimpse(grid_svm) -->
+<!-- ``` -->
+<!-- ### Tuning de hiperparâmetros -->
+
+<!-- ```{r} -->
+<!-- fco2_svm_tune_grid <- tune_grid( -->
+<!--   fco2_svm_wf, -->
+<!--   resamples = fco2_resamples, -->
+<!--   grid = grid_svm, -->
+<!--   metrics = metric_set(rmse) -->
+<!-- ) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- autoplot(fco2_svm_tune_grid) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- collect_metrics(fco2_svm_tune_grid) -->
+<!-- fco2_svm_tune_grid %>% -->
+<!--   show_best(metric = "rmse", n = 5) -->
+<!-- ``` -->
+
+
+<!-- ### Desempenho dos modelos finais -->
+
+<!-- ```{r} -->
+<!-- fco2_svm_best_params <- select_best(fco2_svm_tune_grid, metric = "rmse") -->
+<!-- fco2_svm_wf <- fco2_svm_wf %>% -->
+<!--   finalize_workflow(fco2_svm_best_params) -->
+<!-- fco2_svm_last_fit <- last_fit(fco2_svm_wf, fco2_initial_split) -->
+<!-- ``` -->
+
+<!-- ### Criando os preditos -->
+
+<!-- ```{r} -->
+<!-- fco2_test_preds <- bind_rows( -->
+<!--   collect_predictions(fco2_svm_last_fit)  %>% -->
+<!--     mutate(modelo = "svm") -->
+<!-- ) -->
+
+<!-- fco2_test <- testing(fco2_initial_split) -->
+<!-- visdat::vis_miss(fco2_test) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- fco2_test_preds %>% -->
+<!--   ggplot(aes(x=.pred, y=fco2)) + -->
+<!--   geom_point()+ -->
+<!--   theme_bw() + -->
+<!--   geom_smooth(method = "lm") + -->
+<!--   stat_regline_equation(ggplot2::aes( -->
+<!--   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) + -->
+<!--   geom_abline (slope=1, linetype = "dashed", color="Red") -->
+<!-- ``` -->
+
+<!-- # Importância -->
+
+<!-- To compute the variable importance scores we just call vip() with method = "permute" and pass our previously defined predictions wrapper to the pred_wrapper argument. `estimate` should be a numeric vector, not a numeric matrix. -->
+
 
-```{r}
-fco2_svm_last_fit_model <- fco2_svm_last_fit$.workflow[[1]]$fit$fit
-fco2_svm_last_fit %>%
-  extract_fit_parsnip() %>%
-  vip(
-    method = "permute", 
-    target = "fco2", 
-    metric = "rmse",
-    nsim = 5,
-    pred_wrapper = function(object, newdata)
-      as.vector(kernlab::predict(object, newdata)),
-    train = fco2_train %>% 
-            select(fco2:hlifs,xco2,sif,tmed:inso),
-     aesthetics = list(color = "black", fill = "orange")) +
-    theme(axis.text.y=element_text(size=rel(1.5)),
-          axis.text.x=element_text(size=rel(1.5)),
-          axis.title.x=element_text(size=rel(1.5))
-          )
-```
-
-## Métricas
-
-```{r}
-da <- fco2_test_preds %>% 
-  filter(fco2 > 0, .pred>0 )
-
-my_r <- cor(da$fco2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$fco2,da$.pred)
-my_rmse <- Metrics::rmse(da$fco2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$fco2,da$.pred)
-my_mape <- Metrics::mape(da$fco2,da$.pred)*100
-
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-## Support Vector Machine - Linear
-#### ϵ-insensitive loss regression (Flavor).
-https://bradleyboehmke.github.io/HOML/svm.html
-https://stackoverflow.com/questions/77735850/variable-importance-plot-for-support-vector-machine-with-tidymodel-framework-is
-
-### Definição do modelo
-```{r}
-fco2_svml_model <- svm_linear(
-  cost = tune(), 
-  margin = tune()) %>% # margin sempre para regressão
-  set_mode("regression") %>%
-  set_engine("kernlab") #%>% 
-  #translate()
-
-
-# fco2_svm_model <- svm_linear(
-#   cost = tune(),
-#   margin = tune()
-# ) %>%  
-#   set_engine("LiblineaR") %>% 
-#   set_mode("regression")
-```
-
-
-### Workflow
-```{r}
-fco2_svml_wf <- workflow()   %>%  
-  add_model(fco2_svml_model) %>% 
-  add_recipe(fco2_recipe)
-```
-
-### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
-
-
-```{r}
-grid_svml <- expand.grid(
-  cost = c(0.01, 0.0625, 0.1, 0.5, 1, 10, 20, 50),
-  margin = c(0.175,0.5,0.55,0.6,0.75)
-)
-glimpse(grid_svml)
-```
-### Tuning de hiperparâmetros
-
-```{r}
-fco2_svml_tune_grid <- tune_grid(
-  fco2_svml_wf,
-  resamples = fco2_resamples,
-  grid = grid_svml,
-  metrics = metric_set(rmse)
-)
-```
-
-```{r}
-autoplot(fco2_svml_tune_grid)
-```
-
-```{r}
-collect_metrics(fco2_svml_tune_grid)
-fco2_svml_tune_grid %>%   
-  show_best(metric = "rmse", n = 5)
-```
-
-
-### Desempenho dos modelos finais
-
-```{r}
-fco2_svml_best_params <- select_best(fco2_svml_tune_grid, metric = "rmse")
-fco2_svml_wf <- fco2_svml_wf %>% 
-  finalize_workflow(fco2_svml_best_params)
-fco2_svml_last_fit <- last_fit(fco2_svml_wf, fco2_initial_split)
-```
-
-### Criando os preditos
-
-```{r}
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_svml_last_fit)  %>%  
-    mutate(modelo = "svml")
-)
-
-fco2_test <- testing(fco2_initial_split)
-visdat::vis_miss(fco2_test)
-```
-
-```{r}
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=fco2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-# Importância
-
-To compute the variable importance scores we just call vip() with method = "permute" and pass our previously defined predictions wrapper to the pred_wrapper argument. `estimate` should be a numeric vector, not a numeric matrix.
-
-
-```{r}
-fco2_svml_last_fit_model <- fco2_svml_last_fit$.workflow[[1]]$fit$fit
-fco2_svml_last_fit %>%
-  extract_fit_parsnip() %>%
-  vip(
-    method = "permute", 
-    target = "fco2", 
-    metric = "rmse",
-    nsim = 5,
-    pred_wrapper = function(object, newdata)
-      as.vector(kernlab::predict(object, newdata)),
-    train = fco2_train %>% 
-            select(fco2:hlifs,xco2,sif,tmed:inso),
-     aesthetics = list(color = "black", fill = "orange")) +
-    theme(axis.text.y=element_text(size=rel(1.5)),
-          axis.text.x=element_text(size=rel(1.5)),
-          axis.title.x=element_text(size=rel(1.5))
-          )
-```
-
-## Métricas
-
-```{r}
-da <- fco2_test_preds %>% 
-  filter(fco2 > 0, .pred>0 )
-
-my_r <- cor(da$fco2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$fco2,da$.pred)
-my_rmse <- Metrics::rmse(da$fco2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$fco2,da$.pred)
-my_mape <- Metrics::mape(da$fco2,da$.pred)*100
-
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-
-
-
-## Árvore de Decisão
-
-### Definição do modelo
-```{r}
-fco2_dt_model <- decision_tree(
-  cost_complexity = tune(), # Quanto maior mais poda é realizada na árvore,
-  tree_depth = tune(),  # Limitar evita criação de regras complexas
-  min_n = tune() #número mín de obs em um nó para ser / em sub-nós.
-)  %>%  
-  set_mode("regression")  %>%  
-  set_engine("rpart")
-```
-
-
-### Workflow
-```{r}
-fco2_dt_wf <- workflow()   %>%  
-  add_model(fco2_dt_model) %>% 
-  add_recipe(fco2_recipe)
-```
-
-### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados
-
-```{r}
-# grid_dt <- grid_regular(
-#   cost_complexity(c(1e-1, 1e-7)),
-#   tree_depth(range = c(2, 30)),
-#   min_n(range = c(2, 93)),
-#   levels = 20 # <-----------------------------
-# )
-
-## melhor hiperparâmetros
-grid_dt <- expand.grid(
-  cost_complexity = c(1e-1, 1e-2, 1e-3, 1e-05, 1.e-06, 1e-7),
-  tree_depth = c(2, 5, 15, 30),
-  min_n  = c(2, 42, 93)
-)
-glimpse(grid_dt)
-```
-### Tuning de hiperparâmetros
-
-```{r}
-fco2_dt_tune_grid <- tune_grid(
-  fco2_dt_wf,
-  resamples = fco2_resamples,
-  grid = grid_dt,
-  metrics = metric_set(rmse)
-)
-```
-
-```{r}
-autoplot(fco2_dt_tune_grid)
-```
-
-```{r}
-collect_metrics(fco2_dt_tune_grid)
-fco2_dt_tune_grid %>%   show_best(metric = "rmse", n = 6)
-```
-
-
-### Desempenho dos modelos finais
-
-```{r}
-fco2_dt_best_params <- select_best(fco2_dt_tune_grid, metric = "rmse")
-fco2_dt_wf <- fco2_dt_wf %>% finalize_workflow(fco2_dt_best_params)
-fco2_dt_last_fit <- last_fit(fco2_dt_wf, fco2_initial_split)
-```
-
-### Criando os preditos
-
-```{r}
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_dt_last_fit)  %>%   mutate(modelo = "dt")
-)
-
-fco2_test <- testing(fco2_initial_split)
-visdat::vis_miss(fco2_test)
-```
-
-```{r}
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=fco2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-# Importância
-
-```{r}
-fco2_dt_last_fit_model <-fco2_dt_last_fit$.workflow[[1]]$fit$fit
-vip(fco2_dt_last_fit_model,
-    aesthetics = list(color = "black", fill = "orange")) +
-    theme(axis.text.y=element_text(size=rel(1.5)),
-          axis.text.x=element_text(size=rel(1.5)),
-          axis.title.x=element_text(size=rel(1.5))
-          )
-```
-
-## Métricas
-
-```{r}
-da <- fco2_test_preds %>% 
-  filter(fco2 > 0, .pred>0 )
-
-my_r <- cor(da$fco2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$fco2,da$.pred)
-my_rmse <- Metrics::rmse(da$fco2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$fco2,da$.pred)
-my_mape <- Metrics::mape(da$fco2,da$.pred)*100
-
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-```{r}
-tree_fit_rpart <- extract_fit_engine(fco2_dt_last_fit)  
-rpart.plot::rpart.plot(tree_fit_rpart,cex=.4)
-```
+<!-- ```{r} -->
+<!-- fco2_svm_last_fit_model <- fco2_svm_last_fit$.workflow[[1]]$fit$fit -->
+<!-- fco2_svm_last_fit %>% -->
+<!--   extract_fit_parsnip() %>% -->
+<!--   vip( -->
+<!--     method = "permute", -->
+<!--     target = "fco2", -->
+<!--     metric = "rmse", -->
+<!--     nsim = 5, -->
+<!--     pred_wrapper = function(object, newdata) -->
+<!--       as.vector(kernlab::predict(object, newdata)), -->
+<!--     train = fco2_train %>% -->
+<!--             select(fco2:hlifs,xco2,sif,tmed:inso), -->
+<!--      aesthetics = list(color = "black", fill = "orange")) + -->
+<!--     theme(axis.text.y=element_text(size=rel(1.5)), -->
+<!--           axis.text.x=element_text(size=rel(1.5)), -->
+<!--           axis.title.x=element_text(size=rel(1.5)) -->
+<!--           ) -->
+<!-- ``` -->
+
+<!-- ## Métricas -->
+
+<!-- ```{r} -->
+<!-- da <- fco2_test_preds %>% -->
+<!--   filter(fco2 > 0, .pred>0 ) -->
+
+<!-- my_r <- cor(da$fco2,da$.pred) -->
+<!-- my_r2 <- my_r*my_r -->
+<!-- my_mse <- Metrics::mse(da$fco2,da$.pred) -->
+<!-- my_rmse <- Metrics::rmse(da$fco2, -->
+<!--                          da$.pred) -->
+<!-- my_mae <- Metrics::mae(da$fco2,da$.pred) -->
+<!-- my_mape <- Metrics::mape(da$fco2,da$.pred)*100 -->
+
+<!-- vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape) -->
+<!-- print(data.frame(vector_of_metrics)) -->
+<!-- ``` -->
+
+<!-- ## Support Vector Machine - Linear -->
+<!-- #### ϵ-insensitive loss regression (Flavor). -->
+<!-- https://bradleyboehmke.github.io/HOML/svm.html -->
+<!-- https://stackoverflow.com/questions/77735850/variable-importance-plot-for-support-vector-machine-with-tidymodel-framework-is -->
+
+<!-- ### Definição do modelo -->
+<!-- ```{r} -->
+<!-- fco2_svml_model <- svm_linear( -->
+<!--   cost = tune(), -->
+<!--   margin = tune()) %>% # margin sempre para regressão -->
+<!--   set_mode("regression") %>% -->
+<!--   set_engine("kernlab") #%>% -->
+<!--   #translate() -->
+
+
+<!-- # fco2_svm_model <- svm_linear( -->
+<!-- #   cost = tune(), -->
+<!-- #   margin = tune() -->
+<!-- # ) %>% -->
+<!-- #   set_engine("LiblineaR") %>% -->
+<!-- #   set_mode("regression") -->
+<!-- ``` -->
+
+
+<!-- ### Workflow -->
+<!-- ```{r} -->
+<!-- fco2_svml_wf <- workflow()   %>% -->
+<!--   add_model(fco2_svml_model) %>% -->
+<!--   add_recipe(fco2_recipe) -->
+<!-- ``` -->
+
+<!-- ### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados -->
+
+
+<!-- ```{r} -->
+<!-- grid_svml <- expand.grid( -->
+<!--   cost = c(0.01, 0.0625, 0.1, 0.5, 1, 10, 20, 50), -->
+<!--   margin = c(0.175,0.5,0.55,0.6,0.75) -->
+<!-- ) -->
+<!-- glimpse(grid_svml) -->
+<!-- ``` -->
+<!-- ### Tuning de hiperparâmetros -->
+
+<!-- ```{r} -->
+<!-- fco2_svml_tune_grid <- tune_grid( -->
+<!--   fco2_svml_wf, -->
+<!--   resamples = fco2_resamples, -->
+<!--   grid = grid_svml, -->
+<!--   metrics = metric_set(rmse) -->
+<!-- ) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- autoplot(fco2_svml_tune_grid) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- collect_metrics(fco2_svml_tune_grid) -->
+<!-- fco2_svml_tune_grid %>% -->
+<!--   show_best(metric = "rmse", n = 5) -->
+<!-- ``` -->
+
+
+<!-- ### Desempenho dos modelos finais -->
+
+<!-- ```{r} -->
+<!-- fco2_svml_best_params <- select_best(fco2_svml_tune_grid, metric = "rmse") -->
+<!-- fco2_svml_wf <- fco2_svml_wf %>% -->
+<!--   finalize_workflow(fco2_svml_best_params) -->
+<!-- fco2_svml_last_fit <- last_fit(fco2_svml_wf, fco2_initial_split) -->
+<!-- ``` -->
+
+<!-- ### Criando os preditos -->
+
+<!-- ```{r} -->
+<!-- fco2_test_preds <- bind_rows( -->
+<!--   collect_predictions(fco2_svml_last_fit)  %>% -->
+<!--     mutate(modelo = "svml") -->
+<!-- ) -->
+
+<!-- fco2_test <- testing(fco2_initial_split) -->
+<!-- visdat::vis_miss(fco2_test) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- fco2_test_preds %>% -->
+<!--   ggplot(aes(x=.pred, y=fco2)) + -->
+<!--   geom_point()+ -->
+<!--   theme_bw() + -->
+<!--   geom_smooth(method = "lm") + -->
+<!--   stat_regline_equation(ggplot2::aes( -->
+<!--   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) + -->
+<!--   geom_abline (slope=1, linetype = "dashed", color="Red") -->
+<!-- ``` -->
+
+<!-- # Importância -->
+
+<!-- To compute the variable importance scores we just call vip() with method = "permute" and pass our previously defined predictions wrapper to the pred_wrapper argument. `estimate` should be a numeric vector, not a numeric matrix. -->
+
+
+<!-- ```{r} -->
+<!-- fco2_svml_last_fit_model <- fco2_svml_last_fit$.workflow[[1]]$fit$fit -->
+<!-- fco2_svml_last_fit %>% -->
+<!--   extract_fit_parsnip() %>% -->
+<!--   vip( -->
+<!--     method = "permute", -->
+<!--     target = "fco2", -->
+<!--     metric = "rmse", -->
+<!--     nsim = 5, -->
+<!--     pred_wrapper = function(object, newdata) -->
+<!--       as.vector(kernlab::predict(object, newdata)), -->
+<!--     train = fco2_train %>% -->
+<!--             select(fco2:hlifs,xco2,sif,tmed:inso), -->
+<!--      aesthetics = list(color = "black", fill = "orange")) + -->
+<!--     theme(axis.text.y=element_text(size=rel(1.5)), -->
+<!--           axis.text.x=element_text(size=rel(1.5)), -->
+<!--           axis.title.x=element_text(size=rel(1.5)) -->
+<!--           ) -->
+<!-- ``` -->
+
+<!-- ## Métricas -->
+
+<!-- ```{r} -->
+<!-- da <- fco2_test_preds %>% -->
+<!--   filter(fco2 > 0, .pred>0 ) -->
+
+<!-- my_r <- cor(da$fco2,da$.pred) -->
+<!-- my_r2 <- my_r*my_r -->
+<!-- my_mse <- Metrics::mse(da$fco2,da$.pred) -->
+<!-- my_rmse <- Metrics::rmse(da$fco2, -->
+<!--                          da$.pred) -->
+<!-- my_mae <- Metrics::mae(da$fco2,da$.pred) -->
+<!-- my_mape <- Metrics::mape(da$fco2,da$.pred)*100 -->
+
+<!-- vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape) -->
+<!-- print(data.frame(vector_of_metrics)) -->
+<!-- ``` -->
+
+
+
+
+<!-- ## Árvore de Decisão -->
+
+<!-- ### Definição do modelo -->
+<!-- ```{r} -->
+<!-- fco2_dt_model <- decision_tree( -->
+<!--   cost_complexity = tune(), # Quanto maior mais poda é realizada na árvore, -->
+<!--   tree_depth = tune(),  # Limitar evita criação de regras complexas -->
+<!--   min_n = tune() #número mín de obs em um nó para ser / em sub-nós. -->
+<!-- )  %>% -->
+<!--   set_mode("regression")  %>% -->
+<!--   set_engine("rpart") -->
+<!-- ``` -->
+
+
+<!-- ### Workflow -->
+<!-- ```{r} -->
+<!-- fco2_dt_wf <- workflow()   %>% -->
+<!--   add_model(fco2_dt_model) %>% -->
+<!--   add_recipe(fco2_recipe) -->
+<!-- ``` -->
+
+<!-- ### Criando a matriz (grid) com os valores de hiperparâmetros a serem testados -->
+
+<!-- ```{r} -->
+<!-- # grid_dt <- grid_regular( -->
+<!-- #   cost_complexity(c(1e-1, 1e-7)), -->
+<!-- #   tree_depth(range = c(2, 30)), -->
+<!-- #   min_n(range = c(2, 93)), -->
+<!-- #   levels = 20 # <----------------------------- -->
+<!-- # ) -->
+
+<!-- ## melhor hiperparâmetros -->
+<!-- grid_dt <- expand.grid( -->
+<!--   cost_complexity = c(1e-1, 1e-2, 1e-3, 1e-05, 1.e-06, 1e-7), -->
+<!--   tree_depth = c(2, 5, 15, 30), -->
+<!--   min_n  = c(2, 42, 93) -->
+<!-- ) -->
+<!-- glimpse(grid_dt) -->
+<!-- ``` -->
+<!-- ### Tuning de hiperparâmetros -->
+
+<!-- ```{r} -->
+<!-- fco2_dt_tune_grid <- tune_grid( -->
+<!--   fco2_dt_wf, -->
+<!--   resamples = fco2_resamples, -->
+<!--   grid = grid_dt, -->
+<!--   metrics = metric_set(rmse) -->
+<!-- ) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- autoplot(fco2_dt_tune_grid) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- collect_metrics(fco2_dt_tune_grid) -->
+<!-- fco2_dt_tune_grid %>%   show_best(metric = "rmse", n = 6) -->
+<!-- ``` -->
+
+
+<!-- ### Desempenho dos modelos finais -->
+
+<!-- ```{r} -->
+<!-- fco2_dt_best_params <- select_best(fco2_dt_tune_grid, metric = "rmse") -->
+<!-- fco2_dt_wf <- fco2_dt_wf %>% finalize_workflow(fco2_dt_best_params) -->
+<!-- fco2_dt_last_fit <- last_fit(fco2_dt_wf, fco2_initial_split) -->
+<!-- ``` -->
+
+<!-- ### Criando os preditos -->
+
+<!-- ```{r} -->
+<!-- fco2_test_preds <- bind_rows( -->
+<!--   collect_predictions(fco2_dt_last_fit)  %>%   mutate(modelo = "dt") -->
+<!-- ) -->
+
+<!-- fco2_test <- testing(fco2_initial_split) -->
+<!-- visdat::vis_miss(fco2_test) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- fco2_test_preds %>% -->
+<!--   ggplot(aes(x=.pred, y=fco2)) + -->
+<!--   geom_point()+ -->
+<!--   theme_bw() + -->
+<!--   geom_smooth(method = "lm") + -->
+<!--   stat_regline_equation(ggplot2::aes( -->
+<!--   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) + -->
+<!--   geom_abline (slope=1, linetype = "dashed", color="Red") -->
+<!-- ``` -->
+
+<!-- # Importância -->
+
+<!-- ```{r} -->
+<!-- fco2_dt_last_fit_model <-fco2_dt_last_fit$.workflow[[1]]$fit$fit -->
+<!-- vip(fco2_dt_last_fit_model, -->
+<!--     aesthetics = list(color = "black", fill = "orange")) + -->
+<!--     theme(axis.text.y=element_text(size=rel(1.5)), -->
+<!--           axis.text.x=element_text(size=rel(1.5)), -->
+<!--           axis.title.x=element_text(size=rel(1.5)) -->
+<!--           ) -->
+<!-- ``` -->
+
+<!-- ## Métricas -->
+
+<!-- ```{r} -->
+<!-- da <- fco2_test_preds %>% -->
+<!--   filter(fco2 > 0, .pred>0 ) -->
+
+<!-- my_r <- cor(da$fco2,da$.pred) -->
+<!-- my_r2 <- my_r*my_r -->
+<!-- my_mse <- Metrics::mse(da$fco2,da$.pred) -->
+<!-- my_rmse <- Metrics::rmse(da$fco2, -->
+<!--                          da$.pred) -->
+<!-- my_mae <- Metrics::mae(da$fco2,da$.pred) -->
+<!-- my_mape <- Metrics::mape(da$fco2,da$.pred)*100 -->
+
+<!-- vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape) -->
+<!-- print(data.frame(vector_of_metrics)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- tree_fit_rpart <- extract_fit_engine(fco2_dt_last_fit) -->
+<!-- rpart.plot::rpart.plot(tree_fit_rpart,cex=.4) -->
+<!-- ``` -->
 
 
 ## Random Forest
@@ -1116,85 +1116,85 @@ grid_rf <- expand.grid(
 )
 ```
 
-<!-- ```{r} -->
-<!-- fco2_rf_tune_grid <- tune_grid( -->
-<!--  fco2_rf_wf, -->
-<!--   resamples = fco2_resamples, -->
-<!--   grid = grid_rf, -->
-<!--   metrics = metric_set(rmse) -->
-<!-- ) -->
-<!-- ``` -->
+```{r}
+fco2_rf_tune_grid <- tune_grid(
+ fco2_rf_wf,
+  resamples = fco2_resamples,
+  grid = grid_rf,
+  metrics = metric_set(rmse)
+)
+```
 
 
-<!-- ```{r} -->
-<!-- autoplot(fco2_rf_tune_grid) -->
-<!-- ``` -->
+```{r}
+autoplot(fco2_rf_tune_grid)
+```
 
-<!-- ```{r} -->
-<!-- collect_metrics(fco2_rf_tune_grid) -->
-<!-- fco2_rf_tune_grid %>%    -->
-<!--   show_best(metric = "rmse", n = 6) -->
-<!-- ``` -->
+```{r}
+collect_metrics(fco2_rf_tune_grid)
+fco2_rf_tune_grid %>%
+  show_best(metric = "rmse", n = 6)
+```
 
-<!-- ### Desempenho modelo final -->
-<!-- ```{r} -->
-<!-- fco2_rf_best_params <- select_best(fco2_rf_tune_grid, metric = "rmse") -->
-<!-- fco2_rf_wf <- fco2_rf_wf %>% -->
-<!--   finalize_workflow(fco2_rf_best_params) -->
-<!-- fco2_rf_last_fit <- last_fit(fco2_rf_wf, fco2_initial_split) -->
-<!-- ``` -->
+### Desempenho modelo final
+```{r}
+fco2_rf_best_params <- select_best(fco2_rf_tune_grid, metric = "rmse")
+fco2_rf_wf <- fco2_rf_wf %>%
+  finalize_workflow(fco2_rf_best_params)
+fco2_rf_last_fit <- last_fit(fco2_rf_wf, fco2_initial_split)
+```
 
-<!-- ### Criando os preditos -->
+### Criando os preditos
 
-<!-- ```{r} -->
-<!-- fco2_test_preds <- bind_rows( -->
-<!--   collect_predictions(fco2_rf_last_fit)  %>%    -->
-<!--     mutate(modelo = "rf")) -->
+```{r}
+fco2_test_preds <- bind_rows(
+  collect_predictions(fco2_rf_last_fit)  %>%
+    mutate(modelo = "rf"))
 
-<!-- fco2_test <- testing(fco2_initial_split) -->
-<!-- visdat::vis_miss(fco2_test) -->
-<!-- ``` -->
+fco2_test <- testing(fco2_initial_split)
+visdat::vis_miss(fco2_test)
+```
 
-<!-- ```{r} -->
-<!-- fco2_test_preds %>%  -->
-<!--   ggplot(aes(x=.pred, y=fco2)) + -->
-<!--   geom_point()+ -->
-<!--   theme_bw() + -->
-<!--   geom_smooth(method = "lm") + -->
-<!--   stat_regline_equation(ggplot2::aes( -->
-<!--   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) + -->
-<!--   geom_abline (slope=1, linetype = "dashed", color="Red") -->
-<!-- ``` -->
+```{r}
+fco2_test_preds %>%
+  ggplot(aes(x=.pred, y=fco2)) +
+  geom_point()+
+  theme_bw() +
+  geom_smooth(method = "lm") +
+  stat_regline_equation(ggplot2::aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
+  geom_abline (slope=1, linetype = "dashed", color="Red")
+```
 
-<!-- # Importância -->
+# Importância
 
-<!-- ```{r} -->
-<!-- fco2_rf_last_fit_model <-fco2_rf_last_fit$.workflow[[1]]$fit$fit -->
-<!-- vip(fco2_rf_last_fit_model, -->
-<!--     aesthetics = list(color = "black", fill = "orange")) + -->
-<!--     theme(axis.text.y=element_text(size=rel(1.5)), -->
-<!--           axis.text.x=element_text(size=rel(1.5)), -->
-<!--           axis.title.x=element_text(size=rel(1.5)) -->
-<!--           ) -->
-<!-- ``` -->
-<!-- ## Métricas -->
+```{r}
+fco2_rf_last_fit_model <-fco2_rf_last_fit$.workflow[[1]]$fit$fit
+vip(fco2_rf_last_fit_model,
+    aesthetics = list(color = "black", fill = "orange")) +
+    theme(axis.text.y=element_text(size=rel(1.5)),
+          axis.text.x=element_text(size=rel(1.5)),
+          axis.title.x=element_text(size=rel(1.5))
+          )
+```
+## Métricas
 
-<!-- ```{r} -->
-<!-- da <- fco2_test_preds %>%  -->
-<!--   filter(fco2 > 0, .pred>0 ) -->
+```{r}
+da <- fco2_test_preds %>%
+  filter(fco2 > 0, .pred>0 )
 
-<!-- my_r <- cor(da$fco2,da$.pred) -->
-<!-- my_r2 <- my_r*my_r -->
-<!-- my_mse <- Metrics::mse(da$fco2,da$.pred) -->
-<!-- my_rmse <- Metrics::rmse(da$fco2, -->
-<!--                          da$.pred) -->
-<!-- my_mae <- Metrics::mae(da$fco2,da$.pred) -->
-<!-- my_mape <- Metrics::mape(da$fco2,da$.pred)*100 -->
+my_r <- cor(da$fco2,da$.pred)
+my_r2 <- my_r*my_r
+my_mse <- Metrics::mse(da$fco2,da$.pred)
+my_rmse <- Metrics::rmse(da$fco2,
+                         da$.pred)
+my_mae <- Metrics::mae(da$fco2,da$.pred)
+my_mape <- Metrics::mape(da$fco2,da$.pred)*100
 
 
-<!-- vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape) -->
-<!-- print(data.frame(vector_of_metrics)) -->
-<!-- ``` -->
+vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
+print(data.frame(vector_of_metrics))
+```
 
 <!-- ## Boosting gradient tree (xgb) -->
 
