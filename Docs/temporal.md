@@ -48,7 +48,7 @@ partir do [GitHub](https://github.com/) com os seguintes comandos:
 
 ``` r
 # install.packages("devtools")
-# devtools::install_github("arpanosso/fco2r")
+# devtools::install_github("arpanosso/fco2r",force = TRUE)
 ```
 
 ### Problemas na instalação:
@@ -72,10 +72,10 @@ library(tidyverse)
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.4     ✔ readr     2.1.4
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+    ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
     ## ✔ purrr     1.0.2     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
@@ -90,13 +90,13 @@ library(skimr)
 library(tidymodels)
 ```
 
-    ## ── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──
-    ## ✔ broom        1.0.5     ✔ rsample      1.2.0
-    ## ✔ dials        1.2.0     ✔ tune         1.1.2
-    ## ✔ infer        1.0.5     ✔ workflows    1.1.3
-    ## ✔ modeldata    1.2.0     ✔ workflowsets 1.0.1
-    ## ✔ parsnip      1.1.1     ✔ yardstick    1.2.0
-    ## ✔ recipes      1.0.8     
+    ## ── Attaching packages ────────────────────────────────────── tidymodels 1.2.0 ──
+    ## ✔ broom        1.0.6      ✔ rsample      1.2.1 
+    ## ✔ dials        1.2.1      ✔ tune         1.2.1 
+    ## ✔ infer        1.0.7      ✔ workflows    1.1.4 
+    ## ✔ modeldata    1.3.0      ✔ workflowsets 1.1.0 
+    ## ✔ parsnip      1.2.1      ✔ yardstick    1.3.1 
+    ## ✔ recipes      1.0.10     
     ## ── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
     ## ✖ scales::discard() masks purrr::discard()
     ## ✖ dplyr::filter()   masks stats::filter()
@@ -104,7 +104,7 @@ library(tidymodels)
     ## ✖ dplyr::lag()      masks stats::lag()
     ## ✖ yardstick::spec() masks readr::spec()
     ## ✖ recipes::step()   masks stats::step()
-    ## • Use tidymodels_prefer() to resolve common conflicts.
+    ## • Search for functions across packages at https://www.tidymodels.org/find/
 
 ``` r
 library(ISLR)
@@ -180,83 +180,25 @@ glimpse(data_fco2)
 Vamos conhecer, um pouco mais a nossa base de dados.
 
 ``` r
-skimr::skim(data_fco2)
+data_fco2 %>% 
+  filter(experimento == "Espacial",
+         data >= "01-01-2019") %>% 
+  mutate(
+    municipio = case_when(
+      municipio == "Selv?ra" ~ "Selvíria",
+      municipio == "Selv?ria" ~ "Selvíria",
+      municipio == "Prad?polis" ~ "Pradópolis",
+      TRUE ~ municipio
+    ),
+    ano = year(data)
+  ) %>% 
+  filter(ano == 2018,
+         tratamento == "SI") %>% 
+  ggplot(aes(x=x,y=y)) +
+  geom_point()
 ```
 
-|                                                  |           |
-|:-------------------------------------------------|:----------|
-| Name                                             | data_fco2 |
-| Number of rows                                   | 15397     |
-| Number of columns                                | 39        |
-| \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_   |           |
-| Column type frequency:                           |           |
-| character                                        | 7         |
-| Date                                             | 3         |
-| logical                                          | 2         |
-| numeric                                          | 27        |
-| \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ |           |
-| Group variables                                  | None      |
-
-Data summary
-
-**Variable type: character**
-
-| skim_variable | n_missing | complete_rate | min | max | empty | n_unique | whitespace |
-|:--------------|----------:|--------------:|----:|----:|------:|---------:|-----------:|
-| experimento   |         0 |             1 |   8 |   8 |     0 |        2 |          0 |
-| manejo        |         0 |             1 |   6 |  15 |     0 |       10 |          0 |
-| tratamento    |         0 |             1 |   2 |  10 |     0 |       21 |          0 |
-| cultura       |         0 |             1 |   4 |  14 |     0 |       11 |          0 |
-| estado        |         0 |             1 |   2 |   2 |     0 |        2 |          0 |
-| municipio     |         0 |             1 |   7 |  20 |     0 |        6 |          0 |
-| prof          |         0 |             1 |   5 |   7 |     0 |        2 |          0 |
-
-**Variable type: Date**
-
-| skim_variable | n_missing | complete_rate | min        | max        | median     | n_unique |
-|:--------------|----------:|--------------:|:-----------|:-----------|:-----------|---------:|
-| data          |         0 |             1 | 2001-07-10 | 2019-12-01 | 2014-07-12 |      205 |
-| data_preparo  |         0 |             1 | 1986-03-01 | 2019-04-01 | 2002-01-01 |       14 |
-| conversao     |         0 |             1 | 1970-01-01 | 2009-07-03 | 1986-03-01 |       11 |
-
-**Variable type: logical**
-
-| skim_variable     | n_missing | complete_rate | mean | count      |
-|:------------------|----------:|--------------:|-----:|:-----------|
-| revolvimento_solo |         0 |             1 |    0 | FAL: 15397 |
-| cobertura         |         0 |             1 |    1 | TRU: 15397 |
-
-**Variable type: numeric**
-
-| skim_variable  | n_missing | complete_rate |       mean |         sd |        p0 |        p25 |        p50 |        p75 |       p100 | hist  |
-|:---------------|----------:|--------------:|-----------:|-----------:|----------:|-----------:|-----------:|-----------:|-----------:|:------|
-| x              |         0 |          1.00 | 1392083.56 | 2923710.70 |      0.00 |       0.00 |      30.00 |     100.00 | 7749472.16 | ▇▁▁▁▂ |
-| y              |         0 |          1.00 |  495854.97 | 1722529.75 |      0.00 |       0.00 |      27.00 |      80.00 | 7630525.47 | ▇▁▁▁▁ |
-| longitude_muni |         0 |          1.00 | 1067926.05 | 1796771.47 | 456798.63 |  458447.46 |  458447.46 |  792043.56 | 7638196.06 | ▇▁▁▁▁ |
-| latitude_muni  |         0 |          1.00 | 7231328.21 | 1754220.76 | 795907.06 | 7635356.70 | 7749398.84 | 7749821.85 | 7758831.37 | ▁▁▁▁▇ |
-| id             |         0 |          1.00 |      40.52 |      31.52 |      1.00 |      13.00 |      35.00 |      60.00 |     141.00 | ▇▅▃▁▁ |
-| fco2           |       110 |          0.99 |       2.78 |       2.08 |     -3.42 |       1.30 |       2.16 |       3.75 |      46.93 | ▇▁▁▁▁ |
-| ts             |       317 |          0.98 |      21.84 |       6.76 |      1.00 |      19.33 |      22.50 |      26.15 |     195.63 | ▇▁▁▁▁ |
-| us             |      1754 |          0.89 |      16.31 |       8.93 |      0.00 |      10.00 |      14.06 |      22.00 |      89.00 | ▇▅▁▁▁ |
-| p_h            |      2802 |          0.82 |       4.64 |       1.13 |      3.50 |       4.00 |       4.50 |       5.15 |      52.00 | ▇▁▁▁▁ |
-| mo             |      1355 |          0.91 |      21.59 |      12.60 |      1.35 |      12.00 |      23.00 |      29.00 |      61.26 | ▆▇▇▂▁ |
-| p              |      1355 |          0.91 |      20.95 |      24.74 |      1.00 |       6.00 |      15.48 |      27.36 |     253.00 | ▇▁▁▁▁ |
-| k              |      1348 |          0.91 |       2.40 |       2.21 |      0.03 |       0.90 |       1.70 |       3.40 |      34.00 | ▇▁▁▁▁ |
-| ca             |      1376 |          0.91 |      17.20 |      14.57 |      1.10 |       6.00 |      11.00 |      26.00 |      94.00 | ▇▃▁▁▁ |
-| mg             |      1376 |          0.91 |      10.13 |       5.65 |      0.32 |       7.00 |      10.00 |      13.00 |      65.00 | ▇▂▁▁▁ |
-| h_al           |      1362 |          0.91 |      46.89 |      29.38 |      0.00 |      26.00 |      42.29 |      72.00 |     121.00 | ▅▇▆▂▂ |
-| sb             |      1376 |          0.91 |      29.69 |      20.10 |      1.54 |      15.60 |      23.80 |      42.00 |     161.30 | ▇▃▁▁▁ |
-| ctc            |      1369 |          0.91 |      77.10 |      32.99 |      4.62 |      59.23 |      83.40 |     103.20 |     173.30 | ▂▃▇▃▁ |
-| v              |      1383 |          0.91 |      41.68 |      20.05 |      4.96 |      22.00 |      43.00 |      58.00 |     100.00 | ▆▆▇▅▁ |
-| ds             |      3284 |          0.79 |       1.38 |       0.17 |      0.88 |       1.24 |       1.38 |       1.52 |       1.86 | ▁▆▇▇▁ |
-| macro          |      3277 |          0.79 |       8.55 |       7.85 |    -45.30 |       0.15 |       8.13 |      13.64 |      49.77 | ▁▁▇▃▁ |
-| micro          |      3298 |          0.79 |      25.30 |      17.13 |      0.07 |       0.37 |      33.86 |      38.30 |      52.42 | ▅▁▂▇▁ |
-| vtp            |      3298 |          0.79 |      42.34 |      15.65 |     -4.68 |      40.81 |      46.25 |      51.32 |      87.80 | ▂▁▇▃▁ |
-| pla            |      3438 |          0.78 |      29.57 |      11.80 |    -47.30 |      21.27 |      32.41 |      38.15 |      79.80 | ▁▁▅▇▁ |
-| at             |      8083 |          0.48 |    1013.33 |    1358.81 |     11.72 |     236.00 |     593.62 |     816.00 |    4542.73 | ▇▁▁▁▂ |
-| silte          |      8048 |          0.48 |     229.26 |     336.37 |      1.26 |      50.87 |      73.65 |     188.00 |    1395.00 | ▇▁▁▁▁ |
-| arg            |      8055 |          0.48 |     995.41 |    1560.32 |     27.19 |     173.27 |     403.69 |     609.50 |    5244.76 | ▇▁▁▁▂ |
-| hlifs          |     10872 |          0.29 |   14590.11 |   17253.55 |    158.39 |    1110.15 |    2409.80 |   29707.78 |   84692.90 | ▇▃▁▁▁ |
+![](temporal_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ### Alguns gráficos a respeito de nossa variável alvo, emissão de CO<sub>2</sub> do solo (FCO<sub>2</sub>).
 
@@ -280,17 +222,22 @@ composition(fco2,data_fco2)
 composition(log10(fco2) ,data_fco2)
 ```
 
-    ## Warning: Removed 1 rows containing non-finite values (`stat_qq()`).
+    ## Warning: Removed 1 row containing non-finite outside the scale range
+    ## (`stat_qq()`).
 
-    ## Warning: Removed 1 rows containing non-finite values (`stat_qq_line()`).
+    ## Warning: Removed 1 row containing non-finite outside the scale range
+    ## (`stat_qq_line()`).
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-    ## Warning: Removed 1 rows containing non-finite values (`stat_bin()`).
+    ## Warning: Removed 1 row containing non-finite outside the scale range
+    ## (`stat_bin()`).
 
-    ## Warning: Removed 1 rows containing non-finite values (`stat_density()`).
+    ## Warning: Removed 1 row containing non-finite outside the scale range
+    ## (`stat_density()`).
 
-    ## Warning: Removed 1 rows containing non-finite values (`stat_boxplot()`).
+    ## Warning: Removed 1 row containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
 
 ![](temporal_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> \###
 Carregando os dados do pacote `{geobr}`
@@ -1099,7 +1046,7 @@ fco2_recipe <- recipe(fco2 ~ .,
                       data = fco2_train %>% 
             select(fco2:hlifs,xco2,sif,tmed:inso) 
 ) %>%  
-  # step_normalize(all_numeric_predictors())  %>% 
+  step_normalize(all_numeric_predictors())  %>% 
   step_naomit() %>%  
   step_novel(all_nominal_predictors()) %>% 
   step_zv(all_predictors()) %>%
@@ -1111,24 +1058,25 @@ bake(prep(fco2_recipe), new_data = NULL)
 ```
 
     ## # A tibble: 852 × 39
-    ##       ts    us   p_h    mo     p     k    ca    mg  h_al    sb   ctc     v    ds
-    ##    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-    ##  1   3   21.8    4.1     4    19   0.4     6     7    88  13.4 101.   13    1.62
-    ##  2  22.1  4.4    6.5    23    16   1.2    45    22     0  68.2  79.2  86.1  1.4 
-    ##  3  12.6  8.8    6.5    23    16   1.2    45    22     0  68.2  79.2  86.1  1.4 
-    ##  4  22.3  4.06   4.8    15    15   0.6     7     9    20  16.6  36.6  45    1.68
-    ##  5   4   20.3    3.9     4    17   0.2     4     2    64   6.2  70.2   9    1.6 
-    ##  6  21.7  4.14   5.7    18     3   0.8    18    18    12  36.8  48.8  75    1.6 
-    ##  7  28.8  9.5    4.9    10     2   0.4     7     4     0  11.4  26.4  43.2  1.53
-    ##  8  11.7 10.3    5.4    12     4   0.4    12     5     0  17.4  30.4  57.2  1.71
-    ##  9  22.1  3.3    5.2    10     2   0.3    11     5     0  16.3  28.3  57.6  1.56
-    ## 10  17.4  2.3    5.3    13     3   0.3     9     5     0  14.3  29.3  48.8  1.63
+    ##        ts     us     p_h     mo       p       k     ca       mg     h_al      sb
+    ##     <dbl>  <dbl>   <dbl>  <dbl>   <dbl>   <dbl>  <dbl>    <dbl>    <dbl>   <dbl>
+    ##  1  0.189 -0.818 -0.530  -0.662 -1.01   -1.14   -0.604 -1.17    -0.791   -0.826 
+    ##  2 -2.00   1.26  -0.826  -1.44   1.43    0.851   0.405  0.594    1.09     0.500 
+    ##  3  0.319 -0.504  0.505   1.82   0.904  -0.0359  0.482  0.398   -0.791    0.477 
+    ##  4  0.354 -0.691 -0.190   0.307 -1.11    0.518  -0.604  0.0556  -0.0313  -0.421 
+    ##  5 -0.698  1.55  -1.12   -1.59   1.75    0.851  -0.293  0.00666  0.888   -0.195 
+    ##  6 -0.119 -0.649  0.948   0.888  0.480   0.186   0.327  0.398   -0.791    0.367 
+    ##  7 -0.698  1.99  -0.826  -1.44   1.43    0.851   0.405  0.594    1.09     0.500 
+    ##  8  0.331  0.488  0.0612  1.04  -0.793  -0.479  -0.293  0.594    0.00868 -0.0558
+    ##  9 -0.922  0.198  0.948   0.888  0.0554 -0.258   0.560  0.398   -0.791    0.529 
+    ## 10  0.118 -0.915 -0.530  -0.662 -1.01   -1.14   -0.604 -1.17    -0.791   -0.826 
     ## # ℹ 842 more rows
-    ## # ℹ 26 more variables: macro <dbl>, micro <dbl>, vtp <dbl>, pla <dbl>,
-    ## #   at <dbl>, silte <dbl>, arg <dbl>, hlifs <dbl>, xco2 <dbl>, sif <dbl>,
-    ## #   tmed <dbl>, tmax <dbl>, tmin <dbl>, umed <dbl>, umax <dbl>, umin <dbl>,
-    ## #   pk_pa <dbl>, rad <dbl>, par <dbl>, eto <dbl>, velmax <dbl>, velmin <dbl>,
-    ## #   dir_vel <dbl>, chuva <dbl>, inso <dbl>, fco2 <dbl>
+    ## # ℹ 29 more variables: ctc <dbl>, v <dbl>, ds <dbl>, macro <dbl>, micro <dbl>,
+    ## #   vtp <dbl>, pla <dbl>, at <dbl>, silte <dbl>, arg <dbl>, hlifs <dbl>,
+    ## #   xco2 <dbl>, sif <dbl>, tmed <dbl>, tmax <dbl>, tmin <dbl>, umed <dbl>,
+    ## #   umax <dbl>, umin <dbl>, pk_pa <dbl>, rad <dbl>, par <dbl>, eto <dbl>,
+    ## #   velmax <dbl>, velmin <dbl>, dir_vel <dbl>, chuva <dbl>, inso <dbl>,
+    ## #   fco2 <dbl>
 
 ``` r
 visdat::vis_miss(bake(prep(fco2_recipe), new_data = NULL))
@@ -1187,18 +1135,18 @@ fco2_nn_wf <- workflow()   %>%
 
 ``` r
 grid_nn <- expand.grid(
-  hidden_units = c(1,2,3,4,5,6,7),
-  penalty = c(1,5,10,15),
-  epochs = c(100, 1000, 5000)
+  hidden_units = c(1,5,6,7,8,15),
+  penalty = c(1,5,10,20),
+  epochs = c(50,100,500,1000)
 )
 glimpse(grid_nn)
 ```
 
-    ## Rows: 84
+    ## Rows: 96
     ## Columns: 3
-    ## $ hidden_units <dbl> 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, …
-    ## $ penalty      <dbl> 1, 1, 1, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5, 10, 10, 10, 10,…
-    ## $ epochs       <dbl> 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 10…
+    ## $ hidden_units <dbl> 1, 5, 6, 7, 8, 15, 1, 5, 6, 7, 8, 15, 1, 5, 6, 7, 8, 15, …
+    ## $ penalty      <dbl> 1, 1, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 10, 10, 10, 10, 10, 1…
+    ## $ epochs       <dbl> 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 5…
 
 ### Tuning de hiperparâmetros
 
@@ -1221,20 +1169,20 @@ autoplot(fco2_nn_tune_grid)
 collect_metrics(fco2_nn_tune_grid)
 ```
 
-    ## # A tibble: 84 × 9
+    ## # A tibble: 96 × 9
     ##    hidden_units penalty epochs .metric .estimator  mean     n std_err .config   
     ##           <dbl>   <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>     
-    ##  1            1       1    100 rmse    standard    1.54     5  0.123  Preproces…
-    ##  2            2       1    100 rmse    standard    1.38     5  0.0894 Preproces…
-    ##  3            3       1    100 rmse    standard    1.49     5  0.0734 Preproces…
-    ##  4            4       1    100 rmse    standard    1.49     5  0.0488 Preproces…
-    ##  5            5       1    100 rmse    standard    1.48     5  0.0782 Preproces…
-    ##  6            6       1    100 rmse    standard    1.44     5  0.0594 Preproces…
-    ##  7            7       1    100 rmse    standard    1.44     5  0.0618 Preproces…
-    ##  8            1       5    100 rmse    standard    1.57     5  0.156  Preproces…
-    ##  9            2       5    100 rmse    standard    1.42     5  0.0572 Preproces…
-    ## 10            3       5    100 rmse    standard    1.44     5  0.0830 Preproces…
-    ## # ℹ 74 more rows
+    ##  1            1       1     50 rmse    standard    1.22     5  0.0613 Preproces…
+    ##  2            5       1     50 rmse    standard    1.08     5  0.0634 Preproces…
+    ##  3            6       1     50 rmse    standard    1.06     5  0.0819 Preproces…
+    ##  4            7       1     50 rmse    standard    1.06     5  0.0902 Preproces…
+    ##  5            8       1     50 rmse    standard    1.04     5  0.0823 Preproces…
+    ##  6           15       1     50 rmse    standard    1.06     5  0.0745 Preproces…
+    ##  7            1       5     50 rmse    standard    1.18     5  0.0498 Preproces…
+    ##  8            5       5     50 rmse    standard    1.07     5  0.0741 Preproces…
+    ##  9            6       5     50 rmse    standard    1.08     5  0.0748 Preproces…
+    ## 10            7       5     50 rmse    standard    1.06     5  0.0812 Preproces…
+    ## # ℹ 86 more rows
 
 ``` r
 fco2_nn_tune_grid %>%   
@@ -1244,16 +1192,16 @@ fco2_nn_tune_grid %>%
     ## # A tibble: 5 × 9
     ##   hidden_units penalty epochs .metric .estimator  mean     n std_err .config    
     ##          <dbl>   <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>      
-    ## 1            6       5   5000 rmse    standard    1.04     5  0.0491 Preprocess…
-    ## 2            7       5   1000 rmse    standard    1.05     5  0.0500 Preprocess…
-    ## 3            7      15   5000 rmse    standard    1.05     5  0.0362 Preprocess…
-    ## 4            6      10   1000 rmse    standard    1.07     5  0.0326 Preprocess…
-    ## 5            7       5   5000 rmse    standard    1.07     5  0.0228 Preprocess…
+    ## 1            5       1    100 rmse    standard   0.985     5  0.0863 Preprocess…
+    ## 2            8       1    100 rmse    standard   1.00      5  0.0864 Preprocess…
+    ## 3           15       1    100 rmse    standard   1.01      5  0.0717 Preprocess…
+    ## 4            7       1    100 rmse    standard   1.02      5  0.0633 Preprocess…
+    ## 5            5       1   1000 rmse    standard   1.02      5  0.0817 Preprocess…
 
 ### Desempenho dos modelos finais
 
 ``` r
-fco2_nn_best_params <- select_best(fco2_nn_tune_grid, "rmse")
+fco2_nn_best_params <- select_best(fco2_nn_tune_grid, metric = "rmse")
 fco2_nn_wf <- fco2_nn_wf %>% 
   finalize_workflow(fco2_nn_best_params)
 fco2_nn_last_fit <- last_fit(fco2_nn_wf, fco2_initial_split)
@@ -1326,12 +1274,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8239823
-    ## R2           0.6789468
-    ## MSE          1.1037050
-    ## RMSE         1.0505737
-    ## MAE          0.6821857
-    ## MAPE        32.9579187
+    ## r            0.8203592
+    ## R2           0.6729892
+    ## MSE          1.0928087
+    ## RMSE         1.0453749
+    ## MAE          0.6761347
+    ## MAPE        33.1009293
 
 ## Support Vector Machine - RDF
 
@@ -1409,16 +1357,16 @@ collect_metrics(fco2_svm_tune_grid)
     ## # A tibble: 128 × 9
     ##       cost rbf_sigma margin .metric .estimator  mean     n std_err .config      
     ##      <dbl>     <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>        
-    ##  1  0.01       0.001  0.001 rmse    standard    1.92     5  0.0751 Preprocessor…
-    ##  2  0.0625     0.001  0.001 rmse    standard    1.80     5  0.0780 Preprocessor…
-    ##  3  0.1        0.001  0.001 rmse    standard    1.74     5  0.0778 Preprocessor…
-    ##  4  0.5        0.001  0.001 rmse    standard    1.48     5  0.0686 Preprocessor…
-    ##  5  1          0.001  0.001 rmse    standard    1.39     5  0.0641 Preprocessor…
-    ##  6 10          0.001  0.001 rmse    standard    1.22     5  0.0568 Preprocessor…
-    ##  7 20          0.001  0.001 rmse    standard    1.18     5  0.0504 Preprocessor…
-    ##  8 50          0.001  0.001 rmse    standard    1.14     5  0.0470 Preprocessor…
-    ##  9  0.01       0.01   0.001 rmse    standard    1.79     5  0.0775 Preprocessor…
-    ## 10  0.0625     0.01   0.001 rmse    standard    1.48     5  0.0687 Preprocessor…
+    ##  1  0.01       0.001  0.001 rmse    standard    1.95     5  0.0555 Preprocessor…
+    ##  2  0.0625     0.001  0.001 rmse    standard    1.81     5  0.0611 Preprocessor…
+    ##  3  0.1        0.001  0.001 rmse    standard    1.74     5  0.0613 Preprocessor…
+    ##  4  0.5        0.001  0.001 rmse    standard    1.45     5  0.0704 Preprocessor…
+    ##  5  1          0.001  0.001 rmse    standard    1.34     5  0.0668 Preprocessor…
+    ##  6 10          0.001  0.001 rmse    standard    1.17     5  0.0712 Preprocessor…
+    ##  7 20          0.001  0.001 rmse    standard    1.12     5  0.0773 Preprocessor…
+    ##  8 50          0.001  0.001 rmse    standard    1.08     5  0.0769 Preprocessor…
+    ##  9  0.01       0.01   0.001 rmse    standard    1.81     5  0.0603 Preprocessor…
+    ## 10  0.0625     0.01   0.001 rmse    standard    1.46     5  0.0714 Preprocessor…
     ## # ℹ 118 more rows
 
 ``` r
@@ -1429,16 +1377,16 @@ fco2_svm_tune_grid %>%
     ## # A tibble: 5 × 9
     ##    cost rbf_sigma margin .metric .estimator  mean     n std_err .config         
     ##   <dbl>     <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>           
-    ## 1    50      0.01  0.025 rmse    standard   0.987     5  0.0301 Preprocessor1_M…
-    ## 2    50      0.01  0.001 rmse    standard   0.987     5  0.0281 Preprocessor1_M…
-    ## 3    50      0.01  0.05  rmse    standard   0.987     5  0.0304 Preprocessor1_M…
-    ## 4    50      0.01  0.175 rmse    standard   1.00      5  0.0342 Preprocessor1_M…
-    ## 5    20      0.01  0.175 rmse    standard   1.01      5  0.0394 Preprocessor1_M…
+    ## 1    20      0.01  0.175 rmse    standard   0.999     5  0.0860 Preprocessor1_M…
+    ## 2    20      0.01  0.05  rmse    standard   1.00      5  0.0857 Preprocessor1_M…
+    ## 3    50      0.01  0.025 rmse    standard   1.00      5  0.0839 Preprocessor1_M…
+    ## 4    20      0.01  0.025 rmse    standard   1.00      5  0.0855 Preprocessor1_M…
+    ## 5    50      0.01  0.05  rmse    standard   1.00      5  0.0855 Preprocessor1_M…
 
 ### Desempenho dos modelos finais
 
 ``` r
-fco2_svm_best_params <- select_best(fco2_svm_tune_grid, "rmse")
+fco2_svm_best_params <- select_best(fco2_svm_tune_grid, metric = "rmse")
 fco2_svm_wf <- fco2_svm_wf %>% 
   finalize_workflow(fco2_svm_best_params)
 fco2_svm_last_fit <- last_fit(fco2_svm_wf, fco2_initial_split)
@@ -1521,12 +1469,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8528598
-    ## R2           0.7273699
-    ## MSE          0.9301085
-    ## RMSE         0.9644213
-    ## MAE          0.5156672
-    ## MAPE        23.5450683
+    ## r            0.8388392
+    ## R2           0.7036512
+    ## MSE          0.9918694
+    ## RMSE         0.9959264
+    ## MAE          0.6385267
+    ## MAPE        31.0510441
 
 ## Support Vector Machine - Linear
 
@@ -1601,16 +1549,16 @@ collect_metrics(fco2_svml_tune_grid)
     ## # A tibble: 40 × 8
     ##       cost margin .metric .estimator  mean     n std_err .config              
     ##      <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ##  1  0.01    0.175 rmse    standard    1.29     5  0.0594 Preprocessor1_Model01
-    ##  2  0.0625  0.175 rmse    standard    1.25     5  0.0556 Preprocessor1_Model02
-    ##  3  0.1     0.175 rmse    standard    1.24     5  0.0519 Preprocessor1_Model03
-    ##  4  0.5     0.175 rmse    standard    1.23     5  0.0468 Preprocessor1_Model04
-    ##  5  1       0.175 rmse    standard    1.23     5  0.0455 Preprocessor1_Model05
-    ##  6 10       0.175 rmse    standard    1.23     5  0.0430 Preprocessor1_Model06
-    ##  7 20       0.175 rmse    standard    1.23     5  0.0427 Preprocessor1_Model07
-    ##  8 50       0.175 rmse    standard    1.23     5  0.0426 Preprocessor1_Model08
-    ##  9  0.01    0.5   rmse    standard    1.29     5  0.0568 Preprocessor1_Model09
-    ## 10  0.0625  0.5   rmse    standard    1.22     5  0.0489 Preprocessor1_Model10
+    ##  1  0.01    0.175 rmse    standard    1.23     5  0.0650 Preprocessor1_Model01
+    ##  2  0.0625  0.175 rmse    standard    1.19     5  0.0674 Preprocessor1_Model02
+    ##  3  0.1     0.175 rmse    standard    1.18     5  0.0667 Preprocessor1_Model03
+    ##  4  0.5     0.175 rmse    standard    1.17     5  0.0643 Preprocessor1_Model04
+    ##  5  1       0.175 rmse    standard    1.17     5  0.0626 Preprocessor1_Model05
+    ##  6 10       0.175 rmse    standard    1.17     5  0.0598 Preprocessor1_Model06
+    ##  7 20       0.175 rmse    standard    1.17     5  0.0596 Preprocessor1_Model07
+    ##  8 50       0.175 rmse    standard    1.17     5  0.0595 Preprocessor1_Model08
+    ##  9  0.01    0.5   rmse    standard    1.24     5  0.0664 Preprocessor1_Model09
+    ## 10  0.0625  0.5   rmse    standard    1.17     5  0.0641 Preprocessor1_Model10
     ## # ℹ 30 more rows
 
 ``` r
@@ -1621,16 +1569,16 @@ fco2_svml_tune_grid %>%
     ## # A tibble: 5 × 8
     ##    cost margin .metric .estimator  mean     n std_err .config              
     ##   <dbl>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1   0.5   0.5  rmse    standard    1.21     5  0.0393 Preprocessor1_Model12
-    ## 2   0.1   0.55 rmse    standard    1.21     5  0.0449 Preprocessor1_Model19
-    ## 3   1     0.5  rmse    standard    1.21     5  0.0370 Preprocessor1_Model13
-    ## 4  50     0.5  rmse    standard    1.22     5  0.0364 Preprocessor1_Model16
-    ## 5  20     0.5  rmse    standard    1.22     5  0.0369 Preprocessor1_Model15
+    ## 1   0.5   0.5  rmse    standard    1.16     5  0.0604 Preprocessor1_Model12
+    ## 2   0.1   0.5  rmse    standard    1.16     5  0.0635 Preprocessor1_Model11
+    ## 3   1     0.5  rmse    standard    1.16     5  0.0579 Preprocessor1_Model13
+    ## 4   0.5   0.55 rmse    standard    1.16     5  0.0625 Preprocessor1_Model20
+    ## 5   0.1   0.55 rmse    standard    1.17     5  0.0638 Preprocessor1_Model19
 
 ### Desempenho dos modelos finais
 
 ``` r
-fco2_svml_best_params <- select_best(fco2_svml_tune_grid, "rmse")
+fco2_svml_best_params <- select_best(fco2_svml_tune_grid, metric = "rmse")
 fco2_svml_wf <- fco2_svml_wf %>% 
   finalize_workflow(fco2_svml_best_params)
 fco2_svml_last_fit <- last_fit(fco2_svml_wf, fco2_initial_split)
@@ -1713,12 +1661,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.7803436
-    ## R2           0.6089361
-    ## MSE          1.3403224
-    ## RMSE         1.1577229
-    ## MAE          0.8000502
-    ## MAPE        43.4099297
+    ## r            0.7189273
+    ## R2           0.5168565
+    ## MSE          1.6251708
+    ## RMSE         1.2748219
+    ## MAE          0.9039760
+    ## MAPE        48.9295047
 
 ## Árvore de Decisão
 
@@ -1791,16 +1739,16 @@ collect_metrics(fco2_dt_tune_grid)
     ## # A tibble: 72 × 9
     ##    cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
     ##              <dbl>      <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl>
-    ##  1       0.1                2     2 rmse    standard    1.59     5  0.0283
-    ##  2       0.01               2     2 rmse    standard    1.47     5  0.0474
-    ##  3       0.001              2     2 rmse    standard    1.47     5  0.0474
-    ##  4       0.00001            2     2 rmse    standard    1.47     5  0.0474
-    ##  5       0.000001           2     2 rmse    standard    1.47     5  0.0474
-    ##  6       0.0000001          2     2 rmse    standard    1.47     5  0.0474
-    ##  7       0.1                5     2 rmse    standard    1.41     5  0.0900
-    ##  8       0.01               5     2 rmse    standard    1.15     5  0.0613
-    ##  9       0.001              5     2 rmse    standard    1.11     5  0.0568
-    ## 10       0.00001            5     2 rmse    standard    1.10     5  0.0591
+    ##  1       0.1                2     2 rmse    standard    1.48     5  0.0754
+    ##  2       0.01               2     2 rmse    standard    1.47     5  0.0837
+    ##  3       0.001              2     2 rmse    standard    1.47     5  0.0837
+    ##  4       0.00001            2     2 rmse    standard    1.47     5  0.0837
+    ##  5       0.000001           2     2 rmse    standard    1.47     5  0.0837
+    ##  6       0.0000001          2     2 rmse    standard    1.47     5  0.0837
+    ##  7       0.1                5     2 rmse    standard    1.48     5  0.0754
+    ##  8       0.01               5     2 rmse    standard    1.25     5  0.0894
+    ##  9       0.001              5     2 rmse    standard    1.28     5  0.128 
+    ## 10       0.00001            5     2 rmse    standard    1.28     5  0.127 
     ## # ℹ 62 more rows
     ## # ℹ 1 more variable: .config <chr>
 
@@ -1811,18 +1759,18 @@ fco2_dt_tune_grid %>%   show_best(metric = "rmse", n = 6)
     ## # A tibble: 6 × 9
     ##   cost_complexity tree_depth min_n .metric .estimator  mean     n std_err
     ##             <dbl>      <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl>
-    ## 1       0.00001           15    42 rmse    standard    1.08     5  0.0218
-    ## 2       0.000001          15    42 rmse    standard    1.08     5  0.0218
-    ## 3       0.0000001         15    42 rmse    standard    1.08     5  0.0218
-    ## 4       0.00001           30    42 rmse    standard    1.08     5  0.0218
-    ## 5       0.000001          30    42 rmse    standard    1.08     5  0.0218
-    ## 6       0.0000001         30    42 rmse    standard    1.08     5  0.0218
+    ## 1       0.00001           15    42 rmse    standard    1.11     5  0.0635
+    ## 2       0.000001          15    42 rmse    standard    1.11     5  0.0635
+    ## 3       0.0000001         15    42 rmse    standard    1.11     5  0.0635
+    ## 4       0.00001           30    42 rmse    standard    1.11     5  0.0635
+    ## 5       0.000001          30    42 rmse    standard    1.11     5  0.0635
+    ## 6       0.0000001         30    42 rmse    standard    1.11     5  0.0635
     ## # ℹ 1 more variable: .config <chr>
 
 ### Desempenho dos modelos finais
 
 ``` r
-fco2_dt_best_params <- select_best(fco2_dt_tune_grid, "rmse")
+fco2_dt_best_params <- select_best(fco2_dt_tune_grid, metric = "rmse")
 fco2_dt_wf <- fco2_dt_wf %>% finalize_workflow(fco2_dt_best_params)
 fco2_dt_last_fit <- last_fit(fco2_dt_wf, fco2_initial_split)
 ```
@@ -1888,12 +1836,12 @@ print(data.frame(vector_of_metrics))
 ```
 
     ##      vector_of_metrics
-    ## r            0.8078749
-    ## R2           0.6526618
-    ## MSE          1.2000949
-    ## RMSE         1.0954884
-    ## MAE          0.7044035
-    ## MAPE        34.3924176
+    ## r            0.7844580
+    ## R2           0.6153744
+    ## MSE          1.2942034
+    ## RMSE         1.1376306
+    ## MAE          0.7267432
+    ## MAPE        33.3772141
 
 ``` r
 tree_fit_rpart <- extract_fit_engine(fco2_dt_last_fit)  
@@ -1948,554 +1896,340 @@ grid_rf <- expand.grid(
 )
 ```
 
-``` r
-fco2_rf_tune_grid <- tune_grid(
- fco2_rf_wf,
-  resamples = fco2_resamples,
-  grid = grid_rf,
-  metrics = metric_set(rmse)
-)
-```
-
-``` r
-autoplot(fco2_rf_tune_grid)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-92-1.png)<!-- -->
-
-``` r
-collect_metrics(fco2_rf_tune_grid)
-```
-
-    ## # A tibble: 12 × 9
-    ##     mtry trees min_n .metric .estimator  mean     n std_err .config             
-    ##    <dbl> <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ##  1     5   100     2 rmse    standard   0.921     5  0.0252 Preprocessor1_Model…
-    ##  2     5   100     5 rmse    standard   0.909     5  0.0243 Preprocessor1_Model…
-    ##  3    10   100     2 rmse    standard   0.906     5  0.0225 Preprocessor1_Model…
-    ##  4    10   100     5 rmse    standard   0.906     5  0.0199 Preprocessor1_Model…
-    ##  5    20   100     2 rmse    standard   0.907     5  0.0238 Preprocessor1_Model…
-    ##  6    20   100     5 rmse    standard   0.894     5  0.0254 Preprocessor1_Model…
-    ##  7     5   500     2 rmse    standard   0.907     5  0.0181 Preprocessor1_Model…
-    ##  8     5   500     5 rmse    standard   0.911     5  0.0197 Preprocessor1_Model…
-    ##  9    10   500     2 rmse    standard   0.904     5  0.0219 Preprocessor1_Model…
-    ## 10    10   500     5 rmse    standard   0.901     5  0.0217 Preprocessor1_Model…
-    ## 11    20   500     2 rmse    standard   0.892     5  0.0239 Preprocessor1_Model…
-    ## 12    20   500     5 rmse    standard   0.896     5  0.0231 Preprocessor1_Model…
-
-``` r
-fco2_rf_tune_grid %>%   
-  show_best(metric = "rmse", n = 6)
-```
-
-    ## # A tibble: 6 × 9
-    ##    mtry trees min_n .metric .estimator  mean     n std_err .config              
-    ##   <dbl> <dbl> <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1    20   500     2 rmse    standard   0.892     5  0.0239 Preprocessor1_Model11
-    ## 2    20   100     5 rmse    standard   0.894     5  0.0254 Preprocessor1_Model06
-    ## 3    20   500     5 rmse    standard   0.896     5  0.0231 Preprocessor1_Model12
-    ## 4    10   500     5 rmse    standard   0.901     5  0.0217 Preprocessor1_Model10
-    ## 5    10   500     2 rmse    standard   0.904     5  0.0219 Preprocessor1_Model09
-    ## 6    10   100     2 rmse    standard   0.906     5  0.0225 Preprocessor1_Model03
-
-### Desempenho modelo final
-
-``` r
-fco2_rf_best_params <- select_best(fco2_rf_tune_grid, "rmse")
-fco2_rf_wf <- fco2_rf_wf %>%
-  finalize_workflow(fco2_rf_best_params)
-fco2_rf_last_fit <- last_fit(fco2_rf_wf, fco2_initial_split)
-```
-
-### Criando os preditos
-
-``` r
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_rf_last_fit)  %>%   
-    mutate(modelo = "rf"))
-
-fco2_test <- testing(fco2_initial_split)
-visdat::vis_miss(fco2_test)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-95-1.png)<!-- -->
-
-``` r
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y=fco2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) +
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](temporal_files/figure-gfm/unnamed-chunk-96-1.png)<!-- -->
-
-# Importância
-
-``` r
-fco2_rf_last_fit_model <-fco2_rf_last_fit$.workflow[[1]]$fit$fit
-vip(fco2_rf_last_fit_model,
-    aesthetics = list(color = "black", fill = "orange")) +
-    theme(axis.text.y=element_text(size=rel(1.5)),
-          axis.text.x=element_text(size=rel(1.5)),
-          axis.title.x=element_text(size=rel(1.5))
-          )
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-97-1.png)<!-- --> \##
-Métricas
-
-``` r
-da <- fco2_test_preds %>% 
-  filter(fco2 > 0, .pred>0 )
-
-my_r <- cor(da$fco2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$fco2,da$.pred)
-my_rmse <- Metrics::rmse(da$fco2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$fco2,da$.pred)
-my_mape <- Metrics::mape(da$fco2,da$.pred)*100
-
-
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-    ##      vector_of_metrics
-    ## r            0.9031413
-    ## R2           0.8156643
-    ## MSE          0.6262449
-    ## RMSE         0.7913563
-    ## MAE          0.4468458
-    ## MAPE        21.2551532
-
-## Boosting gradient tree (xgb)
-
-``` r
-cores = 4
-fco2_xgb_model <- boost_tree(
-  mtry = 0.8, 
-  trees = tune(), # <---------------
-  min_n = 5, 
-  tree_depth = 4,
-  loss_reduction = 0, # lambda
-  learn_rate = tune(), # epsilon
-  sample_size = 0.8
-)  %>%   
-  set_mode("regression")  %>% 
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-```
-
-``` r
-fco2_xgb_wf <- workflow()  %>%  
-  add_model(fco2_xgb_model) %>%  
-  add_recipe(fco2_recipe)
-```
-
-``` r
-grid_xgb <- grid_regular(
-  learn_rate(range =  c(0.005, 0.3)),
-  trees(range = c(3, 100)),
-  levels = 5
-)
-```
-
-#### Passo 1
-
-``` r
-fco2_xgb_tune_grid <- tune_grid(
- fco2_xgb_wf,
-  resamples = fco2_resamples,
-  grid = grid_xgb,
-  metrics = metric_set(rmse)
-)
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-102-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 × 8
-    ##   trees learn_rate .metric .estimator  mean     n std_err .config              
-    ##   <int>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1    75       1.01 rmse    standard    1.10     5  0.0639 Preprocessor1_Model04
-    ## 2   100       1.01 rmse    standard    1.11     5  0.0592 Preprocessor1_Model05
-    ## 3    51       1.01 rmse    standard    1.11     5  0.0677 Preprocessor1_Model03
-    ## 4    27       1.01 rmse    standard    1.12     5  0.0660 Preprocessor1_Model02
-    ## 5     3       1.20 rmse    standard    1.15     5  0.0387 Preprocessor1_Model06
-
-``` r
-fco2_xgb_select_best_passo1 <- fco2_xgb_tune_grid %>% 
-  select_best(metric = "rmse")
-fco2_xgb_select_best_passo1
-```
-
-    ## # A tibble: 1 × 3
-    ##   trees learn_rate .config              
-    ##   <int>      <dbl> <chr>                
-    ## 1    75       1.01 Preprocessor1_Model04
-
-#### Passo 2
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = 0.8,
-  trees = fco2_xgb_select_best_passo1$trees,
-  min_n = tune(),
-  tree_depth = tune(), 
-  loss_reduction = 0, 
-  learn_rate = fco2_xgb_select_best_passo1$learn_rate, 
-  sample_size = 0.8
-) %>% 
-  set_mode("regression")  %>% 
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow() %>%  
-    add_model(fco2_xgb_model)   %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- grid_regular(
-  tree_depth(range = c(1, 4)), 
-  min_n(range = c(5, 60)),
-  levels = 5
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples =fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, verbose = FALSE, allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-#### Melhores hiperparâmetros
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-105-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid  %>%   
-  show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 × 8
-    ##   min_n tree_depth .metric .estimator  mean     n std_err .config              
-    ##   <int>      <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1    46          1 rmse    standard   0.956     5  0.0121 Preprocessor1_Model13
-    ## 2    32          1 rmse    standard   0.973     5  0.0207 Preprocessor1_Model09
-    ## 3    18          1 rmse    standard   0.982     5  0.0266 Preprocessor1_Model05
-    ## 4    18          2 rmse    standard   0.983     5  0.0280 Preprocessor1_Model06
-    ## 5    60          1 rmse    standard   0.989     5  0.0241 Preprocessor1_Model17
-
-``` r
-fco2_xgb_select_best_passo2 <- fco2_xgb_tune_grid  %>% 
-  select_best(metric = "rmse")
-fco2_xgb_select_best_passo2
-```
-
-    ## # A tibble: 1 × 3
-    ##   min_n tree_depth .config              
-    ##   <int>      <int> <chr>                
-    ## 1    46          1 Preprocessor1_Model13
-
-## Passo 3
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = 0.8,
-  trees = fco2_xgb_select_best_passo1$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction =tune(), 
-  learn_rate = fco2_xgb_select_best_passo1$learn_rate, 
-  sample_size = 0.8
-)  %>%  
-  set_mode("regression")  %>%  
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow()  %>%   
-    add_model(fco2_xgb_model)  %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- grid_regular(
-  loss_reduction(range = c(0.01, 8)),
-  levels = 6
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples = fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, 
-                           verbose = FALSE, 
-                           allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-#### Melhores hiperparâmetros
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-107-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 × 7
-    ##   loss_reduction .metric .estimator  mean     n std_err .config             
-    ##            <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-    ## 1           1.02 rmse    standard   0.956     5  0.0199 Preprocessor1_Model1
-    ## 2          40.6  rmse    standard   1.19      5  0.0228 Preprocessor1_Model2
-    ## 3   100000000    rmse    standard   1.88      5  0.0743 Preprocessor1_Model6
-    ## 4       63680.   rmse    standard   1.88      5  0.0733 Preprocessor1_Model4
-    ## 5        1607.   rmse    standard   1.88      5  0.0741 Preprocessor1_Model3
-
-``` r
-fco2_xgb_select_best_passo3 <- fco2_xgb_tune_grid %>% select_best(metric = "rmse")
-fco2_xgb_select_best_passo3
-```
-
-    ## # A tibble: 1 × 2
-    ##   loss_reduction .config             
-    ##            <dbl> <chr>               
-    ## 1           1.02 Preprocessor1_Model1
-
-### Passo 4
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = tune(),
-  trees = fco2_xgb_select_best_passo1$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = fco2_xgb_select_best_passo1$learn_rate, 
-  sample_size = tune()
-)%>%  
-  set_mode("regression")  |> 
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow()  %>%   
-    add_model(fco2_xgb_model)  %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- expand.grid(
-    sample_size = seq(0.5, 1.0, length.out = 4), ## <---
-    mtry = seq(0.1, 1.0, length.out = 4) ## <---
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples = fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, 
-                           verbose = FALSE, 
-                           allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-109-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid  %>%  
-  show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 × 8
-    ##    mtry sample_size .metric .estimator  mean     n std_err .config              
-    ##   <dbl>       <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1   0.7       1     rmse    standard   0.937     5 0.0139  Preprocessor1_Model12
-    ## 2   1         0.833 rmse    standard   0.949     5 0.0102  Preprocessor1_Model15
-    ## 3   1         1     rmse    standard   0.949     5 0.00995 Preprocessor1_Model16
-    ## 4   0.7       0.833 rmse    standard   0.961     5 0.0158  Preprocessor1_Model11
-    ## 5   0.4       1     rmse    standard   0.963     5 0.0127  Preprocessor1_Model08
-
-``` r
-fco2_xgb_select_best_passo4 <- fco2_xgb_tune_grid   %>%
-  select_best(metric = "rmse")
-fco2_xgb_select_best_passo4
-```
-
-    ## # A tibble: 1 × 3
-    ##    mtry sample_size .config              
-    ##   <dbl>       <dbl> <chr>                
-    ## 1   0.7           1 Preprocessor1_Model12
-
-### Passo 5
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = fco2_xgb_select_best_passo4$mtry,
-  trees = tune(),
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = tune(), 
-  sample_size = fco2_xgb_select_best_passo4$sample_size
-) %>% 
-  set_mode("regression")  %>%  
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-
-#### Workflow
-fco2_xgb_wf <- workflow() %>%   
-    add_model(fco2_xgb_model)  %>%   
-    add_recipe(fco2_recipe)
-
-#### Grid
-fco2_xgb_grid <- expand.grid(
-    learn_rate = c(0.10, 0.15, 0.25, 0.50),
-    trees = c(100, 250, 500)
-)
-
-fco2_xgb_tune_grid <- fco2_xgb_wf   %>%   
-  tune_grid(
-    resamples = fco2_resamples,
-    grid = fco2_xgb_grid,
-    control = control_grid(save_pred = TRUE, 
-                           verbose = FALSE, 
-                           allow_par = TRUE),
-    metrics = metric_set(rmse)
-  )
-
-#### Melhores hiperparâmetros
-autoplot(fco2_xgb_tune_grid)
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
-
-``` r
-fco2_xgb_tune_grid  %>%   
-  show_best(metric = "rmse", n = 5)
-```
-
-    ## # A tibble: 5 × 8
-    ##   trees learn_rate .metric .estimator  mean     n std_err .config              
-    ##   <dbl>      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-    ## 1   250       0.5  rmse    standard   0.952     5  0.0139 Preprocessor1_Model11
-    ## 2   500       0.5  rmse    standard   0.952     5  0.0139 Preprocessor1_Model12
-    ## 3   500       0.25 rmse    standard   0.959     5  0.0159 Preprocessor1_Model09
-    ## 4   250       0.25 rmse    standard   0.959     5  0.0159 Preprocessor1_Model08
-    ## 5   100       0.5  rmse    standard   0.959     5  0.0154 Preprocessor1_Model10
-
-``` r
-fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid %>%
-  select_best(metric = "rmse")
-fco2_xgb_select_best_passo5
-```
-
-    ## # A tibble: 1 × 3
-    ##   trees learn_rate .config              
-    ##   <dbl>      <dbl> <chr>                
-    ## 1   250        0.5 Preprocessor1_Model11
-
-## Desempenho dos modelos finais
-
-``` r
-fco2_xgb_model <- boost_tree(
-  mtry = fco2_xgb_select_best_passo4$mtry,
-  trees = fco2_xgb_select_best_passo5$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = fco2_xgb_select_best_passo5$learn_rate, 
-  sample_size = fco2_xgb_select_best_passo4$sample_size
-) %>%  
-  set_mode("regression")  %>%  
-  set_engine("xgboost", nthread = cores, counts = FALSE)
-```
-
-``` r
-df <- data.frame(
-  mtry = fco2_xgb_select_best_passo4$mtry,
-  trees = fco2_xgb_select_best_passo5$trees,
-  min_n = fco2_xgb_select_best_passo2$min_n,
-  tree_depth = fco2_xgb_select_best_passo2$tree_depth, 
-  loss_reduction = fco2_xgb_select_best_passo3$loss_reduction, 
-  learn_rate = fco2_xgb_select_best_passo5$learn_rate, 
-  sample_size = fco2_xgb_select_best_passo4$sample_size
-)
-fco2_xgb_wf <- fco2_xgb_wf %>% finalize_workflow(df) # <------
-fco2_xgb_last_fit <- last_fit(fco2_xgb_wf, fco2_initial_split) # <--------
-```
-
-## Criar Preditos
-
-``` r
-fco2_test_preds <- bind_rows(
-  collect_predictions(fco2_xgb_last_fit)  %>%   
-    mutate(modelo = "xgb")
-)
-```
-
-``` r
-fco2_test_preds %>% 
-  ggplot(aes(x=.pred, y = fco2)) +
-  geom_point()+
-  theme_bw() +
-  geom_smooth(method = "lm") +
-  stat_regline_equation(ggplot2::aes(
-  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))+
-  geom_abline (slope=1, linetype = "dashed", color="Red")
-```
-
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-![](temporal_files/figure-gfm/unnamed-chunk-116-1.png)<!-- -->
-
-``` r
-fco2_xgb_last_fit_model <-fco2_xgb_last_fit$.workflow[[1]]$fit$fit
-vip(fco2_xgb_last_fit_model,
-    aesthetics = list(color = "black", fill = "orange")) +
-    theme(axis.text.y=element_text(size=rel(1.5)),
-          axis.text.x=element_text(size=rel(1.5)),
-          axis.title.x=element_text(size=rel(1.5))
-          )
-```
-
-![](temporal_files/figure-gfm/unnamed-chunk-117-1.png)<!-- -->
-
-## Métricas
-
-``` r
-da <- fco2_test_preds %>% 
-  filter(fco2 > 0, .pred>0 )
-
-my_r <- cor(da$fco2,da$.pred)
-my_r2 <- my_r*my_r
-my_mse <- Metrics::mse(da$fco2,da$.pred)
-my_rmse <- Metrics::rmse(da$fco2,
-                         da$.pred)
-my_mae <- Metrics::mae(da$fco2,da$.pred)
-my_mape <- Metrics::mape(da$fco2,da$.pred)*100
-
-vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape)
-print(data.frame(vector_of_metrics))
-```
-
-    ##      vector_of_metrics
-    ## r            0.8239692
-    ## R2           0.6789253
-    ## MSE          1.0901307
-    ## RMSE         1.0440932
-    ## MAE          0.6277181
-    ## MAPE        31.9303174
+<!-- ```{r} -->
+<!-- fco2_rf_tune_grid <- tune_grid( -->
+<!--  fco2_rf_wf, -->
+<!--   resamples = fco2_resamples, -->
+<!--   grid = grid_rf, -->
+<!--   metrics = metric_set(rmse) -->
+<!-- ) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- autoplot(fco2_rf_tune_grid) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- collect_metrics(fco2_rf_tune_grid) -->
+<!-- fco2_rf_tune_grid %>%    -->
+<!--   show_best(metric = "rmse", n = 6) -->
+<!-- ``` -->
+<!-- ### Desempenho modelo final -->
+<!-- ```{r} -->
+<!-- fco2_rf_best_params <- select_best(fco2_rf_tune_grid, metric = "rmse") -->
+<!-- fco2_rf_wf <- fco2_rf_wf %>% -->
+<!--   finalize_workflow(fco2_rf_best_params) -->
+<!-- fco2_rf_last_fit <- last_fit(fco2_rf_wf, fco2_initial_split) -->
+<!-- ``` -->
+<!-- ### Criando os preditos -->
+<!-- ```{r} -->
+<!-- fco2_test_preds <- bind_rows( -->
+<!--   collect_predictions(fco2_rf_last_fit)  %>%    -->
+<!--     mutate(modelo = "rf")) -->
+<!-- fco2_test <- testing(fco2_initial_split) -->
+<!-- visdat::vis_miss(fco2_test) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_test_preds %>%  -->
+<!--   ggplot(aes(x=.pred, y=fco2)) + -->
+<!--   geom_point()+ -->
+<!--   theme_bw() + -->
+<!--   geom_smooth(method = "lm") + -->
+<!--   stat_regline_equation(ggplot2::aes( -->
+<!--   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~"))) + -->
+<!--   geom_abline (slope=1, linetype = "dashed", color="Red") -->
+<!-- ``` -->
+<!-- # Importância -->
+<!-- ```{r} -->
+<!-- fco2_rf_last_fit_model <-fco2_rf_last_fit$.workflow[[1]]$fit$fit -->
+<!-- vip(fco2_rf_last_fit_model, -->
+<!--     aesthetics = list(color = "black", fill = "orange")) + -->
+<!--     theme(axis.text.y=element_text(size=rel(1.5)), -->
+<!--           axis.text.x=element_text(size=rel(1.5)), -->
+<!--           axis.title.x=element_text(size=rel(1.5)) -->
+<!--           ) -->
+<!-- ``` -->
+<!-- ## Métricas -->
+<!-- ```{r} -->
+<!-- da <- fco2_test_preds %>%  -->
+<!--   filter(fco2 > 0, .pred>0 ) -->
+<!-- my_r <- cor(da$fco2,da$.pred) -->
+<!-- my_r2 <- my_r*my_r -->
+<!-- my_mse <- Metrics::mse(da$fco2,da$.pred) -->
+<!-- my_rmse <- Metrics::rmse(da$fco2, -->
+<!--                          da$.pred) -->
+<!-- my_mae <- Metrics::mae(da$fco2,da$.pred) -->
+<!-- my_mape <- Metrics::mape(da$fco2,da$.pred)*100 -->
+<!-- vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape) -->
+<!-- print(data.frame(vector_of_metrics)) -->
+<!-- ``` -->
+<!-- ## Boosting gradient tree (xgb) -->
+<!-- ```{r} -->
+<!-- cores = 4 -->
+<!-- fco2_xgb_model <- boost_tree( -->
+<!--   mtry = 0.8,  -->
+<!--   trees = tune(), # <--------------- -->
+<!--   min_n = 5,  -->
+<!--   tree_depth = 4, -->
+<!--   loss_reduction = 0, # lambda -->
+<!--   learn_rate = tune(), # epsilon -->
+<!--   sample_size = 0.8 -->
+<!-- )  %>%    -->
+<!--   set_mode("regression")  %>%  -->
+<!--   set_engine("xgboost", nthread = cores, counts = FALSE) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_wf <- workflow()  %>%   -->
+<!--   add_model(fco2_xgb_model) %>%   -->
+<!--   add_recipe(fco2_recipe) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- grid_xgb <- grid_regular( -->
+<!--   learn_rate(range =  c(0.005, 0.3)), -->
+<!--   trees(range = c(3, 100)), -->
+<!--   levels = 5 -->
+<!-- ) -->
+<!-- ``` -->
+<!-- #### Passo 1 -->
+<!-- ```{r} -->
+<!-- fco2_xgb_tune_grid <- tune_grid( -->
+<!--  fco2_xgb_wf, -->
+<!--   resamples = fco2_resamples, -->
+<!--   grid = grid_xgb, -->
+<!--   metrics = metric_set(rmse) -->
+<!-- ) -->
+<!-- autoplot(fco2_xgb_tune_grid) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_select_best_passo1 <- fco2_xgb_tune_grid %>%  -->
+<!--   select_best(metric = "rmse") -->
+<!-- fco2_xgb_select_best_passo1 -->
+<!-- ``` -->
+<!-- #### Passo 2 -->
+<!-- ```{r} -->
+<!-- fco2_xgb_model <- boost_tree( -->
+<!--   mtry = 0.8, -->
+<!--   trees = fco2_xgb_select_best_passo1$trees, -->
+<!--   min_n = tune(), -->
+<!--   tree_depth = tune(),  -->
+<!--   loss_reduction = 0,  -->
+<!--   learn_rate = fco2_xgb_select_best_passo1$learn_rate,  -->
+<!--   sample_size = 0.8 -->
+<!-- ) %>%  -->
+<!--   set_mode("regression")  %>%  -->
+<!--   set_engine("xgboost", nthread = cores, counts = FALSE) -->
+<!-- #### Workflow -->
+<!-- fco2_xgb_wf <- workflow() %>%   -->
+<!--     add_model(fco2_xgb_model)   %>%    -->
+<!--     add_recipe(fco2_recipe) -->
+<!-- #### Grid -->
+<!-- fco2_xgb_grid <- grid_regular( -->
+<!--   tree_depth(range = c(1, 4)),  -->
+<!--   min_n(range = c(5, 60)), -->
+<!--   levels = 5 -->
+<!-- ) -->
+<!-- fco2_xgb_tune_grid <- fco2_xgb_wf   %>%    -->
+<!--   tune_grid( -->
+<!--     resamples =fco2_resamples, -->
+<!--     grid = fco2_xgb_grid, -->
+<!--     control = control_grid(save_pred = TRUE, verbose = FALSE, allow_par = TRUE), -->
+<!--     metrics = metric_set(rmse) -->
+<!--   ) -->
+<!-- #### Melhores hiperparâmetros -->
+<!-- autoplot(fco2_xgb_tune_grid) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_tune_grid  %>%    -->
+<!--   show_best(metric = "rmse", n = 5) -->
+<!-- fco2_xgb_select_best_passo2 <- fco2_xgb_tune_grid  %>%  -->
+<!--   select_best(metric = "rmse") -->
+<!-- fco2_xgb_select_best_passo2 -->
+<!-- ``` -->
+<!-- ## Passo 3 -->
+<!-- ```{r} -->
+<!-- fco2_xgb_model <- boost_tree( -->
+<!--   mtry = 0.8, -->
+<!--   trees = fco2_xgb_select_best_passo1$trees, -->
+<!--   min_n = fco2_xgb_select_best_passo2$min_n, -->
+<!--   tree_depth = fco2_xgb_select_best_passo2$tree_depth,  -->
+<!--   loss_reduction =tune(),  -->
+<!--   learn_rate = fco2_xgb_select_best_passo1$learn_rate,  -->
+<!--   sample_size = 0.8 -->
+<!-- )  %>%   -->
+<!--   set_mode("regression")  %>%   -->
+<!--   set_engine("xgboost", nthread = cores, counts = FALSE) -->
+<!-- #### Workflow -->
+<!-- fco2_xgb_wf <- workflow()  %>%    -->
+<!--     add_model(fco2_xgb_model)  %>%    -->
+<!--     add_recipe(fco2_recipe) -->
+<!-- #### Grid -->
+<!-- fco2_xgb_grid <- grid_regular( -->
+<!--   loss_reduction(range = c(0.01, 8)), -->
+<!--   levels = 6 -->
+<!-- ) -->
+<!-- fco2_xgb_tune_grid <- fco2_xgb_wf   %>%    -->
+<!--   tune_grid( -->
+<!--     resamples = fco2_resamples, -->
+<!--     grid = fco2_xgb_grid, -->
+<!--     control = control_grid(save_pred = TRUE,  -->
+<!--                            verbose = FALSE,  -->
+<!--                            allow_par = TRUE), -->
+<!--     metrics = metric_set(rmse) -->
+<!--   ) -->
+<!-- #### Melhores hiperparâmetros -->
+<!-- autoplot(fco2_xgb_tune_grid) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_tune_grid   %>%   show_best(metric = "rmse", n = 5) -->
+<!-- fco2_xgb_select_best_passo3 <- fco2_xgb_tune_grid %>% select_best(metric = "rmse") -->
+<!-- fco2_xgb_select_best_passo3 -->
+<!-- ``` -->
+<!-- ### Passo 4 -->
+<!-- ```{r} -->
+<!-- fco2_xgb_model <- boost_tree( -->
+<!--   mtry = tune(), -->
+<!--   trees = fco2_xgb_select_best_passo1$trees, -->
+<!--   min_n = fco2_xgb_select_best_passo2$min_n, -->
+<!--   tree_depth = fco2_xgb_select_best_passo2$tree_depth,  -->
+<!--   loss_reduction = fco2_xgb_select_best_passo3$loss_reduction,  -->
+<!--   learn_rate = fco2_xgb_select_best_passo1$learn_rate,  -->
+<!--   sample_size = tune() -->
+<!-- )%>%   -->
+<!--   set_mode("regression")  |>  -->
+<!--   set_engine("xgboost", nthread = cores, counts = FALSE) -->
+<!-- #### Workflow -->
+<!-- fco2_xgb_wf <- workflow()  %>%    -->
+<!--     add_model(fco2_xgb_model)  %>%    -->
+<!--     add_recipe(fco2_recipe) -->
+<!-- #### Grid -->
+<!-- fco2_xgb_grid <- expand.grid( -->
+<!--     sample_size = seq(0.5, 1.0, length.out = 4), ## <--- -->
+<!--     mtry = seq(0.1, 1.0, length.out = 4) ## <--- -->
+<!-- ) -->
+<!-- fco2_xgb_tune_grid <- fco2_xgb_wf   %>%    -->
+<!--   tune_grid( -->
+<!--     resamples = fco2_resamples, -->
+<!--     grid = fco2_xgb_grid, -->
+<!--     control = control_grid(save_pred = TRUE,  -->
+<!--                            verbose = FALSE,  -->
+<!--                            allow_par = TRUE), -->
+<!--     metrics = metric_set(rmse) -->
+<!--   ) -->
+<!-- autoplot(fco2_xgb_tune_grid) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_tune_grid  %>%   -->
+<!--   show_best(metric = "rmse", n = 5) -->
+<!-- fco2_xgb_select_best_passo4 <- fco2_xgb_tune_grid   %>% -->
+<!--   select_best(metric = "rmse") -->
+<!-- fco2_xgb_select_best_passo4 -->
+<!-- ``` -->
+<!-- ### Passo 5 -->
+<!-- ```{r} -->
+<!-- fco2_xgb_model <- boost_tree( -->
+<!--   mtry = fco2_xgb_select_best_passo4$mtry, -->
+<!--   trees = tune(), -->
+<!--   min_n = fco2_xgb_select_best_passo2$min_n, -->
+<!--   tree_depth = fco2_xgb_select_best_passo2$tree_depth,  -->
+<!--   loss_reduction = fco2_xgb_select_best_passo3$loss_reduction,  -->
+<!--   learn_rate = tune(),  -->
+<!--   sample_size = fco2_xgb_select_best_passo4$sample_size -->
+<!-- ) %>%  -->
+<!--   set_mode("regression")  %>%   -->
+<!--   set_engine("xgboost", nthread = cores, counts = FALSE) -->
+<!-- #### Workflow -->
+<!-- fco2_xgb_wf <- workflow() %>%    -->
+<!--     add_model(fco2_xgb_model)  %>%    -->
+<!--     add_recipe(fco2_recipe) -->
+<!-- #### Grid -->
+<!-- fco2_xgb_grid <- expand.grid( -->
+<!--     learn_rate = c(0.10, 0.15, 0.25, 0.50), -->
+<!--     trees = c(100, 250, 500) -->
+<!-- ) -->
+<!-- fco2_xgb_tune_grid <- fco2_xgb_wf   %>%    -->
+<!--   tune_grid( -->
+<!--     resamples = fco2_resamples, -->
+<!--     grid = fco2_xgb_grid, -->
+<!--     control = control_grid(save_pred = TRUE,  -->
+<!--                            verbose = FALSE,  -->
+<!--                            allow_par = TRUE), -->
+<!--     metrics = metric_set(rmse) -->
+<!--   ) -->
+<!-- #### Melhores hiperparâmetros -->
+<!-- autoplot(fco2_xgb_tune_grid) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_tune_grid  %>%    -->
+<!--   show_best(metric = "rmse", n = 5) -->
+<!-- fco2_xgb_select_best_passo5 <- fco2_xgb_tune_grid %>% -->
+<!--   select_best(metric = "rmse") -->
+<!-- fco2_xgb_select_best_passo5 -->
+<!-- ``` -->
+<!-- ## Desempenho dos modelos finais -->
+<!-- ```{r} -->
+<!-- fco2_xgb_model <- boost_tree( -->
+<!--   mtry = fco2_xgb_select_best_passo4$mtry, -->
+<!--   trees = fco2_xgb_select_best_passo5$trees, -->
+<!--   min_n = fco2_xgb_select_best_passo2$min_n, -->
+<!--   tree_depth = fco2_xgb_select_best_passo2$tree_depth,  -->
+<!--   loss_reduction = fco2_xgb_select_best_passo3$loss_reduction,  -->
+<!--   learn_rate = fco2_xgb_select_best_passo5$learn_rate,  -->
+<!--   sample_size = fco2_xgb_select_best_passo4$sample_size -->
+<!-- ) %>%   -->
+<!--   set_mode("regression")  %>%   -->
+<!--   set_engine("xgboost", nthread = cores, counts = FALSE) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- df <- data.frame( -->
+<!--   mtry = fco2_xgb_select_best_passo4$mtry, -->
+<!--   trees = fco2_xgb_select_best_passo5$trees, -->
+<!--   min_n = fco2_xgb_select_best_passo2$min_n, -->
+<!--   tree_depth = fco2_xgb_select_best_passo2$tree_depth,  -->
+<!--   loss_reduction = fco2_xgb_select_best_passo3$loss_reduction,  -->
+<!--   learn_rate = fco2_xgb_select_best_passo5$learn_rate,  -->
+<!--   sample_size = fco2_xgb_select_best_passo4$sample_size -->
+<!-- ) -->
+<!-- fco2_xgb_wf <- fco2_xgb_wf %>% finalize_workflow(df) # <------ -->
+<!-- fco2_xgb_last_fit <- last_fit(fco2_xgb_wf, fco2_initial_split) # <-------- -->
+<!-- ``` -->
+<!-- ## Criar Preditos -->
+<!-- ```{r} -->
+<!-- fco2_test_preds <- bind_rows( -->
+<!--   collect_predictions(fco2_xgb_last_fit)  %>%    -->
+<!--     mutate(modelo = "xgb") -->
+<!-- ) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_test_preds %>%  -->
+<!--   ggplot(aes(x=.pred, y = fco2)) + -->
+<!--   geom_point()+ -->
+<!--   theme_bw() + -->
+<!--   geom_smooth(method = "lm") + -->
+<!--   stat_regline_equation(ggplot2::aes( -->
+<!--   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))+ -->
+<!--   geom_abline (slope=1, linetype = "dashed", color="Red") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- fco2_xgb_last_fit_model <-fco2_xgb_last_fit$.workflow[[1]]$fit$fit -->
+<!-- vip(fco2_xgb_last_fit_model, -->
+<!--     aesthetics = list(color = "black", fill = "orange")) + -->
+<!--     theme(axis.text.y=element_text(size=rel(1.5)), -->
+<!--           axis.text.x=element_text(size=rel(1.5)), -->
+<!--           axis.title.x=element_text(size=rel(1.5)) -->
+<!--           ) -->
+<!-- ``` -->
+<!-- ## Métricas -->
+<!-- ```{r} -->
+<!-- da <- fco2_test_preds %>%  -->
+<!--   filter(fco2 > 0, .pred>0 ) -->
+<!-- my_r <- cor(da$fco2,da$.pred) -->
+<!-- my_r2 <- my_r*my_r -->
+<!-- my_mse <- Metrics::mse(da$fco2,da$.pred) -->
+<!-- my_rmse <- Metrics::rmse(da$fco2, -->
+<!--                          da$.pred) -->
+<!-- my_mae <- Metrics::mae(da$fco2,da$.pred) -->
+<!-- my_mape <- Metrics::mape(da$fco2,da$.pred)*100 -->
+<!-- vector_of_metrics <- c(r=my_r, R2=my_r2, MSE=my_mse, RMSE=my_rmse, MAE=my_mae, MAPE=my_mape) -->
+<!-- print(data.frame(vector_of_metrics)) -->
+<!-- ``` -->
