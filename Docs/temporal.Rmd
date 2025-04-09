@@ -498,7 +498,7 @@ fco2_recipe <- recipe(fco2 ~ .,
                       data = fco2_train %>% 
             select(fco2:hlifs,xco2,sif,tmed:inso) 
 ) %>%  
-  # step_normalize(all_numeric_predictors())  %>% 
+  step_normalize(all_numeric_predictors())  %>% 
   step_naomit() %>%  
   step_novel(all_nominal_predictors()) %>% 
   step_zv(all_predictors()) %>%
